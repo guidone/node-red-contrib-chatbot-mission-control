@@ -1,0 +1,54 @@
+.mission-control-app {
+
+  .title {
+    color: #ff0000;
+  }
+
+}
+
+.mc-sidebar {
+  .rs-sidenav-subtle {
+    background-color: #05386b ;
+    flex: 1 0;
+  }
+  .rs-navbar.rs-navbar-subtle {
+    background-color: #05386b ;
+
+  }
+
+  .rs-dropdown-item-content {
+    color: #eeeeee !important;
+  }
+  .rs-btn-subtle {
+    color: #eeeeee;
+  }
+}
+
+.mc-header {
+  position: fixed;
+  width: 100%;
+
+  .rs-navbar {
+    box-shadow: 0px 3px 14px -7px rgba(102,94,102,1);
+    background-color: #ffffff;
+  }
+  .rs-nav {
+
+    .rs-nav-item > .rs-nav-item-content {
+      color: #8e8e93;
+    }
+
+  }
+}
+
+.mc-inner-container {
+  margin-left: 260px;
+}
+
+.mc-inner-content {
+  margin-top: 56px;
+}
+
+.mc-main-container {
+  height: 100vh;
+}
