@@ -1,0 +1,20 @@
+{
+  "name": "red-contrib-chatbot-mission-control",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "node-red": {
+    "version": ">=0.14.0",
+    "nodes": {
+      "ui_base": "nodes/mc_base.js"
+    }
+  },
+  "dependencies": {
+    "serve-static": "^1.14.1"
+  }
+}
