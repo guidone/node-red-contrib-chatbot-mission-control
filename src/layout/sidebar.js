@@ -89,8 +89,7 @@ return (
                 eventKey="1" 
                 onSelect={onClick} 
                 href={url} 
-                icon={icon != null ? <Icon icon={icon} /> : null}
-                renderItem={children => <Link className="rs-nav-item-content" to={url}>{label}</Link>}
+                renderItem={children => <Link className="rs-nav-item-content" to={url}>{icon != null ? <Icon icon={icon} /> : null}{label}</Link>}
               >
                 {label}
               </Nav.Item>    

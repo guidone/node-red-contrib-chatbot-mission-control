@@ -1,6 +1,14 @@
 import React from 'react';
 import { Button, Container, Header, Navbar, Dropdown, Nav, Footer, Content, Icon, Sidebar, Sidenav, Affix } from 'rsuite';
 
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from 'react-router-dom';
+
+
 export default () => {
   
   return (
@@ -11,7 +19,7 @@ export default () => {
         </Navbar.Header>
         <Navbar.Body>
           <Nav>
-            <Nav.Item icon={<Icon icon="home" />}>Home</Nav.Item>
+            <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/mc"><Icon icon="home" /> Home</Link>} >Home</Nav.Item>
             <Nav.Item>News</Nav.Item>
             <Nav.Item>Products</Nav.Item>
             <Dropdown title="About">

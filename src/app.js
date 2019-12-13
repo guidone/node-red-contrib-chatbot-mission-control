@@ -9,15 +9,18 @@ import {
 
 import { Plugin, CodePlug, Views, plug } from '../lib/code-plug';
 
+import Sidebar from './layout/sidebar';
+import Header from './layout/header';
+import HomePage from './pages/home';
+
+
+
 import './plugins/send-message/index';
 
 
-import WebSocket from 'ws';
  
 // const socket = io('ws://localhost:1880/comms');
 
-import Sidebar from './layout/sidebar';
-import Header from './layout/header';
 
 
 import Sockette from 'sockette';
@@ -44,8 +47,10 @@ plug('items', MyView1);
 plug('items', MyView2);
 
 
-plug('sidebar', null, { id: 'item-1', label: 'My Item 1', url: 'page1', icon: 'dashboard' })
+plug('sidebar', null, { id: 'item-1', label: 'My Item 1', url: '/mc/page1', icon: 'dashboard' })
 plug('sidebar', null, { id: 'item-2', label: 'My Item 2', url: 'page2' })
+
+plug('pages', MyView1, { url: '/mc/page1' });
 
 
 class App extends React.Component {
@@ -55,59 +60,32 @@ class App extends React.Component {
 
     return (
       <CodePlug>
-        <Router>
+        {codePlug => (
+          <Router>
           <div className="mission-control-app">        
             <Container className="mc-main-container">          
               <Sidebar/>
               <Container className="mc-inner-container">            
                 <Header/>
                 <Content className="mc-inner-content">
-
-                <Switch>
-                  <Route path="/mc/page1">
-                    <div>pagina 1</div>
-                  </Route>
-                  <Route path="/mc/page2">
-                    <div>pagina 2</div>
-                  </Route>
-
-                  <Views region="pages">
-                    {(View, { url }) => {
-                      
-                      return (
-                        <Route key={url} path={url}>
-                          <View/>
+                  <Switch>                              
+                    {codePlug
+                      .getItems('pages')
+                      .map(({ view: View, props }) => (
+                        <Route key={props.url} path={props.url}>
+                          <View {...props} />
                         </Route>
-                      );
-                    }}
-                  </Views>
-
-                  <Route path="/">
-                    <Views region="items"/>
-                    bella secco
-                
-
-                    <div style={{width: '250px', height: '250px', backgroundColor: 'red'}}></div>
-                    <div style={{width: '250px', height: '250px', backgroundColor: 'yellow'}}></div>
-                    <div style={{width: '250px', height: '250px', backgroundColor: 'green'}}></div>
-                    <div style={{width: '250px', height: '250px', backgroundColor: 'red'}}></div>
-                    <div style={{width: '250px', height: '250px', backgroundColor: 'yellow'}}></div>
-                    <div style={{width: '250px', height: '250px', backgroundColor: 'green'}}></div>
-
-                    <div className="title">sono ross</div> 
-
-                    <Button onClick={() => ws.send(JSON.stringify({ topic: 'send', payload: 'bella secco!' }))}>Allora?</Button>
-                  </Route>
-                </Switch>
-
-
-
-
+                      ))}
+                    <Route path="/mc">
+                      <HomePage/>
+                    </Route>
+                  </Switch>
                 </Content>
               </Container>
             </Container>
           </div>
         </Router>
+        )}        
       </CodePlug>
     );
   }
