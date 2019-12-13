@@ -22,12 +22,12 @@ module.exports = function(RED) {
   // exposed methods
   return {
     Events,
-    send: sendSocket
+    sendMessage: sendMessage
   };
 }
 
-function sendSocket(topic, payload) {
-
+function sendMessage(topic, payload) {
+  Events.emit('send', topic, payload);
 }
 
 
@@ -48,6 +48,7 @@ function join() {
 function bootstrap(server, app, log, redSettings) {
 
   log.info('RedBot Mission Control 0.0.1');
+  console.log('redSettings', redSettings.getUserSettings())
 
   const uiSettings = redSettings.ui || {};
   if ((uiSettings.hasOwnProperty('path')) && (typeof uiSettings.path === 'string')) {
@@ -55,13 +56,6 @@ function bootstrap(server, app, log, redSettings) {
   } else { 
     settings.path = 'mc'; 
   }
-  
-  /*if ((uiSettings.hasOwnProperty("readOnly")) && (typeof uiSettings.readOnly === "boolean")) {
-      settings.readOnly = uiSettings.readOnly;
-  }
-  else { settings.readOnly = false; }
-  settings.defaultGroupHeader = uiSettings.defaultGroup || 'Default';
-  settings.verbose = redSettings.verbose || false;*/
 
   const fullPath = join(redSettings.httpNodeRoot, settings.path);
   const socketIoPath = join(fullPath, 'socket.io');
@@ -73,9 +67,12 @@ function bootstrap(server, app, log, redSettings) {
   app.use('/mc/main.js', serveStatic(path.join(__dirname, 'dist/main.js')));
 
 
+  // Setup web socket
   const wss = new WebSocket.Server({ port: 1942 });
 
   wss.on('connection', ws => {
+    
+    const sendHandler = (topic, payload) => ws.send(JSON.stringify({ topic, payload }));
     ws.on('message', message => {
       // console.log('received: %s', message);
       let parsed;
@@ -88,10 +85,15 @@ function bootstrap(server, app, log, redSettings) {
         Events.emit('message', parsed.topic, parsed.payload);
       } 
     });
-
-});
-
-
-
+  
+    ws.on('close', () => {
+      console.log('chiudo e rimiuovo send handler')
+      Events.removeListener('send', sendHandler);  
+    });
+    
+    Events.on('send', (topic, payload) => {
+      sendHandler(topic, payload);
+    });
+  });
 
 };

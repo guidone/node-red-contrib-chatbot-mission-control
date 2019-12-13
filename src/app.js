@@ -1,6 +1,9 @@
 import React from 'react';
 import { Button, Container, Navbar, Dropdown, Nav, Footer, Content, Icon } from 'rsuite';
 
+
+import { Plugin, CodePlug, Views, plug } from '../lib/code-plug';
+
 import WebSocket from 'ws';
  
 // const socket = io('ws://localhost:1880/comms');
@@ -22,11 +25,15 @@ const ws = new Sockette('ws://localhost:1942', {
   onerror: e => console.log('Error:', e)
 });
 
-
+const MyView1 = () => <div>My view 1</div>;
+MyView1.displayName = 'uno';
+const MyView2 = () => <div>My view 2</div>;
+MyView2.displayName = 'due';
 
 // clone schema https://demo.uifort.com/bamburgh-admin-dashboard-pro/
 
-
+plug('items', MyView1);
+plug('items', MyView2);
 
 
 class App extends React.Component {
@@ -35,31 +42,34 @@ class App extends React.Component {
   render() {
 
     return (
-      <div className="mission-control-app">        
-        <Container className="mc-main-container">          
-          <Sidebar/>
-          <Container className="mc-inner-container">            
-            <Header/>
-            <Content className="mc-inner-content">
+      <CodePlug>
+        <div className="mission-control-app">        
+          <Container className="mc-main-container">          
+            <Sidebar/>
+            <Container className="mc-inner-container">            
+              <Header/>
+              <Content className="mc-inner-content">
 
-              bella secco
-          
+                <Views region="items"/>
+                bella secco
+            
 
-              <div style={{width: '250px', height: '250px', backgroundColor: 'red'}}></div>
-              <div style={{width: '250px', height: '250px', backgroundColor: 'yellow'}}></div>
-              <div style={{width: '250px', height: '250px', backgroundColor: 'green'}}></div>
-              <div style={{width: '250px', height: '250px', backgroundColor: 'red'}}></div>
-              <div style={{width: '250px', height: '250px', backgroundColor: 'yellow'}}></div>
-              <div style={{width: '250px', height: '250px', backgroundColor: 'green'}}></div>
+                <div style={{width: '250px', height: '250px', backgroundColor: 'red'}}></div>
+                <div style={{width: '250px', height: '250px', backgroundColor: 'yellow'}}></div>
+                <div style={{width: '250px', height: '250px', backgroundColor: 'green'}}></div>
+                <div style={{width: '250px', height: '250px', backgroundColor: 'red'}}></div>
+                <div style={{width: '250px', height: '250px', backgroundColor: 'yellow'}}></div>
+                <div style={{width: '250px', height: '250px', backgroundColor: 'green'}}></div>
 
-              <div className="title">sono ross</div> 
+                <div className="title">sono ross</div> 
 
-              <Button onClick={() => ws.send(JSON.stringify({ topic: 'send', payload: 'bella secco!' }))}>Allora?</Button>
+                <Button onClick={() => ws.send(JSON.stringify({ topic: 'send', payload: 'bella secco!' }))}>Allora?</Button>
 
-            </Content>
+              </Content>
+            </Container>
           </Container>
-        </Container>
-      </div>
+        </div>
+      </CodePlug>
     );
   }
 
