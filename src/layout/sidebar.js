@@ -3,6 +3,12 @@ import { Button, Container, Header, Navbar, Dropdown, Nav, Footer, Content, Icon
 
 import { Plugin, CodePlug, Views, plug } from '../../lib/code-plug';
 
+import {
+  
+  Link,
+  
+} from "react-router-dom";
+
 
 const iconStyles = {
     width: 56,
@@ -78,18 +84,19 @@ return (
         <Nav>
           <Views region="sidebar">
             {(View, { label, onClick = () => {}, url, icon }) => (
-              <Nav.Item eventKey="1" onSelect={onClick} href={url} icon={icon != null ? <Icon icon={icon} /> : null}>
+              <Nav.Item 
+                key={label}
+                eventKey="1" 
+                onSelect={onClick} 
+                href={url} 
+                icon={icon != null ? <Icon icon={icon} /> : null}
+                renderItem={children => <Link className="rs-nav-item-content" to={url}>{label}</Link>}
+              >
                 {label}
               </Nav.Item>    
             )}
           </Views>
           
-          <Nav.Item eventKey="1" active icon={<Icon icon="dashboard" />}>
-            Dashboard
-          </Nav.Item>
-          <Nav.Item eventKey="2" icon={<Icon icon="group" />}>
-            User Group
-            </Nav.Item>
           <Dropdown
             eventKey="3"
             trigger="hover"

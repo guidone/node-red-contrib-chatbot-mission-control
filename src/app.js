@@ -1,8 +1,16 @@
 import React from 'react';
 import { Button, Container, Navbar, Dropdown, Nav, Footer, Content, Icon } from 'rsuite';
-
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from 'react-router-dom';
 
 import { Plugin, CodePlug, Views, plug } from '../lib/code-plug';
+
+import './plugins/send-message/index';
+
 
 import WebSocket from 'ws';
  
@@ -36,8 +44,8 @@ plug('items', MyView1);
 plug('items', MyView2);
 
 
-plug('sidebar', null, { label: 'My Item 1', onClick: () => alert('clicked 1'), url: '/page1', icon: 'dashboard' })
-plug('sidebar', null, { label: 'My Item 2', onClick: () => alert('clicked 2'), url: '/page12' })
+plug('sidebar', null, { id: 'item-1', label: 'My Item 1', url: 'page1', icon: 'dashboard' })
+plug('sidebar', null, { id: 'item-2', label: 'My Item 2', url: 'page2' })
 
 
 class App extends React.Component {
@@ -47,32 +55,59 @@ class App extends React.Component {
 
     return (
       <CodePlug>
-        <div className="mission-control-app">        
-          <Container className="mc-main-container">          
-            <Sidebar/>
-            <Container className="mc-inner-container">            
-              <Header/>
-              <Content className="mc-inner-content">
+        <Router>
+          <div className="mission-control-app">        
+            <Container className="mc-main-container">          
+              <Sidebar/>
+              <Container className="mc-inner-container">            
+                <Header/>
+                <Content className="mc-inner-content">
 
-                <Views region="items"/>
-                bella secco
-            
+                <Switch>
+                  <Route path="/mc/page1">
+                    <div>pagina 1</div>
+                  </Route>
+                  <Route path="/mc/page2">
+                    <div>pagina 2</div>
+                  </Route>
 
-                <div style={{width: '250px', height: '250px', backgroundColor: 'red'}}></div>
-                <div style={{width: '250px', height: '250px', backgroundColor: 'yellow'}}></div>
-                <div style={{width: '250px', height: '250px', backgroundColor: 'green'}}></div>
-                <div style={{width: '250px', height: '250px', backgroundColor: 'red'}}></div>
-                <div style={{width: '250px', height: '250px', backgroundColor: 'yellow'}}></div>
-                <div style={{width: '250px', height: '250px', backgroundColor: 'green'}}></div>
+                  <Views region="pages">
+                    {(View, { url }) => {
+                      
+                      return (
+                        <Route key={url} path={url}>
+                          <View/>
+                        </Route>
+                      );
+                    }}
+                  </Views>
 
-                <div className="title">sono ross</div> 
+                  <Route path="/">
+                    <Views region="items"/>
+                    bella secco
+                
 
-                <Button onClick={() => ws.send(JSON.stringify({ topic: 'send', payload: 'bella secco!' }))}>Allora?</Button>
+                    <div style={{width: '250px', height: '250px', backgroundColor: 'red'}}></div>
+                    <div style={{width: '250px', height: '250px', backgroundColor: 'yellow'}}></div>
+                    <div style={{width: '250px', height: '250px', backgroundColor: 'green'}}></div>
+                    <div style={{width: '250px', height: '250px', backgroundColor: 'red'}}></div>
+                    <div style={{width: '250px', height: '250px', backgroundColor: 'yellow'}}></div>
+                    <div style={{width: '250px', height: '250px', backgroundColor: 'green'}}></div>
 
-              </Content>
+                    <div className="title">sono ross</div> 
+
+                    <Button onClick={() => ws.send(JSON.stringify({ topic: 'send', payload: 'bella secco!' }))}>Allora?</Button>
+                  </Route>
+                </Switch>
+
+
+
+
+                </Content>
+              </Container>
             </Container>
-          </Container>
-        </div>
+          </div>
+        </Router>
       </CodePlug>
     );
   }
