@@ -36,6 +36,10 @@ plug('items', MyView1);
 plug('items', MyView2);
 
 
+plug('sidebar', null, { label: 'My Item 1', onClick: () => alert('clicked 1'), url: '/page1', icon: 'dashboard' })
+plug('sidebar', null, { label: 'My Item 2', onClick: () => alert('clicked 2'), url: '/page12' })
+
+
 class App extends React.Component {
 
 

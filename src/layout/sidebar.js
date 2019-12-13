@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button, Container, Header, Navbar, Dropdown, Nav, Footer, Content, Icon, Sidebar, Sidenav, Affix } from 'rsuite';
 
+import { Plugin, CodePlug, Views, plug } from '../../lib/code-plug';
+
 
 const iconStyles = {
     width: 56,
@@ -74,9 +76,17 @@ return (
       </Sidenav.Header>
       <Sidenav.Body>
         <Nav>
+          <Views region="sidebar">
+            {(View, { label, onClick = () => {}, url, icon }) => (
+              <Nav.Item eventKey="1" onSelect={onClick} href={url} icon={icon != null ? <Icon icon={icon} /> : null}>
+                {label}
+              </Nav.Item>    
+            )}
+          </Views>
+          
           <Nav.Item eventKey="1" active icon={<Icon icon="dashboard" />}>
             Dashboard
-            </Nav.Item>
+          </Nav.Item>
           <Nav.Item eventKey="2" icon={<Icon icon="group" />}>
             User Group
             </Nav.Item>
