@@ -1,148 +1,32 @@
 import React from 'react';
-import { Button, Container, Header, Navbar, Dropdown, Nav, Footer, Content, Icon, Sidebar, Sidenav, Affix } from 'rsuite';
+import { Button, Container, Navbar, Dropdown, Nav, Footer, Content, Icon } from 'rsuite';
 
-const iconStyles = {
-  width: 56,
-  height: 56,
-  lineHeight: '56px',
-  textAlign: 'center'
-};
+import WebSocket from 'ws';
+ 
+// const socket = io('ws://localhost:1880/comms');
 
-const headerStyles = {
-  padding: 18,
-  fontSize: 16,
-  height: 56,
-  background: '#3b3e66',
-  color: ' #fff',
-  whiteSpace: 'nowrap',
-  overflow: 'hidden'
-};
+import Sidebar from './layout/sidebar';
+import Header from './layout/header';
+
+
+import Sockette from 'sockette';
+
+const ws = new Sockette('ws://localhost:1942', {
+  timeout: 5e3,
+  maxAttempts: 10,
+  onopen: e => console.log('Connected!', e),
+  onmessage: e => console.log('Received:', e),
+  onreconnect: e => console.log('Reconnecting...', e),
+  onmaximum: e => console.log('Stop Attempting!', e),
+  onclose: e => console.log('Closed!', e),
+  onerror: e => console.log('Error:', e)
+});
+
 
 
 // clone schema https://demo.uifort.com/bamburgh-admin-dashboard-pro/
 
-const NavToggle = ({ expand, onChange }) => {
-  return (
-    <Navbar appearance="subtle" className="nav-toggle">
-      <Navbar.Body>
-        <Nav>
-          <Dropdown
-            placement="topStart"
-            trigger="click"
-            renderTitle={children => {
-              return <Icon style={iconStyles} icon="cog" />;
-            }}
-          >
-            <Dropdown.Item>Help</Dropdown.Item>
-            <Dropdown.Item>Settings</Dropdown.Item>
-            <Dropdown.Item>Sign out</Dropdown.Item>
-          </Dropdown>
-        </Nav>
 
-        <Nav pullRight>
-          <Nav.Item onClick={onChange} style={{ width: 56, textAlign: 'center' }}>
-            <Icon icon={expand ? 'angle-left' : 'angle-right'} />
-          </Nav.Item>
-        </Nav>
-      </Navbar.Body>
-    </Navbar>
-  );
-};
-
-const MySideBar = () => {
-
-  return (
-    <Sidebar
-      className="mc-sidebar"
-        style={{ display: 'flex', flexDirection: 'column', height: '100vh', 'position': 'fixed' }}
-        width={260}
-        collapsible
-      >
-        <Sidenav
-          expanded={true}
-          defaultOpenKeys={['3']}
-          appearance="subtle"
-        >
-          <Sidenav.Header>
-            <div style={headerStyles}>
-              <Icon icon="logo-analytics" size="lg" style={{ verticalAlign: 0 }} />
-              <span style={{ marginLeft: 12 }}> BRAND</span>
-            </div>
-          </Sidenav.Header>
-          <Sidenav.Body>
-            <Nav>
-              <Nav.Item eventKey="1" active icon={<Icon icon="dashboard" />}>
-                Dashboard
-              </Nav.Item>
-              <Nav.Item eventKey="2" icon={<Icon icon="group" />}>
-                User Group
-              </Nav.Item>
-              <Dropdown
-                eventKey="3"
-                trigger="hover"
-                title="Advanced"
-                icon={<Icon icon="magic" />}
-                placement="rightStart"
-              >
-                <Dropdown.Item eventKey="3-1">Geo</Dropdown.Item>
-                <Dropdown.Item eventKey="3-2">Devices</Dropdown.Item>
-                <Dropdown.Item eventKey="3-3">Brand</Dropdown.Item>
-                <Dropdown.Item eventKey="3-4">Loyalty</Dropdown.Item>
-                <Dropdown.Item eventKey="3-5">Visit Depth</Dropdown.Item>
-              </Dropdown>
-              <Dropdown
-                eventKey="4"
-                trigger="hover"
-                title="Settings"
-                icon={<Icon icon="gear-circle" />}
-                placement="rightStart"
-              >
-                <Dropdown.Item eventKey="4-1">Applications</Dropdown.Item>
-                <Dropdown.Item eventKey="4-2">Websites</Dropdown.Item>
-                <Dropdown.Item eventKey="4-3">Channels</Dropdown.Item>
-                <Dropdown.Item eventKey="4-4">Tags</Dropdown.Item>
-                <Dropdown.Item eventKey="4-5">Versions</Dropdown.Item>
-              </Dropdown>
-            </Nav>
-          </Sidenav.Body>
-        </Sidenav>
-        <NavToggle expand={true} onChange={() => {}} />
-      </Sidebar>
-
-  );
-
-}
-
-const MyHeader = () => {
-
-  return (
-    <Header className="mc-header">
-      <Navbar appearance="inverse">
-        <Navbar.Header>
-          <a className="navbar-brand logo">BRAND</a>
-        </Navbar.Header>
-        <Navbar.Body>
-          <Nav>
-            <Nav.Item icon={<Icon icon="home" />}>Home</Nav.Item>
-            <Nav.Item>News</Nav.Item>
-            <Nav.Item>Products</Nav.Item>
-            <Dropdown title="About">
-              <Dropdown.Item>Company</Dropdown.Item>
-              <Dropdown.Item>Team</Dropdown.Item>
-              <Dropdown.Item>Contact</Dropdown.Item>
-            </Dropdown>
-          </Nav>
-          <Nav pullRight>
-            <Nav.Item icon={<Icon icon="cog" />}>Settings</Nav.Item>
-          </Nav>
-        </Navbar.Body>
-      </Navbar>
-
-    </Header>
-
-  )
-
-}
 
 
 class App extends React.Component {
@@ -152,14 +36,10 @@ class App extends React.Component {
 
     return (
       <div className="mission-control-app">        
-        <Container className="mc-main-container">
-          
-            <MySideBar/>
-          
-          <Container className="mc-inner-container">
-            
-              <MyHeader/>
-            
+        <Container className="mc-main-container">          
+          <Sidebar/>
+          <Container className="mc-inner-container">            
+            <Header/>
             <Content className="mc-inner-content">
 
               bella secco
@@ -174,26 +54,11 @@ class App extends React.Component {
 
               <div className="title">sono ross</div> 
 
-              <Button>Allora?</Button>
+              <Button onClick={() => ws.send(JSON.stringify({ topic: 'send', payload: 'bella secco!' }))}>Allora?</Button>
 
             </Content>
           </Container>
         </Container>
-          
-         
-        
-        
-       
-
-
-
-
-
-       
-
-      
-
-     
       </div>
     );
   }

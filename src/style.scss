@@ -1,3 +1,7 @@
+$sidebar-background: #05386b;
+$sidebar-color: #eeeeee;
+$sidebag-hover-background: #087CA7;
+
 .mission-control-app {
 
   .title {
@@ -6,21 +10,79 @@
 
 }
 
+.mc-sidebar-header {
+  padding: 18px;
+  font-size: 16px;
+  height: 56px;
+  background-color: $sidebar-background;
+  color: $sidebar-color;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
 .mc-sidebar {
   .rs-sidenav-subtle {
-    background-color: #05386b ;
+    background-color: $sidebar-background;
     flex: 1 0;
   }
   .rs-navbar.rs-navbar-subtle {
-    background-color: #05386b ;
+    background-color: $sidebar-background;
 
   }
 
-  .rs-dropdown-item-content {
-    color: #eeeeee !important;
+  .rs-nav .rs-nav-item-active > .rs-nav-item-content,
+  .rs-nav .rs-dropdown .rs-dropdown-menu-active ~ .rs-dropdown-toggle {
+    color: $sidebar-color;
   }
+   
+  .rs-nav .rs-dropdown .rs-dropdown-menu-active ~ .rs-dropdown-toggle:hover, 
+  .rs-nav .rs-nav-item-active > .rs-nav-item-content:hover, 
+  .rs-nav .rs-dropdown .rs-dropdown-menu-active ~ .rs-dropdown-toggle:focus, 
+  .rs-nav .rs-nav-item-active > .rs-nav-item-content:focus, 
+  .rs-nav .rs-dropdown .rs-dropdown-menu-active ~ .rs-dropdown-toggle:active, 
+  .rs-nav .rs-nav-item-active > .rs-nav-item-content:active {
+    background-color: $sidebag-hover-background;
+    color: $sidebar-color;
+  }
+
+  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content, 
+  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-menu > li > .rs-dropdown-item-content, 
+  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-item-content > .rs-dropdown-menu-toggle, 
+  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-item-content > .rs-dropdown-menu-toggle {
+    color: $sidebar-color;
+  }
+  
+  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content:hover, 
+  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-menu > li > .rs-dropdown-item-content:hover, 
+  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-item-content > .rs-dropdown-menu-toggle:hover, 
+  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-item-content > .rs-dropdown-menu-toggle:hover {
+    background-color: $sidebag-hover-background;
+  }
+
+  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content:focus, 
+  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-menu > li > .rs-dropdown-item-content:focus, 
+  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-item-content > .rs-dropdown-menu-toggle:focus,
+  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-item-content > .rs-dropdown-menu-toggle:focus {
+    background-color: $sidebag-hover-background;
+    border-right: 3px solid #eeeeee;
+  }
+  
+  .rs-nav-default .rs-nav-item:not(.rs-nav-item-active):not(.rs-nav-item-disabled) > .rs-nav-item-content:hover, 
+  .rs-nav-default .rs-nav-item:not(.rs-nav-item-active):not(.rs-nav-item-disabled) > .rs-nav-item-content:focus {
+    background-color: $sidebag-hover-background;
+    color: $sidebar-color;
+  }
+
+  .rs-btn-subtle:focus, .rs-btn-subtle.rs-btn-focus, .rs-btn-subtle:hover {
+    background-color: $sidebag-hover-background;
+  }
+
+  .rs-nav-item > .rs-nav-item-content {
+    color: $sidebar-color ;
+  }
+
   .rs-btn-subtle {
-    color: #eeeeee;
+    color: $sidebar-color;
   }
 }
 
