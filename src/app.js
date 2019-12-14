@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useReducer } from 'react';
 import { Button, Container, Navbar, Dropdown, Nav, Footer, Content, Icon } from 'rsuite';
 import {
   BrowserRouter as Router,
@@ -9,12 +9,16 @@ import {
 
 import { Plugin, CodePlug, Views, plug } from '../lib/code-plug';
 
+import compose from './helpers/compose-reducers';
+import withState from './wrappers/with-state';
+import AppContext from './common/app-context';
+
+
 import Sidebar from './layout/sidebar';
 import Header from './layout/header';
 import HomePage from './pages/home';
 
-
-
+// Plugins
 import './plugins/send-message/index';
 
 
@@ -53,12 +57,43 @@ plug('sidebar', null, { id: 'item-2', label: 'My Item 2', url: 'page2' })
 plug('pages', MyView1, { url: '/mc/page1' });
 
 
-class App extends React.Component {
+const initialState = {
+  count: 0,
+  user: 'guidone'
+};
+function reducer1(state, action) {
+  switch (action.type) {
+    case 'increment':
+      return {...state, count: state.count + 1};
+    case 'decrement':
+      return {...state, count: state.count - 1};
+    default:
+      return state;
+  }
+}
+
+function reducer2(state, action) {
+
+  switch (action.type) {
+    case 'user':
+      return {...state, user: state.user + '*'};
+    default:
+      return state;
+  }
+}
+const reducer = compose(reducer1, reducer2);
 
 
-  render() {
+
+
+
+
+const App = () => {
+
+  const [state, dispatch] = useReducer(reducer, initialState);
 
     return (
+      <AppContext.Provider value={state}>
       <CodePlug>
         {codePlug => (
           <Router>
@@ -73,11 +108,11 @@ class App extends React.Component {
                       .getItems('pages')
                       .map(({ view: View, props }) => (
                         <Route key={props.url} path={props.url}>
-                          <View {...props} />
+                          <View {...props} dispatch={dispatch}/>
                         </Route>
                       ))}
                     <Route path="/mc">
-                      <HomePage/>
+                      <HomePage dispatch={dispatch}/>
                     </Route>
                   </Switch>
                 </Content>
@@ -87,8 +122,9 @@ class App extends React.Component {
         </Router>
         )}        
       </CodePlug>
+      </AppContext.Provider>
     );
-  }
+ 
 
 }
 

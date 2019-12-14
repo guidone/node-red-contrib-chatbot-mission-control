@@ -1,6 +1,8 @@
 import React from 'react';
 import { Button, Container, Header, Navbar, Dropdown, Nav, Footer, Content, Icon, Sidebar, Sidenav, Affix } from 'rsuite';
 
+import withState from '../wrappers/with-state';
+
 import {
   BrowserRouter as Router,
   Switch,
@@ -9,8 +11,8 @@ import {
 } from 'react-router-dom';
 
 
-export default () => {
-  
+ const AppHeader = ({ user }) => {
+  console.log('refresh header', user)
   return (
     <Header className="mc-header">
       <Navbar appearance="inverse">
@@ -37,3 +39,5 @@ export default () => {
     </Header>
   );
 }
+
+export default withState(AppHeader, ['user']);

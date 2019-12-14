@@ -2,15 +2,22 @@ import React from 'react';
 import { Button, Container, Navbar, Dropdown, Nav, Footer, Content, Icon } from 'rsuite';
 
 import { Views } from '../../lib/code-plug';
-
-class HomePage extends React.Component {
+import withState from '../wrappers/with-state';
+class HomePage extends React.PureComponent {
 
   render() {
 
+    const { count, dispatch, user } = this.props;
+    console.log('home refreshed');
     return (
       <div>
+                bella secco <br/>
+    <span>count: {count} {user}</span>
         <Views region="items"/>
-        bella secco
+        <Button onClick={() => dispatch({ type: 'increment' })}>inc</Button>
+        <Button onClick={() => dispatch({ type: 'decrement' })}>dec</Button>
+        <Button onClick={() => dispatch({ type: 'user' })}>user</Button>
+
     
 
         <div style={{width: '250px', height: '250px', backgroundColor: 'red'}}></div>
@@ -30,4 +37,4 @@ class HomePage extends React.Component {
 
 }
 
-export default HomePage;
+export default withState(HomePage, ['count']);;
