@@ -81,51 +81,56 @@ function reducer2(state, action) {
       return state;
   }
 }
-const reducer = compose(reducer1, reducer2);
 
 
+plug('reducers', reducer1);
+plug('reducers', reducer2);
+
+// TODO
+// wrapper per il socket passandogli il dispatch
+// home page con le tiles
 
 
+const AppRouter = ({ codePlug }) => {
 
+  const reducers = compose(...codePlug.getItems('reducers').map(item => item.view ));
+  const [state, dispatch] = useReducer(reducers, initialState);
 
-const App = () => {
-
-  const [state, dispatch] = useReducer(reducer, initialState);
-
-    return (
-      <AppContext.Provider value={state}>
-      <CodePlug>
-        {codePlug => (
-          <Router>
-          <div className="mission-control-app">        
-            <Container className="mc-main-container">          
-              <Sidebar/>
-              <Container className="mc-inner-container">            
-                <Header/>
-                <Content className="mc-inner-content">
-                  <Switch>                              
-                    {codePlug
-                      .getItems('pages')
-                      .map(({ view: View, props }) => (
-                        <Route key={props.url} path={props.url}>
-                          <View {...props} dispatch={dispatch}/>
-                        </Route>
-                      ))}
-                    <Route path="/mc">
-                      <HomePage dispatch={dispatch}/>
-                    </Route>
-                  </Switch>
-                </Content>
-              </Container>
+  return (
+    <AppContext.Provider value={state}>
+      <Router>
+        <div className="mission-control-app">        
+          <Container className="mc-main-container">          
+            <Sidebar/>
+            <Container className="mc-inner-container">            
+              <Header/>
+              <Content className="mc-inner-content">
+                <Switch>                              
+                  {codePlug
+                    .getItems('pages')
+                    .map(({ view: View, props }) => (
+                      <Route key={props.url} path={props.url}>
+                        <View {...props} dispatch={dispatch}/>
+                      </Route>
+                    ))}
+                  <Route path="/mc">
+                    <HomePage dispatch={dispatch}/>
+                  </Route>
+                </Switch>
+              </Content>
             </Container>
-          </div>
-        </Router>
-        )}        
-      </CodePlug>
-      </AppContext.Provider>
-    );
- 
+          </Container>
+        </div>
+      </Router>
+    </AppContext.Provider>
+  );
 
-}
+};
+
+const App = () => (
+  <CodePlug>
+    {codePlug => <AppRouter codePlug={codePlug} />}        
+  </CodePlug>
+);
 
 export default App;

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Container, Header, Navbar, Dropdown, Nav, Footer, Content, Icon, Sidebar, Sidenav, Affix } from 'rsuite';
+import { Button, Container, Header, Navbar, Dropdown, Nav, Footer, Content, Icon, Sidebar, Sidenav, Avatar } from 'rsuite';
 
 import withState from '../wrappers/with-state';
 
@@ -20,7 +20,17 @@ import {
           <a className="navbar-brand logo">BRAND</a>
         </Navbar.Header>
         <Navbar.Body>
-          <Nav>
+          <Nav pullRight>
+            <Dropdown
+              className="mc-avatar"
+              placement="bottomEnd"
+              renderTitle={()=> <Avatar circle>RS</Avatar>}
+            >
+              <Dropdown.Item ><Icon icon="user" /> New User</Dropdown.Item>
+              <Dropdown.Item ><Icon icon="group" /> New Group</Dropdown.Item>
+            </Dropdown>
+          </Nav>
+          <Nav pullRight>
             <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/mc"><Icon icon="home" /> Home</Link>} >Home</Nav.Item>
             <Nav.Item>News</Nav.Item>
             <Nav.Item>Products</Nav.Item>
@@ -30,9 +40,12 @@ import {
               <Dropdown.Item>Contact</Dropdown.Item>
             </Dropdown>
           </Nav>
-          <Nav pullRight>
-            <Nav.Item icon={<Icon icon="cog" />}>Settings</Nav.Item>
-          </Nav>
+          
+
+          
+
+            
+          
         </Navbar.Body>
       </Navbar>
 
