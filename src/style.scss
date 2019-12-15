@@ -131,3 +131,20 @@ $sidebag-hover-background: #087CA7;
   }
 
 }
+
+
+.mc-home {
+  background-color: rgb(241, 244, 246);
+
+
+  .react-grid-item {
+    background-color: #fff;
+    background-clip: border-box;
+    border: 0 solid rgba(0,0,0,.125);
+    border-radius: .25rem;
+    box-shadow: 0 0 1px rgba(0,0,0,.125), 0 1px 3px rgba(0,0,0,.2);
+  }
+
+}
+
+

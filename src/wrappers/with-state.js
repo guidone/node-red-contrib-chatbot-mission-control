@@ -5,7 +5,7 @@ import AppContext from '../common/app-context';
 export default (Component, fields = []) => {
   return (props) => (
     <AppContext.Consumer>
-      {state => {
+      {({ state }) => {
         let stateProps = {};
         if (fields.length === 0) {
           stateProps = { ...state };

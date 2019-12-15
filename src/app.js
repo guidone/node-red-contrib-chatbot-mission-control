@@ -17,6 +17,7 @@ import AppContext from './common/app-context';
 import Sidebar from './layout/sidebar';
 import Header from './layout/header';
 import HomePage from './pages/home';
+import WebSocket from './common/web-socket';
 
 // Plugins
 import './plugins/send-message/index';
@@ -27,18 +28,6 @@ import './plugins/send-message/index';
 
 
 
-import Sockette from 'sockette';
-
-const ws = new Sockette('ws://localhost:1942', {
-  timeout: 5e3,
-  maxAttempts: 10,
-  onopen: e => console.log('Connected!', e),
-  onmessage: e => console.log('Received:', e),
-  onreconnect: e => console.log('Reconnecting...', e),
-  onmaximum: e => console.log('Stop Attempting!', e),
-  onclose: e => console.log('Closed!', e),
-  onerror: e => console.log('Error:', e)
-});
 
 const MyView1 = () => <div>My view 1</div>;
 MyView1.displayName = 'uno';
@@ -97,31 +86,33 @@ const AppRouter = ({ codePlug }) => {
   const [state, dispatch] = useReducer(reducers, initialState);
 
   return (
-    <AppContext.Provider value={state}>
-      <Router>
-        <div className="mission-control-app">        
-          <Container className="mc-main-container">          
-            <Sidebar/>
-            <Container className="mc-inner-container">            
-              <Header/>
-              <Content className="mc-inner-content">
-                <Switch>                              
-                  {codePlug
-                    .getItems('pages')
-                    .map(({ view: View, props }) => (
-                      <Route key={props.url} path={props.url}>
-                        <View {...props} dispatch={dispatch}/>
-                      </Route>
-                    ))}
-                  <Route path="/mc">
-                    <HomePage dispatch={dispatch}/>
-                  </Route>
-                </Switch>
-              </Content>
+    <AppContext.Provider value={{ state, dispatch }}>
+      <WebSocket dispatch={dispatch}>
+        <Router>
+          <div className="mission-control-app">        
+            <Container className="mc-main-container">          
+              <Sidebar/>
+              <Container className="mc-inner-container">            
+                <Header/>
+                <Content className="mc-inner-content">
+                  <Switch>                              
+                    {codePlug
+                      .getItems('pages')
+                      .map(({ view: View, props }) => (
+                        <Route key={props.url} path={props.url}>
+                          <View {...props} dispatch={dispatch}/>
+                        </Route>
+                      ))}
+                    <Route path="/mc">
+                      <HomePage dispatch={dispatch} codePlug={codePlug} />
+                    </Route>
+                  </Switch>
+                </Content>
+              </Container>
             </Container>
-          </Container>
-        </div>
-      </Router>
+          </div>
+        </Router>
+      </WebSocket>
     </AppContext.Provider>
   );
 

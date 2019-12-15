@@ -1,20 +1,18 @@
-import Sockette from 'sockette';
+import React from 'react';
 
-const ws = new Sockette('ws://localhost:1942', {
-  timeout: 5e3,
-  maxAttempts: 10,
-  onopen: e => console.log('Connected!', e),
-  onmessage: e => console.log('Received:', e),
-  onreconnect: e => console.log('Reconnecting...', e),
-  onmaximum: e => console.log('Stop Attempting!', e),
-  onclose: e => console.log('Closed!', e),
-  onerror: e => console.log('Error:', e)
-});
+import { SocketContext } from '../common/web-socket';
 
-
-export default Component => {
-
-  return props => (
-    <Component {...props} >{props.children}</Component>
+export default (Component) => {
+  return (props) => (
+    <SocketContext.Consumer>
+      {({ ws, onMessage }) => (
+        <Component 
+          {...props} 
+          sendMessage={ws != null ? (topic, payload) => ws.send(JSON.stringify({ topic, payload })) : () => {}}
+        >
+          {props.children}
+        </Component>
+      )}
+    </SocketContext.Consumer>
   );
 };
