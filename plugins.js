@@ -1,2 +1,3 @@
 // Plugins
-import './plugins/send-message/index';
+import './plugins/send-message';
+import './plugins/configuration';

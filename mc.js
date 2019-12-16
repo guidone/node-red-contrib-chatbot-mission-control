@@ -63,7 +63,7 @@ function bootstrap(server, app, log, redSettings) {
   console.log('socket', socketIoPath)
   //io = socketio(server, { path: '/mc-socket-io' });
 
-  app.use('/mc', serveStatic(path.join(__dirname, 'src')));
+  app.use('^\/mc', (req, res, next) => res.sendFile(`${__dirname}/src/index.html`));
   app.use('/mc/main.js', serveStatic(path.join(__dirname, 'dist/main.js')));
 
 

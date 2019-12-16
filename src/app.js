@@ -41,7 +41,18 @@ plug('items', MyView2);
 
 
 plug('sidebar', null, { id: 'item-1', label: 'My Item 1', url: '/mc/page1', icon: 'dashboard' })
-plug('sidebar', null, { id: 'item-2', label: 'My Item 2', url: 'page2' })
+
+/*plug('sidebar', null, { 
+  id: 'configuration', 
+  label: 'Configuration', 
+  url: '/mc/configuration', 
+  icon: 'cog',
+  options: [
+    { id: 'configuration-1', label: 'Configuration 1', url: '/mc/configuration', icon: 'dashboard' },
+    { id: 'configuration-2', label: 'Configuration 2', url: '/mc/configuration', icon: 'dashboard' },
+    { id: 'configuration-3', label: 'Configuration 3', url: '/mc/configuration', icon: 'dashboard' },
+  ] 
+});*/
 
 plug('pages', MyView1, { url: '/mc/page1' });
 
