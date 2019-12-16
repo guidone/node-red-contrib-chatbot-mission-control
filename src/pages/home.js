@@ -18,17 +18,10 @@ import '../../node_modules/react-resizable/css/styles.css';
 
 
 
-const Widget1 = ({ sendMessage, stats }) => (
-  <Panel>
 
-    <h1>{stats}</h1>
-    <Button onClick={() => sendMessage('send', 'bella secco!')}>Send Message</Button>
-  </Panel>
-);
 
 const Widget2 = ({ count, user, dispatch }) => (
-  <Panel>
-    <Panel.Title>I am a title</Panel.Title>
+  <Panel title="I am a title">
     <span>count: {count} {user}</span>
     <Views region="items"/>
     <Button onClick={() => dispatch({ type: 'increment' })}>inc</Button>
@@ -38,7 +31,7 @@ const Widget2 = ({ count, user, dispatch }) => (
 );
 
 
-plug('widgets', withState(withSocket(Widget1), ['stats']), { x: 0, y: 0, w: 2, h: 4, isResizable: false, id: 1 })
+
 plug('widgets', withDispatch(withState(Widget2, ['count', 'user'])), { x: 0, y: 0, w: 1, h: 4, isResizable: false, id: 2 })
 
 plug('reducers', (state, action) => {
@@ -80,7 +73,8 @@ class HomePage extends React.Component {
       <div className="mc-home">
         <ResponsiveReactGridLayout
           className="layout"
-          cols={{ lg: 3, md: 3, sm: 2, xs: 2, xxs: 1 }}
+          cols={{ lg: 4, md: 4, sm: 3, xs: 2, xxs: 1 }}
+          draggableCancel=".ui-grid-panel *:not(.ui-panel-title)"
           rowHeight={50}
           margin={[20, 20]}
           layouts={this.state.layouts}
@@ -89,6 +83,7 @@ class HomePage extends React.Component {
           }
         >
           {items.map(({ view: View, props }) => {
+            console.log('ridisgno items')
             const { x, y, h, w, isResizable } = props;
             return (
               <div key={props.id} data-grid={{x, y, w, h, isResizable }}>

@@ -1,5 +1,5 @@
 import React, { useReducer } from 'react';
-import { Button, Container, Navbar, Dropdown, Nav, Footer, Content, Icon } from 'rsuite';
+import { Button, Container, Navbar, Dropdown, Nav, Footer, Content, Icon, Notification } from 'rsuite';
 import {
   BrowserRouter as Router,
   Switch,
@@ -19,12 +19,12 @@ import Header from './layout/header';
 import HomePage from './pages/home';
 import WebSocket from './common/web-socket';
 
-// Plugins
-import './plugins/send-message/index';
+// Import plugins
+import '../plugins';
 
 
  
-// const socket = io('ws://localhost:1880/comms');
+
 
 
 
@@ -70,6 +70,17 @@ function reducer2(state, action) {
       return state;
   }
 }
+
+function SocketReducers(state, action) {
+  switch(action.type) {
+    case 'socket.connected':
+      Notification.success({ title: 'Connected!'});
+      return state;
+    default:
+      return state;
+  }
+}
+plug('reducers', SocketReducers);
 
 
 plug('reducers', reducer1);

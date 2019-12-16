@@ -89,6 +89,7 @@ $sidebag-hover-background: #087CA7;
 .mc-header {
   position: fixed;
   width: calc(100% - 260px);
+  z-index: 10;
 
   .rs-navbar {
     box-shadow: 0px 3px 14px -7px rgba(102,94,102,1);

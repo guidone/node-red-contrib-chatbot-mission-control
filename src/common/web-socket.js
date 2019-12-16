@@ -17,7 +17,7 @@ class WebSocket extends React.Component {
     const ws = new Sockette('ws://localhost:1942', {
       timeout: 5e3,
       maxAttempts: 10,
-      onopen: e => console.log('Connected!', e),
+      onopen: e => dispatch({ type: 'socket.connected'}),
       onmessage: e => {
         let message;
         try {
@@ -29,7 +29,7 @@ class WebSocket extends React.Component {
           dispatch({ type: 'socket.message', topic: message.topic, payload: message.payload });
         }
       },
-      onreconnect: e => console.log('Reconnecting...', e),
+      onreconnect: e => dispatch({ type: 'socket.reconneting'}),
       onmaximum: e => console.log('Stop Attempting!', e),
       onclose: e => console.log('Closed!', e),
       onerror: e => console.log('Error:', e)
