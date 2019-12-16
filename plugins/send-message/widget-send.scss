@@ -1,0 +1,14 @@
+.widget-send-message {
+  .rs-form-group {
+    flex: 1 0;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: stretch;
+    .rs-form-control-wrapper {
+      flex: 1 0;
+    }
+  }
+}

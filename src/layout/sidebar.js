@@ -125,7 +125,6 @@ return (
         </Nav>
       </Sidenav.Body>
     </Sidenav>
-    <NavToggle expand={true} onChange={() => { }} />
   </Sidebar>
   );
 };
