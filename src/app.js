@@ -22,9 +22,20 @@ import WebSocket from './common/web-socket';
 // Import plugins
 import '../plugins';
 
+import { InMemoryCache } from "apollo-cache-inmemory";
+import { createHttpLink } from 'apollo-link-http';
+import { ApolloClient } from 'apollo-client';
+import { ApolloLink } from "apollo-link";
+import { ApolloProvider } from 'react-apollo';
 
- 
 
+const cache = new InMemoryCache(); // where current data is stored
+const apolloLink = createHttpLink({ uri: '/graphql' });
+
+const client = new ApolloClient({
+  cache,
+  link: ApolloLink.from([apolloLink])
+});
 
 
 
@@ -108,34 +119,36 @@ const AppRouter = ({ codePlug }) => {
   const [state, dispatch] = useReducer(reducers, initialState);
 
   return (
-    <AppContext.Provider value={{ state, dispatch }}>
-      <WebSocket dispatch={dispatch}>
-        <Router>
-          <div className="mission-control-app">        
-            <Container className="mc-main-container">          
-              <Sidebar/>
-              <Container className="mc-inner-container">            
-                <Header/>
-                <Content className="mc-inner-content">
-                  <Switch>                              
-                    {codePlug
-                      .getItems('pages')
-                      .map(({ view: View, props }) => (
-                        <Route key={props.url} path={props.url}>
-                          <View {...props} dispatch={dispatch}/>
-                        </Route>
-                      ))}
-                    <Route path="/mc">
-                      <HomePage dispatch={dispatch} codePlug={codePlug} />
-                    </Route>
-                  </Switch>
-                </Content>
+    <ApolloProvider client={client}>
+      <AppContext.Provider value={{ state, dispatch, client }}>
+        <WebSocket dispatch={dispatch}>
+          <Router>
+            <div className="mission-control-app">        
+              <Container className="mc-main-container">          
+                <Sidebar/>
+                <Container className="mc-inner-container">            
+                  <Header/>
+                  <Content className="mc-inner-content">
+                    <Switch>                              
+                      {codePlug
+                        .getItems('pages')
+                        .map(({ view: View, props }) => (
+                          <Route key={props.url} path={props.url}>
+                            <View {...props} dispatch={dispatch}/>
+                          </Route>
+                        ))}
+                      <Route path="/mc">
+                        <HomePage dispatch={dispatch} codePlug={codePlug} />
+                      </Route>
+                    </Switch>
+                  </Content>
+                </Container>
               </Container>
-            </Container>
-          </div>
-        </Router>
-      </WebSocket>
-    </AppContext.Provider>
+            </div>
+          </Router>
+        </WebSocket>
+      </AppContext.Provider>
+    </ApolloProvider>
   );
 
 };

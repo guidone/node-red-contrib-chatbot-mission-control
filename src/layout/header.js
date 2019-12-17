@@ -16,9 +16,6 @@ import {
   return (
     <Header className="mc-header">
       <Navbar appearance="inverse">
-        <Navbar.Header>
-          <a className="navbar-brand logo">BRAND</a>
-        </Navbar.Header>
         <Navbar.Body>
           <Nav>
             <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/mc">Home</Link>} />
