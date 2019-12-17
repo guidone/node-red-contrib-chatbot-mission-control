@@ -10,7 +10,14 @@ module.exports = {
   },
   devServer: {
     contentBase: './dist',
-    hot: true
+    //publicPath: './src/images',
+    hot: true,
+    proxy: {
+      '*.png': {
+        target: 'http://localhost:[port]/',
+        //pathRewrite: { '^/some/sub-path': '' },
+      }
+    },
   },
   module: {
     rules: [

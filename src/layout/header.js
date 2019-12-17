@@ -20,6 +20,16 @@ import {
           <a className="navbar-brand logo">BRAND</a>
         </Navbar.Header>
         <Navbar.Body>
+          <Nav>
+            <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/mc">Home</Link>} />
+            <Nav.Item>News</Nav.Item>
+            <Nav.Item>Products</Nav.Item>
+            <Dropdown title="About">
+              <Dropdown.Item>Company</Dropdown.Item>
+              <Dropdown.Item>Team</Dropdown.Item>
+              <Dropdown.Item>Contact</Dropdown.Item>
+            </Dropdown>
+          </Nav>
           <Nav pullRight>
             <Dropdown
               className="mc-avatar"
@@ -30,16 +40,7 @@ import {
               <Dropdown.Item ><Icon icon="group" /> New Group</Dropdown.Item>
             </Dropdown>
           </Nav>
-          <Nav pullRight>
-            <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/mc"><Icon icon="home" /> Home</Link>} >Home</Nav.Item>
-            <Nav.Item>News</Nav.Item>
-            <Nav.Item>Products</Nav.Item>
-            <Dropdown title="About">
-              <Dropdown.Item>Company</Dropdown.Item>
-              <Dropdown.Item>Team</Dropdown.Item>
-              <Dropdown.Item>Contact</Dropdown.Item>
-            </Dropdown>
-          </Nav>
+          
           
 
           

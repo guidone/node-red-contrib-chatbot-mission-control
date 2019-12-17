@@ -11,16 +11,22 @@ $sidebag-hover-background: #087CA7;
 }
 
 .mc-sidebar-header {
-  padding: 18px;
+  padding: 10px;
   font-size: 16px;
   height: 56px;
   background-color: $sidebar-background;
   color: $sidebar-color;
   white-space: nowrap;
   overflow: hidden;
+
 }
 
 .mc-sidebar {
+
+  .mc-sidebar-body {
+    margin-top: 20px;
+  }
+
   .rs-sidenav-subtle {
     background-color: $sidebar-background;
     flex: 1 0;

@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom'
 // import 'rsuite/lib/styles/index.less'; 
 import 'rsuite/dist/styles/rsuite-default.css'
 import './style.scss';
-
+import './styles/header.css';
 
 import App from './app';
 
