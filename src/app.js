@@ -45,7 +45,13 @@ MyView1.displayName = 'uno';
 const MyView2 = () => <div>My view 2</div>;
 MyView2.displayName = 'due';
 
+// Inspiration design
 // clone schema https://demo.uifort.com/bamburgh-admin-dashboard-pro/
+// React grid
+// https://github.com/STRML/react-grid-layout#installation
+// useQuery
+// https://www.apollographql.com/docs/react/data/queries/
+
 
 plug('items', MyView1);
 plug('items', MyView2);
