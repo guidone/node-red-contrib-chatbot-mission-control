@@ -2,17 +2,19 @@ const serveStatic = require('serve-static');
 const path = require('path');
 const events = require('events');
 const WebSocket = require('ws');
+const fs = require('fs');
+const moment = require('moment');
 
 
-
-
-
-
+const lcd = require('./lib/lcd/index');
 
 let initialized = false;
 let io;
 let settings = {};
 const Events = new events.EventEmitter();
+
+
+
 
 module.exports = function(RED) {
   if (!initialized) {
@@ -47,8 +49,17 @@ function join() {
 
 function bootstrap(server, app, log, redSettings) {
 
-  log.info('RedBot Mission Control 0.0.1');
-  console.log('redSettings', redSettings.getUserSettings())
+  // print version
+  const jsonPackage = fs.readFileSync(__dirname + '/package.json');
+  try {
+    const package = JSON.parse(jsonPackage.toString());
+    // eslint-disable-next-line no-console
+    console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
+      + ' - [info] RedBot Mission Control version:')
+      + ' ' + lcd.green(package.version) + lcd.grey(' (node-red-contrib-chatbot-mission-control)'));
+  } catch(e) {
+    lcd.error('Unable to open node-red-contrib-chatbot-mission-control/package.json');
+  }
 
   const uiSettings = redSettings.ui || {};
   if ((uiSettings.hasOwnProperty('path')) && (typeof uiSettings.path === 'string')) {
@@ -57,12 +68,15 @@ function bootstrap(server, app, log, redSettings) {
     settings.path = 'mc'; 
   }
 
-  const fullPath = join(redSettings.httpNodeRoot, settings.path);
-  const socketIoPath = join(fullPath, 'socket.io');
+  //const fullPath = join(redSettings.httpNodeRoot, settings.path);
+  //const socketIoPath = join(fullPath, 'socket.io');
 
-  console.log('socket', socketIoPath)
-  //io = socketio(server, { path: '/mc-socket-io' });
 
+
+  app.get('/mc/api/configuration', (req, res) => {
+    // todo get real configuration
+    res.send({ test1: 42 });
+  });
   app.use('^\/mc', (req, res, next) => res.sendFile(`${__dirname}/src/index.html`));
   app.use('/mc/main.js', serveStatic(path.join(__dirname, 'dist/main.js')));
 
@@ -87,7 +101,6 @@ function bootstrap(server, app, log, redSettings) {
     });
   
     ws.on('close', () => {
-      console.log('chiudo e rimiuovo send handler')
       Events.removeListener('send', sendHandler);  
     });
     

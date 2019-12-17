@@ -1,0 +1,37 @@
+<script type="text/javascript">
+    $.RedBot.registerType('mc-configuration', {
+      category: 'Mission Control',
+      color: '#FFCC66',
+      defaults: {
+        namespace: {
+          value: ''
+        },
+        topic: {
+          value: ''
+        },
+        payload: {
+          value: ''
+        }
+      },
+      inputs: 0,
+      outputs: 1,
+      paletteLabel: 'MC Configuration',
+      icon: 'chatbot-command.png',
+      label: function() {        
+        return 'MC Configuration' + (this.namespace !== null && this.namespace !== '' ? ' (' + this.namespace + ')' : '');
+      }
+    });
+  </script>
+  
+  <script type="text/x-red" data-template-name="mc-configuration">
+    <div class="form-row">
+      <label for="node-input-namespace"><i class="icon-tag"></i> Topic</label>
+      <input type="text" id="node-input-namespace" placeholder="Namespace">
+    </div>
+  </script>
+  
+  <script type="text/x-red" data-help-name="mc-configuration">
+  </script>
+  
+  
+  

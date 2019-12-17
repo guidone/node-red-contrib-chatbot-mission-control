@@ -1,15 +1,16 @@
 import React, { useState } from 'react';
 
-import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, FlexboxGrid } from 'rsuite';
+import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, FlexboxGrid, HelpBlock, Notification } from 'rsuite';
 import { Link } from 'react-router-dom';
 
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import InfoPanel from '../../../src/components/info-panel';
+import withSocket from '../../../src/wrappers/with-socket';
 
-const ConfigurationPage = () => {
+const ConfigurationPage = ({ sendMessage }) => {
 
-  const [formValue, setFormValue] = useState({ message: '' });
+  const [formValue, setFormValue] = useState({ param_1: '', param_2: '' });
 
   return (
     <PageContainer className="page-configuration">
@@ -18,18 +19,25 @@ const ConfigurationPage = () => {
 
       <FlexboxGrid justify="space-between">
         <FlexboxGrid.Item colspan={17}>
-          <Form fluid formValue={formValue} onChange={formValue => setFormValue(formValue)}>
+          <Form formValue={formValue} onChange={formValue => setFormValue(formValue)}>
           
             <FormGroup>
-              <ControlLabel>Message to send</ControlLabel>
-              <FormControl name="message" componentClass="textarea" style={{ height: '100%' }}/>
+              <ControlLabel>Username</ControlLabel>
+              <FormControl name="param_1" />
+              <HelpBlock>Required</HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>Email</ControlLabel>
+              <FormControl name="param_2" type="email" />
+              <HelpBlock tooltip>I am a tooltip</HelpBlock>
             </FormGroup>
           
             <FormGroup>
               <ButtonToolbar>
                 <Button appearance="primary" onClick={() => {
-                  sendMessage('send', formValue.message);
-                  setFormValue({ message: '' });
+                  console.log('sending', formValue);
+                  sendMessage('mc.configuration', formValue);
+                  Notification.success({ title: 'Configuration', description: 'Configuration saved successful' });
                 }}>
                   Send Message
                 </Button>
@@ -57,4 +65,4 @@ const ConfigurationPage = () => {
 
 };
 
-export default ConfigurationPage;
+export default withSocket(ConfigurationPage);
