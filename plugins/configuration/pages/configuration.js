@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, FlexboxGrid, HelpBlock, Notification } from 'rsuite';
 import { Link } from 'react-router-dom';
-import { Query } from 'react-apollo';
+import { Query, useQuery, useMutation } from 'react-apollo';
 
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
@@ -11,7 +11,7 @@ import withSocket from '../../../src/wrappers/with-socket';
 
 import gql from 'graphql-tag';
 
-const GET_CONFIGURATIONS = gql`
+const GET_CONFIGURATION = gql`
 query($namespace: String) {
   configurations(namespace: $namespace) {
     id
@@ -21,10 +21,39 @@ query($namespace: String) {
 }
 `;
 
+const UPDATE_CONFIGURATION = gql`
+mutation($configuration: NewConfiguration!) {
+  createConfiguration(configuration: $configuration) {
+    id,
+    namespace,
+    payload
+  }
+}
+`;
+
+import ConfigurationForm from '../views/form';
 
 const ConfigurationPage = ({ sendMessage }) => {
 
-  const [formValue, setFormValue] = useState({ param_1: '', param_2: '' });
+  const { loading, error, data } = useQuery(GET_CONFIGURATION, {
+    variables: { namespace: 'postcardbot' },
+  });
+
+  const [
+    updateConfiguration,
+    { loading: mutationLoading, error: mutationError },
+  ] = useMutation(UPDATE_CONFIGURATION, {
+    onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' })
+  });
+
+  //const [formValue, setFormValue] = useState({ param_1: '', param_2: '' });
+
+
+  let formValue = {};
+  if (data != null && data.configurations != null && data.configurations.length !== 0) {
+    formValue = JSON.parse(data.configurations[0].payload);
+    console.log('cosa??', formValue)
+  } 
 
   return (
     <PageContainer className="page-configuration">
@@ -34,57 +63,33 @@ const ConfigurationPage = ({ sendMessage }) => {
       <FlexboxGrid justify="space-between">
         <FlexboxGrid.Item colspan={17}>
 
-        <Query query={GET_CONFIGURATIONS} fetchPolicy="network-only" variables={{ namespace: 'postcardbot' }} >
-          {({ data, error, loading }) => {
-            console.log('data', data, error, loading)
-            if (loading) {
-              return <div>loading</div>;
-            }
-            if (error) {
-              return <div>error</div>;
-            }
+          {loading && <div>loading</div>}
+          {error && <div>error</div>}
+          {!loading && !error && (
+            <ConfigurationForm 
+              disabled={loading || mutationLoading}
+              value={formValue}
+              onSubmit={formValue => {
+                console.log('savlo', formValue)
+                //console.log('sending', formValue);
+                sendMessage('mc.configuration', formValue);
+                
+                updateConfiguration({ 
+                  variables: { 
+                    configuration: {
+                      namespace: 'postcardbot',
+                      payload: JSON.stringify(formValue)
+                    } 
+                  }
+                });
 
-            let formValue = {};
-            if (data.configurations != null && data.configurations.length !== 0) {
-              formValue = JSON.parse(data.configurations[0].payload);
-              console.log('cosa??', formValue)
-            } 
-            
-            return (
-              <Form formValue={formValue} onChange={formValue => setFormValue(formValue)}>          
-                <FormGroup>
-                  <ControlLabel>Username</ControlLabel>
-                  <FormControl name="param_1" />
-                  <HelpBlock>Required</HelpBlock>
-                </FormGroup>
-                <FormGroup>
-                  <ControlLabel>Email</ControlLabel>
-                  <FormControl name="param_2" type="email" />
-                  <HelpBlock tooltip>I am a tooltip</HelpBlock>
-                </FormGroup>
-              
-                <FormGroup>
-                  <ButtonToolbar>
-                    <Button appearance="primary" onClick={() => {
-                      console.log('sending', formValue);
-                      sendMessage('mc.configuration', formValue);
-                      Notification.success({ title: 'Configuration', description: 'Configuration saved successful' });
-                    }}>
-                      Send Message
-                    </Button>
-                    <Button appearance="default" onClick={() => setFormValue({ message: '' }) }>
-                      Cancel
-                    </Button> 
-                  </ButtonToolbar>
-                </FormGroup>
-          
-              </Form>
-            )
-          }}
-        </Query>
 
-      
+              }}
+            />
+          )}
         
+              
+            
         </FlexboxGrid.Item>
         <InfoPanel colspan={7}>
 

@@ -66,7 +66,51 @@ const configurationType = new GraphQLObjectType({
   }
 });
 
+const newConfigurationType = new GraphQLInputObjectType({
+  name: 'NewConfiguration',
+  description: 'tbd',
+  fields: () => ({
+    namespace: {
+      type: GraphQLString,
+      description: '',
+    },
+    payload: {
+      type: GraphQLString,
+      description: '',
+    }
+  })
+});
+
 const schema = new GraphQLSchema({
+  
+  mutation: new GraphQLObjectType({
+    name: 'Mutations',
+    description: 'These are the things we can change',
+    fields: {
+      
+      createConfiguration: {
+        type: configurationType,
+        args: {
+          configuration: { type: new GraphQLNonNull(newConfigurationType) }
+        },
+        /*resolve(root, { plugin }) {
+          return Plugin.create(plugin);
+        }*/
+        resolve(root, { configuration }) {
+          return Configuration.findOne({ where: { namespace: configuration.namespace }})
+            .then(found => {
+              if (found != null) {
+                return Configuration.update(configuration, { where: { id: found.id }})
+                  .then(() => Configuration.findByPk(found.id));  
+              } 
+              return Configuration.create(extension);
+            });
+        }
+      }
+      
+    }
+  }),
+  
   query: new GraphQLObjectType({
     name: 'Queries',
     fields: {
@@ -155,7 +199,8 @@ function bootstrap(server, app, log, redSettings) {
   //const socketIoPath = join(fullPath, 'socket.io');
 
   // install graphql server
-  graphQLServer.applyMiddleware({ app });
+  //graphQLServer.applyMiddleware({ app });
+  app.use(graphQLServer.getMiddleware())
   console.log(`🚀 Server ready at http://localhost:1880${graphQLServer.graphqlPath}`)
 
   app.get('/mc/api/configuration', (req, res) => {
