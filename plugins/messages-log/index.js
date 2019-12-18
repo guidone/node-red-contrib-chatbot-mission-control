@@ -11,33 +11,10 @@ import moment from 'moment';
 
 import './message-log.scss';
 
-const colorType = type => {
-  switch(type) {
-    case 'message': return 'cyan';
-    case 'document':
-    case 'photo':
-    case 'video':
-    case 'sticker':
-      return 'orange';
-    default: return 'grey';
-  }
-}
 
-function humanFileSize(bytes, si = true) {
-  var thresh = si ? 1000 : 1024;
-  if(Math.abs(bytes) < thresh) {
-      return bytes + ' B';
-  }
-  var units = si
-      ? ['kB','MB','GB','TB','PB','EB','ZB','YB']
-      : ['KiB','MiB','GiB','TiB','PiB','EiB','ZiB','YiB'];
-  var u = -1;
-  do {
-      bytes /= thresh;
-      ++u;
-  } while(Math.abs(bytes) >= thresh && u < units.length - 1);
-  return bytes.toFixed(1)+' '+units[u];
-}
+
+import humanFileSize from './helpers/human-file-size';
+import colorType from './helpers/color-type';
 
 const Preview = ({ content }) => {
   if (_.isString(content)) {
@@ -90,7 +67,7 @@ const MessageLogWidget = ({ messageLog = [] }) => {
 const handleMessages = (state, action) => {
   switch(action.type) {
     case 'socket.message':
-      if (action.topic === 'message.sent') {
+      if (action.topic === 'message.log') {
         const payload = _.isArray(action.payload) ? action.payload : [action.payload];
         console.log('message was sent', action.payload)
         const messages = payload.map(message => ({ ...message, ts: moment() }));
