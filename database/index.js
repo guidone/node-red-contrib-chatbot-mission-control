@@ -1,10 +1,8 @@
-
 const { ApolloServer } = require('apollo-server-express');
 const { resolver } = require('graphql-sequelize');
 
 const { Configuration } = require('./sqlite-schema');
 // todo: create if not exist 
-//sequelize.sync({ force: true });
 
 const {
   GraphQLSchema,
@@ -74,7 +72,7 @@ const schema = new GraphQLSchema({
                 return Configuration.update(configuration, { where: { id: found.id }})
                   .then(() => Configuration.findByPk(found.id));  
               } 
-              return Configuration.create(extension);
+              return Configuration.create(configuration);
             });
         }
       }

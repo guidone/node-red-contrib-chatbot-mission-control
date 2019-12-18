@@ -12,7 +12,7 @@ import useConfiguration from '../../../src/hooks/configuration';
 
 const ConfigurationPage = ({ sendMessage }) => {
 
-  const { loading, error, data, update } = useConfiguration({ 
+  const { loading, saving, error, data, update } = useConfiguration({ 
     namespace: 'postcardbot',
     onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' }) 
   });
@@ -23,10 +23,10 @@ const ConfigurationPage = ({ sendMessage }) => {
       <FlexboxGrid justify="space-between">
         <FlexboxGrid.Item colspan={17}>
           {loading && <div>loading</div>}
-          {error && <div>error</div>}
+          {error && <div>{error.message}</div>}
           {!loading && !error && (
             <ConfigurationForm 
-              disabled={loading}
+              disabled={saving}
               value={data}
               onSubmit={formValue => {
                 sendMessage('mc.configuration', formValue);

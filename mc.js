@@ -10,7 +10,6 @@ const graphQLServer = require('./database/index');
 const { Configuration } = require('./database/sqlite-schema');
 
 let initialized = false;
-let io;
 let settings = {};
 const Events = new events.EventEmitter();
 

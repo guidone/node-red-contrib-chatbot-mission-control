@@ -38,7 +38,8 @@ const useConfiguration = ({ namespace, onCompleted = () => {} }) => {
   ] = useMutation(UPDATE_CONFIGURATION, { onCompleted });
 
   return { 
-    loading: loading || mutationLoading, 
+    loading: loading, 
+    saving: mutationLoading,
     error: error || mutationError, 
     data: configurationValue,
     update: configuration => updateConfiguration({ 
