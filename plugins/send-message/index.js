@@ -60,6 +60,6 @@ class SendPage extends React.Component {
 }
 
 plug('sidebar', null, { id: 'send-message', label: 'Send Message', url: '/mc/send-message', icon: 'shield' })
-plug('pages', SendPage, { url: '/mc/send-message' });
+plug('pages', SendPage, { url: '/mc/send-message', id: 'send-message', title: 'Send Message' });
 
 

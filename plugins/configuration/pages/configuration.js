@@ -19,7 +19,7 @@ const ConfigurationPage = ({ sendMessage }) => {
 
   return (
     <PageContainer className="page-configuration">
-      <Breadcrumbs />
+      <Breadcrumbs pages={['Configuration']}/>
       <FlexboxGrid justify="space-between">
         <FlexboxGrid.Item colspan={17}>
           {loading && <div>loading</div>}
