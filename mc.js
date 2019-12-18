@@ -38,6 +38,18 @@ function sendMessage(topic, payload) {
 // web socket docs
 // https://github.com/websockets/ws#api-docs
 
+// design 
+// https://adminlte.io/themes/v3/index2.html
+
+// Inspiration design
+// https://colorlib.com/wp/free-dashboard-templates/
+// clone schema https://demo.uifort.com/bamburgh-admin-dashboard-pro/
+// React grid
+// https://github.com/STRML/react-grid-layout#installation
+// useQuery
+// https://www.apollographql.com/docs/react/data/queries/
+
+
 function bootstrap(server, app, log, redSettings) {
 
   // print version
