@@ -16,10 +16,6 @@ import '../../node_modules/react-grid-layout/css/styles.css';
 import '../../node_modules/react-resizable/css/styles.css';
 
 
-
-
-
-
 const Widget2 = ({ count, user, dispatch }) => (
   <Panel title="I am a title">
     <span>count: {count} {user}</span>
@@ -78,15 +74,16 @@ class HomePage extends React.Component {
           rowHeight={50}
           margin={[20, 20]}
           layouts={this.state.layouts}
-          onLayoutChange={(layout, layouts) =>
+          onLayoutChange={(layout, layouts) => {
+            console.log('layout', layout);
+            console.log('layouts', layouts)
             this.onLayoutChange(layout, layouts)
-          }
+          }}
         >
           {items.map(({ view: View, props }) => {
-            console.log('ridisgno items')
-            const { x, y, h, w, isResizable } = props;
+            const { x, y, h, w, isResizable, minW, maxW } = props;
             return (
-              <div key={props.id} data-grid={{x, y, w, h, isResizable }}>
+              <div key={props.id} data-grid={{x, y, w, h, isResizable, minW, maxW }}>
                 <View {...props}/>
               </div>
             );

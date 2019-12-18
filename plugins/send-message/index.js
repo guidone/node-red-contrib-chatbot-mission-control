@@ -41,7 +41,7 @@ const SendMessageWidget = ({ sendMessage, stats }) => {
   );
 }
 
-plug('widgets', withSocket(SendMessageWidget), { x: 1, y: 0, w: 2, h: 4, isResizable: false, id: 1 })
+plug('widgets', withSocket(SendMessageWidget), { x: 1, y: 0, w: 2, h: 4, isResizable: true, id: 1 })
 
 class SendPage extends React.Component {
 

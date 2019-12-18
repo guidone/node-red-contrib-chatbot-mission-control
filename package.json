@@ -1,5 +1,5 @@
 {
-  "name": "red-contrib-chatbot-mission-control",
+  "name": "node-red-contrib-chatbot-mission-control",
   "version": "0.1.0",
   "description": "",
   "main": "index.js",
