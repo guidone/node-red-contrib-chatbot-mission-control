@@ -32,7 +32,6 @@ plug('widgets', withDispatch(withState(Widget2, ['count', 'user'])), { x: 0, y: 
 
 plug('reducers', (state, action) => {
   if (action.type === 'socket.message') {
-    console.log('aggiungi stats');
     let counter = state.stats != null ? state.stats : 0;
     return { ...state, stats: counter + 1 };
   } else {
@@ -61,8 +60,7 @@ class HomePage extends React.Component {
 
 
     const items = codePlug.getItems('widgets');
-    console.log('woidgets', items)
-
+    
     const { count, dispatch, user } = this.props;
 
     return (

@@ -12,7 +12,6 @@ import {
 
 
  const AppHeader = ({ user }) => {
-  console.log('refresh header', user)
   return (
     <Header className="mc-header">
       <Navbar appearance="inverse">

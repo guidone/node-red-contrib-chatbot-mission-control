@@ -1,6 +1,6 @@
-import React, { Fragment } from 'react';
-import Sockette from 'sockette';
+import React from 'react';
 
+import socketListener from '../../lib/socket';
 const SocketContext = React.createContext({});
 
 class WebSocket extends React.Component {
@@ -12,34 +12,24 @@ class WebSocket extends React.Component {
     };
   }
 
+  onMessage = (topic, payload) => this.props.dispatch({ type: 'socket.message', topic, payload });
+  onOpen = () => this.props.dispatch({ type: 'socket.open' });
+
   componentDidMount() {
-    const { dispatch } = this.props;
-    const ws = new Sockette('ws://localhost:1942', {
-      timeout: 5e3,
-      maxAttempts: 10,
-      onopen: e => dispatch({ type: 'socket.connected'}),
-      onmessage: e => {
-        let message;
-        try {
-          message = JSON.parse(e.data);
-        } catch(e) {
-          // do nothing
-        }
-        if (message != null) {
-          dispatch({ type: 'socket.message', topic: message.topic, payload: message.payload });
-        }
-      },
-      onreconnect: e => dispatch({ type: 'socket.reconneting'}),
-      onmaximum: e => console.log('Stop Attempting!', e),
-      onclose: e => console.log('Closed!', e),
-      onerror: e => console.log('Error:', e)
-    });
-    this.setState({ ws });
+    socketListener
+      .on('message', this.onMessage)
+      .on('open', this.onOpen);
+  }
+
+  componentWillUnmount() {
+    socketListener
+      .off('message', this.onMessage)
+      .off('open', this.onOpen);
   }
 
   render() {
     const { ws } = this.state;
-    return <SocketContext.Provider value={{ ws, onMessage: this.onMessage }}>{this.props.children}</SocketContext.Provider>;
+    return <SocketContext.Provider value={{ socketListener }}>{this.props.children}</SocketContext.Provider>;
   }
 }
 

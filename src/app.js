@@ -85,7 +85,7 @@ function reducer2(state, action) {
 
 function SocketReducers(state, action) {
   switch(action.type) {
-    case 'socket.connected':
+    case 'socket.open':
       Notification.success({ title: 'Connected!'});
       return state;
     default:

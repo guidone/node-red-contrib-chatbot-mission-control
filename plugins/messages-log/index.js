@@ -1,20 +1,38 @@
-import React, { useState, Fragment } from 'react';
+import React, { Fragment } from 'react';
 import _ from 'lodash';
-import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, Tag, List, FlexboxGrid } from 'rsuite';
+import moment from 'moment';
+import { Icon, IconButton, Tag, List, FlexboxGrid } from 'rsuite';
 
 import { plug } from '../../lib/code-plug';
-import withState from '../../src/wrappers/with-state';
-import withSocket from '../../src/wrappers/with-socket';
 import Panel from '../../src/components/grid-panel';
-import { WidgetForm, Content, Footer } from '../../src/components/widget-form';
-import moment from 'moment';
+import useSocket from '../../src/hooks/socket';
 
 import './message-log.scss';
-
-
-
 import humanFileSize from './helpers/human-file-size';
 import colorType from './helpers/color-type';
+
+const handleMessages = (state, action) => {
+  switch(action.type) {
+    case 'socket.message':
+      if (action.topic === 'message.log') {
+        const payload = _.isArray(action.payload) ? action.payload : [action.payload];
+        const messages = payload.map(message => ({ ...message, ts: moment() }));
+        const messageLog = state.messageLog != null ? [...messages, ...state.messageLog] : messages;
+        return {
+          ...state,
+          messageLog
+        }; 
+      }
+      return state;
+    case 'clear':
+      return {
+        ...state,
+        messageLog: []
+      }; 
+    default:
+      return state; 
+  }
+};
 
 const Preview = ({ content }) => {
   if (_.isString(content)) {
@@ -24,18 +42,21 @@ const Preview = ({ content }) => {
   } else {
     return <Fragment>Unknown content</Fragment>;
   }
-
 }
 
-
-const MessageLogWidget = ({ messageLog = [] }) => {
-   
-  console.log('I am the messageLog', messageLog)
+const MessageLogWidget = () => {   
+  const { state, dispatch } = useSocket(handleMessages, { messageLog: [] });
+  const { messageLog } = state;
 
   return (
-    <Panel title="Message Log" className="widget-message-log" scrollable>
+    <Panel 
+      title="Message Log" 
+      className="widget-message-log"
+      menu={<IconButton onClick={() => dispatch({ type: 'clear' })} appearance="link" icon={<Icon icon="trash"/>} size="md"/>} 
+      scrollable
+    >
       {messageLog.length === 0 && (
-        <div>empty</div>
+        <Panel.Empty>No messages</Panel.Empty>
       )}
       {messageLog.length !== 0 && (
         <List hover autoScroll size="sm">
@@ -59,34 +80,12 @@ const MessageLogWidget = ({ messageLog = [] }) => {
           ))}
         </List>
       )}
-
+      
     </Panel>
   );
 }
 
-const handleMessages = (state, action) => {
-  switch(action.type) {
-    case 'socket.message':
-      if (action.topic === 'message.log') {
-        const payload = _.isArray(action.payload) ? action.payload : [action.payload];
-        console.log('message was sent', action.payload)
-        const messages = payload.map(message => ({ ...message, ts: moment() }));
-        const messageLog = state.messageLog != null ? [...messages, ...state.messageLog] : messages;
-        return {
-          ...state,
-          messageLog
-        }; 
-      }
-      return state;
-    default:
-      return state; 
-  }
-
-};
-
-// todo min size 3
-plug('reducers', handleMessages);
-plug('widgets', withState(MessageLogWidget, ['messageLog']), { x: 1, y: 0, w: 2, h: 4, minW: 2, isResizable: true, id: 'message-log' })
+plug('widgets', MessageLogWidget, { x: 0, y: 0, w: 2, h: 4, minW: 2, isResizable: true, id: 'message-log' })
 
 
 

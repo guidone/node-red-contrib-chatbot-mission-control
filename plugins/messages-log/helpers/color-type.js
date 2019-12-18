@@ -1,4 +1,4 @@
-export default colorType = type => {
+export default type => {
   switch(type) {
     case 'message': return 'cyan';
     case 'document':

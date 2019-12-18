@@ -5,10 +5,10 @@ import { SocketContext } from '../common/web-socket';
 export default (Component) => {
   return (props) => (
     <SocketContext.Consumer>
-      {({ ws, onMessage }) => (
+      {({ socketListener }) => (
         <Component 
           {...props} 
-          sendMessage={ws != null ? (topic, payload) => ws.send(JSON.stringify({ topic, payload })) : () => {}}
+          sendMessage={socketListener != null ? (topic, payload) => socketListener.send(JSON.stringify({ topic, payload })) : () => {}}
         >
           {props.children}
         </Component>

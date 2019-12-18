@@ -18,10 +18,29 @@
     font-weight: 600;
     padding-left: 10px;
     padding-right: 10px;
+
+    .menu {
+      display: inline-block;
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      height: 40px;
+      line-height: 40px;
+      vertical-align: middle;
+    }
   }
 
   .ui-grid-panel-content {
     flex: 1 0;
+  }
+
+  .ui-grid-panel-empty {
+    height: 100%;
+    line-height: 100%;
+    vertical-align: middle;
+    text-align: center;
+    padding-top: 40px;
+    color: #999999;
   }
 
   .rs-form {
