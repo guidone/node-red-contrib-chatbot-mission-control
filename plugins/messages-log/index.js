@@ -7,85 +7,91 @@ import { plug } from '../../lib/code-plug';
 import Panel from '../../src/components/grid-panel';
 import useSocket from '../../src/hooks/socket';
 
+import MessageList from './views/message-list';
 import './message-log.scss';
-import humanFileSize from './helpers/human-file-size';
-import colorType from './helpers/color-type';
+
 
 const handleMessages = (state, action) => {
   switch(action.type) {
     case 'socket.message':
-      if (action.topic === 'message.log') {
+      if (action.topic === 'message.out') {
         const payload = _.isArray(action.payload) ? action.payload : [action.payload];
         const messages = payload.map(message => ({ ...message, ts: moment() }));
-        const messageLog = state.messageLog != null ? [...messages, ...state.messageLog] : messages;
+        const messageOutLog = state.messageOutLog != null ? [...messages, ...state.messageOutLog] : messages;
         return {
           ...state,
-          messageLog
+          messageOutLog
+        }; 
+      } else if (action.topic === 'message.in') {
+        const payload = _.isArray(action.payload) ? action.payload : [action.payload];
+        const messages = payload.map(message => ({ ...message, ts: moment() }));
+        const messageInLog = state.messageInLog != null ? [...messages, ...state.messageInLog] : messages;
+        return {
+          ...state,
+          messageInLog
         }; 
       }
       return state;
-    case 'clear':
+    case 'clear-out':
       return {
         ...state,
-        messageLog: []
+        messageOutLog: []
+      };
+    case 'clear-in':
+      return {
+        ...state,
+        messageInLog: []
       }; 
     default:
       return state; 
   }
 };
 
-const Preview = ({ content }) => {
-  if (_.isString(content)) {
-    return <Fragment>{content}</Fragment>;
-  } else if (_.isObject(content) && content.type === 'Buffer') {
-    return <Fragment>Buffer <span className="file-size"> ({humanFileSize(content.data.length)})</span></Fragment>;
-  } else {
-    return <Fragment>Unknown content</Fragment>;
-  }
-}
 
-const MessageLogWidget = () => {   
-  const { state, dispatch } = useSocket(handleMessages, { messageLog: [] });
-  const { messageLog } = state;
+const MessageOutLogWidget = () => {   
+  const { state, dispatch } = useSocket(handleMessages, { messageOutLog: [] });
+  const { messageOutLog } = state;
 
   return (
     <Panel 
-      title="Message Log" 
+      title="Outbound Message Log" 
       className="widget-message-log"
-      menu={<IconButton onClick={() => dispatch({ type: 'clear' })} appearance="link" icon={<Icon icon="trash"/>} size="md"/>} 
+      hint={`To see outgoing messages here, set a MC Output node with topic "message.out" in the Node-RED flow in a way that
+        receives the same input of the Sender nodes`}
+      menu={<IconButton onClick={() => dispatch({ type: 'clear-out' })} appearance="link" icon={<Icon icon="trash"/>} size="md"/>} 
       scrollable
     >
-      {messageLog.length === 0 && (
+      {messageOutLog.length === 0 && (
         <Panel.Empty>No messages</Panel.Empty>
       )}
-      {messageLog.length !== 0 && (
-        <List hover autoScroll size="sm">
-          {messageLog.map((message, index) => (
-            <List.Item key={index} index={index}>
-              <FlexboxGrid>
-                <FlexboxGrid.Item colspan={3} className="ellipsis cell-date">
-                  {message.ts.fromNow()}
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={3}>
-                  <Tag color={colorType(message.type)}>{message.type}</Tag>
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={3} className="cell-chat-id">
-                  {message.chatId}
-                </FlexboxGrid.Item>
-                <FlexboxGrid.Item colspan={15} className="ellipsis cell-content">
-                  <Preview content={message.content}/>
-                </FlexboxGrid.Item>
-              </FlexboxGrid>
-            </List.Item>
-          ))}
-        </List>
-      )}
-      
+      {messageOutLog.length !== 0 && <MessageList messages={messageOutLog} />}
     </Panel>
   );
 }
 
-plug('widgets', MessageLogWidget, { x: 0, y: 0, w: 2, h: 4, minW: 2, isResizable: true, id: 'message-log' })
+const MessageInLogWidget = () => {   
+  const { state, dispatch } = useSocket(handleMessages, { messageInLog: [] });
+  const { messageInLog } = state;
+
+  return (
+    <Panel 
+      title="Inbound Message Log" 
+      className="widget-message-log"
+      hint={`To see ingoing messages here, set a MC Output node with topic "message.in" in the Node-RED flow in a way that
+        receives the same output of the Receiver nodes`}
+      menu={<IconButton onClick={() => dispatch({ type: 'clear-in' })} appearance="link" icon={<Icon icon="trash"/>} size="md"/>} 
+      scrollable
+    >
+      {messageInLog.length === 0 && (
+        <Panel.Empty>No messages</Panel.Empty>
+      )}
+      {messageInLog.length !== 0 && <MessageList messages={messageInLog} />}
+    </Panel>
+  );
+}
+
+plug('widgets', MessageOutLogWidget, { x: 0, y: 0, w: 2, h: 4, minW: 2, isResizable: true, id: 'message-out-log' })
+plug('widgets', MessageInLogWidget, { x: 0, y: 2, w: 2, h: 4, minW: 2, isResizable: true, id: 'message-in-log' })
 
 
 
