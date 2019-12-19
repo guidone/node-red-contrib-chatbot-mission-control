@@ -23,7 +23,7 @@ const MessageList = ({ messages = [] }) => {
             <FlexboxGrid.Item colspan={3} className="ellipsis cell-date">
               {message.ts.fromNow()}
             </FlexboxGrid.Item>
-            <FlexboxGrid.Item colspan={3}>
+            <FlexboxGrid.Item colspan={3} className="cell-type">
               <Tag color={colorType(message.type)}>{message.type}</Tag>
             </FlexboxGrid.Item>
             <FlexboxGrid.Item colspan={3} className="cell-chat-id ellipsis">

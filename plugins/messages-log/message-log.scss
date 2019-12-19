@@ -8,13 +8,21 @@
   .cell-chat-id {
     font-style: italic;
     line-height: 25px;
+    font-size: 13px;
   }
 
   .cell-date {
     font-size: 12px;
     line-height: 24px;
     color: #666666;
+  }
 
+  .cell-type {
+    .rs-tag {
+      padding: 0px 4px 1px 4px;
+      font-size: 11px;
+      border-radius: 3px;
+    }
   }
 
   .cell-content {
