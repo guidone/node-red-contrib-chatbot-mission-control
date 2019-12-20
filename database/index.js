@@ -1,109 +1,49 @@
-const { ApolloServer } = require('apollo-server-express');
-const { resolver } = require('graphql-sequelize');
+const fs = require('fs');
+const Sequelize = require('sequelize');
+const { resolve } = require('path');
+const moment = require('moment');
+const lcd = require('../lib/lcd/index');
 
-const { Configuration } = require('./sqlite-schema');
-// todo: create if not exist 
+const GraphQLServer = require('./graphql');
 
-const {
-  GraphQLSchema,
-  GraphQLObjectType,
-  GraphQLNonNull,
-  GraphQLFloat,
-  GraphQLInt,
-  GraphQLString,
-  GraphQLList,
-  GraphQLBoolean,
-  GraphQLInputObjectType
-} = require('graphql');
+let exportCache;
 
-const configurationType = new GraphQLObjectType({
-  name: 'Configuration',
-  description: 'tbd',
-  fields: {
-    id: {
-      type: new GraphQLNonNull(GraphQLInt),
-      description: 'The id of the configuration',
-    },
-    namespace: {
-      type: GraphQLString,
-      description: '',
-    },
-    payload: {
-      type: GraphQLString,
-      description: '',
-    }
+module.exports = mcSettings => {
+  if (exportCache != null) {
+    return exportCache;;
   }
-});
+  const { dbPath } = mcSettings;
 
-const newConfigurationType = new GraphQLInputObjectType({
-  name: 'NewConfiguration',
-  description: 'tbd',
-  fields: () => ({
-    namespace: {
-      type: GraphQLString,
-      description: '',
-    },
-    payload: {
-      type: GraphQLString,
-      description: '',
-    }
-  })
-});
-
-const schema = new GraphQLSchema({
+  const sequelize = new Sequelize('mission_control', '', '', {
+    host: 'localhost',
+    dialect: 'sqlite',
+    storage: dbPath,
+    logging: true
+  });
+    
+  const Configuration = sequelize.define('configuration', {
+    namespace: Sequelize.STRING,
+    payload: Sequelize.TEXT,
+    ts: Sequelize.DATE
+  });
   
-  mutation: new GraphQLObjectType({
-    name: 'Mutations',
-    description: 'These are the things we can change',
-    fields: {
-      
-      createConfiguration: {
-        type: configurationType,
-        args: {
-          configuration: { type: new GraphQLNonNull(newConfigurationType) }
-        },
-        /*resolve(root, { plugin }) {
-          return Plugin.create(plugin);
-        }*/
-        resolve(root, { configuration }) {
-          return Configuration.findOne({ where: { namespace: configuration.namespace }})
-            .then(found => {
-              if (found != null) {
-                return Configuration.update(configuration, { where: { id: found.id }})
-                  .then(() => Configuration.findByPk(found.id));  
-              } 
-              return Configuration.create(configuration);
-            });
-        }
-      }
-      
-    }
-  }),
+  if (!fs.existsSync(dbPath)) {
+    sequelize.sync({ force: true });
+    console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
+    + ' - [info] Initialized RedBot Mission Control database:')
+    + ' ' + lcd.grey(resolve(dbPath)));
+  } else {
+    console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
+      + ' - [info] Mounted RedBot Mission Control database:')
+      + ' ' + lcd.grey(resolve(dbPath)));
+  }
+
+  const graphQLServer = GraphQLServer({ Configuration });
   
-  query: new GraphQLObjectType({
-    name: 'Queries',
-    fields: {
+  exportCache = {
+    Configuration,
+    graphQLServer
+  }
 
-      configurations: {
-        type: new GraphQLList(configurationType),
-        args: {
-          offset: { type: GraphQLInt },
-          limit: { type: GraphQLInt },
-          order: { type: GraphQLString },
-          namespace: { type: GraphQLString }
-        },
-        resolve: resolver(Configuration)
-      },
-
-      version: {
-        type: GraphQLInt,
-        resolve: () => 42
-      }
-    }
-  })
-});
-
-
-const graphQLServer = new ApolloServer({ schema });
-
-module.exports = graphQLServer;
+  return exportCache;
+};

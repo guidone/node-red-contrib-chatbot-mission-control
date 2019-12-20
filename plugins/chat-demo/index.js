@@ -45,10 +45,10 @@ const Metadata = ({ children }) => {
   );
 }
 
-const ChatWindow = ({ children }) => {
+const ChatWindow = ({ children, width = '100%' }) => {
 
   return (
-    <div className="ui-chat-window chat">{children}</div>
+    <div className="ui-chat-window chat" style={{ width: _.isNumber(width) ? `${width}px` : width }}>{children}</div>
   );
 
 }
@@ -96,8 +96,9 @@ const UserStatus = ({ online = true }) => {
 class ChatPage extends React.Component {
   render() {
     return (
-      <div className="chat-demo">
-          
+      <div className="chat-demo" style={{ padding: 50}}>
+
+         <div style={{width: '400px'}}> 
       <ChatWindow>
         <Messages>
           <Message inbound>
@@ -154,7 +155,7 @@ class ChatPage extends React.Component {
       <MessageComposer/> 
       
     </ChatWindow>  
-
+    </div>
 
        
        

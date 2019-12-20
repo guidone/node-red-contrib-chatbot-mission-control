@@ -6,8 +6,8 @@ const fs = require('fs');
 const moment = require('moment');
 
 const lcd = require('./lib/lcd/index');
-const graphQLServer = require('./database/index');
-const { Configuration } = require('./database/sqlite-schema');
+
+const DatabaseSchema = require('./database/index');
 
 let initialized = false;
 let settings = {};
@@ -62,6 +62,24 @@ function bootstrap(server, app, log, redSettings) {
   } catch(e) {
     lcd.error('Unable to open node-red-contrib-chatbot-mission-control/package.json');
   }
+
+
+
+
+  // get mission control configurations
+  console.log(lcd.timestamp() + 'Red Bot Mission Control configuration:')
+  const mcSettings = redSettings.missionControl || {};
+  if (mcSettings.dbPath == null) {
+    mcSettings.dbPath = __dirname + '/mission-control.sqlite';
+  } else {
+    mcSettings.dbPath = mcSettings.dbPath.replace(/\/$/, '') + '/mission-control.sqlite';
+  }
+  console.log(lcd.timestamp() + '  ' + lcd.green('dbPath: ') + lcd.grey(mcSettings.dbPath));
+
+  // todo put db schema here
+  const databaseSchema = DatabaseSchema(mcSettings)
+  const { Configuration, graphQLServer } = databaseSchema;
+
 
   const uiSettings = redSettings.ui || {};
   if ((uiSettings.hasOwnProperty('path')) && (typeof uiSettings.path === 'string')) {
