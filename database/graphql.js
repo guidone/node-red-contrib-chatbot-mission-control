@@ -14,7 +14,81 @@ const {
   GraphQLInputObjectType
 } = require('graphql');
 
-module.exports = ({ Configuration }) => {
+module.exports = ({ Configuration, Message }) => {
+
+  const newMessageType = new GraphQLInputObjectType({
+    name: 'NewMessage',
+    description: 'tbd',
+    fields: () => ({
+      chatId: {
+        type: GraphQLString,
+        description: '',
+      },
+      userId: {
+        type: GraphQLString,
+        description: '',
+      },
+      messageId: {
+        type: GraphQLString,
+        description: '',
+      },
+      from: {
+        type: GraphQLString,
+        description: '',
+      },
+      type: {
+        type: GraphQLString,
+        description: '',
+      },
+      content: {
+        type: GraphQLString,
+        description: '',
+      },
+      ts: {
+        type: GraphQLString,
+        description: '',
+      }  
+    })
+  });
+
+  const messageType = new GraphQLObjectType({
+    name: 'Message',
+    description: 'tbd',
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The id of the message',
+      },
+      chatId: {
+        type: GraphQLString,
+        description: '',
+      },
+      userId: {
+        type: GraphQLString,
+        description: '',
+      },
+      messageId: {
+        type: GraphQLString,
+        description: '',
+      },
+      from: {
+        type: GraphQLString,
+        description: '',
+      },
+      type: {
+        type: GraphQLString,
+        description: '',
+      },
+      content: {
+        type: GraphQLString,
+        description: '',
+      },
+      ts: {
+        type: GraphQLString,
+        description: '',
+      }
+    }
+  });
 
   const configurationType = new GraphQLObjectType({
     name: 'Configuration',
@@ -62,9 +136,6 @@ module.exports = ({ Configuration }) => {
           args: {
             configuration: { type: new GraphQLNonNull(newConfigurationType) }
           },
-          /*resolve(root, { plugin }) {
-            return Plugin.create(plugin);
-          }*/
           resolve(root, { configuration }) {
             return Configuration.findOne({ where: { namespace: configuration.namespace }})
               .then(found => {
@@ -74,6 +145,16 @@ module.exports = ({ Configuration }) => {
                 } 
                 return Configuration.create(configuration);
               });
+          }
+        },
+
+        createMessage: {
+          type: messageType,
+          args: {
+            message: { type: new GraphQLNonNull(newMessageType) }
+          },
+          resolve(root, { message }) {
+            return Message.create(message);    
           }
         }
         
@@ -93,6 +174,17 @@ module.exports = ({ Configuration }) => {
             namespace: { type: GraphQLString }
           },
           resolve: resolver(Configuration)
+        },
+
+        messages: {
+          type: new GraphQLList(messageType),
+          args: {
+            offset: { type: GraphQLInt },
+            limit: { type: GraphQLInt },
+            order: { type: GraphQLString },
+            type: { type: GraphQLString }
+          },
+          resolve: resolver(Message)
         },
   
         version: {

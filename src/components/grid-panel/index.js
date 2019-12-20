@@ -5,9 +5,9 @@ import { Icon, Tooltip, Whisper } from 'rsuite';
 
 import './panel.scss';
 
-const Panel = ({ children, title, className, draggable = true, scrollable = false, menu, hint }) => {
+const Panel = ({ children, title, className, draggable = true, scrollable = false, menu, hint, nopadding = false }) => {
   return (
-    <div className={classNames('ui-grid-panel', className, { draggable, 'not-scrollable': !scrollable, scrollable } )}>
+    <div className={classNames('ui-grid-panel', className, { draggable, 'not-scrollable': !scrollable, scrollable, nopadding } )}>
       {!_.isEmpty(title) && (
         <div className="ui-panel-title">
           {title}

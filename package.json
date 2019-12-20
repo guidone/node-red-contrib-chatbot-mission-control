@@ -16,12 +16,15 @@
       "mc_base": "nodes/mc_base.js",
       "mc_input": "nodes/mc_input.js",
       "mc_output": "nodes/mc_output.js",
-      "mc-configuration": "nodes/mc_configuration.js"
+      "mc-configuration": "nodes/mc_configuration.js",
+      "mc-store": "nodes/mc_store.js"
     }
   },
   "dependencies": {
+    "apollo-boost": "^0.4.7",
     "apollo-cache-inmemory": "^1.6.5",
     "apollo-client": "^2.6.8",
+    "apollo-link": "^1.2.13",
     "apollo-link-http": "^1.5.16",
     "apollo-server-express": "^2.9.14",
     "classnames": "^2.2.6",
@@ -31,6 +34,7 @@
     "graphql-sequelize": "^9.3.6",
     "lodash": "^4.17.15",
     "moment": "^2.24.0",
+    "node-fetch": "^2.6.0",
     "prettyjson": "^1.2.1",
     "react": "^16.12.0",
     "react-apollo": "^3.1.3",

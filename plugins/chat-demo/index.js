@@ -1,92 +1,19 @@
 import React from 'react';
 import { Icon } from 'rsuite';
+import moment from 'moment';
 
 import { plug } from '../../lib/code-plug';
 
 import './style.scss';
 
+import Panel from '../../src/components/grid-panel';
+import { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, MessageDate, MessageUser, UserStatus } from '../../src/components/chat';
+import useSocket from '../../src/hooks/socket';
+
 
 import classNames from 'classnames';
 
-const Message = ({ children, inbound = true }) => {
 
-  return (
-    <li className={classNames('ui-chat-message', { clearfix: inbound, inbound, outbound: !inbound })}>
-      {children}
-    </li>
-  );
-
-};
-
-const Messages = ({ children }) => {
-
-  return (
-    <div className="ui-chat-messages chat-history">
-      <ul>
-        {children}
-      </ul>
-    </div>
-  );
-};
-
-
-const Content = ({ children }) => {
-
-  return (
-    <div className="ui-chat-content message">{children}</div>
-  );
-}
-
-const Metadata = ({ children }) => {
-  return (
-    <div className="ui-chat-metadata">
-      {children}
-    </div>
-  );
-}
-
-const ChatWindow = ({ children, width = '100%' }) => {
-
-  return (
-    <div className="ui-chat-window chat" style={{ width: _.isNumber(width) ? `${width}px` : width }}>{children}</div>
-  );
-
-}
-
-
-const MessageComposer = () => {
-  return (
-    <div className="ui-chat-message-composer">
-        <textarea name="message-to-send" id="message-to-send" placeholder ="Type your message" rows="3"></textarea>
-                
-        <i className="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
-        <i className="fa fa-file-image-o"></i>
-        
-        <button>Send</button>
-
-      </div>
-  );
-
-}
-
-const MessageDate = ({ children }) => {
-
-  return (
-    <span className="ui-chat-message-date">{children}</span>
-  );
-}
-
-const MessageUser = ({ children }) => {
-  return (
-    <div className="ui-chat-message-user">{children}</div>
-  );
-}
-
-const UserStatus = ({ online = true }) => {
-  return (
-    <Icon icon="circle" className={classNames('ui-chat-status', { online, offline: !online })} />
-  )
-}
 
 // <div className="message other-message float-right">
 
@@ -167,6 +94,59 @@ class ChatPage extends React.Component {
 
 
 }
+
+
+const handleMessages = (state, action) => {
+  switch(action.type) {
+    case 'socket.message':
+      if (action.topic === 'message.out') {
+        const payload = _.isArray(action.payload) ? action.payload : [action.payload];
+        return {
+          ...state,
+          lastMessage: payload[payload.length - 1]
+        };
+      }       
+      return state;
+    default:
+      return state; 
+  }
+};
+
+
+const LastMessageWidget = () => {
+  
+  const { state, dispatch } = useSocket(handleMessages, { lastMessage: null });
+  const { lastMessage } = state;
+
+  console.log('lastMessage', lastMessage)
+
+  return (
+    <Panel 
+      title="Last Message" 
+      className="widget-last-message"
+      nopadding
+    >
+      <ChatWindow style={{ height: '100%' }}>
+        <Messages>
+          {lastMessage != null && (
+            <Message inbound={false}>
+              <Metadata>
+                <MessageDate date={moment()}/> &nbsp; &nbsp;
+                <MessageUser>Olia</MessageUser> <UserStatus />
+                
+              </Metadata>
+              <Content>
+                {lastMessage.content}
+              </Content>
+            </Message>
+          )}
+        </Messages>
+      </ChatWindow>
+    </Panel>
+  );
+}
+
+plug('widgets', LastMessageWidget, { x: 0, y: 0, w: 2, h: 6,  isResizable: false, id: 'last-message' })
 
 plug('sidebar', null, { id: 'chat-demo', label: 'Chat Demo', url: '/mc/chat', icon: 'shield' })
 plug('pages', ChatPage, { url: '/mc/chat', id: 'chat', title: 'Chat Demo' });

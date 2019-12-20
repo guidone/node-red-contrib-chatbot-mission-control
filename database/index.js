@@ -26,6 +26,16 @@ module.exports = mcSettings => {
     payload: Sequelize.TEXT,
     ts: Sequelize.DATE
   });
+
+  const Message = sequelize.define('message', {
+    chatId: Sequelize.STRING,
+    userId: Sequelize.STRING,
+    from: Sequelize.STRING,
+    messageId: Sequelize.STRING,
+    type: Sequelize.TEXT,
+    content: Sequelize.TEXT,
+    ts: Sequelize.DATE
+  });
   
   if (!fs.existsSync(dbPath)) {
     sequelize.sync({ force: true });
@@ -38,10 +48,11 @@ module.exports = mcSettings => {
       + ' ' + lcd.grey(resolve(dbPath)));
   }
 
-  const graphQLServer = GraphQLServer({ Configuration });
+  const graphQLServer = GraphQLServer({ Configuration, Message });
   
   exportCache = {
     Configuration,
+    Message,
     graphQLServer
   }
 

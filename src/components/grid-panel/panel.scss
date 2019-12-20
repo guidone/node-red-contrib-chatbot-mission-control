@@ -71,5 +71,16 @@
       overflow: scroll;
     }
   }
+
+  &.nopadding {
+    .ui-grid-panel-content {
+      margin-left: -10px;
+      margin-right: -10px;
+      margin-bottom: -10px;
+      border-bottom-left-radius: 3px;
+      border-bottom-right-radius: 3px;
+      margin-top: -5px;
+    }
+  }
 }
 
