@@ -3,6 +3,7 @@ import { Tag, List, FlexboxGrid } from 'rsuite';
 
 import humanFileSize from '../helpers/human-file-size';
 import colorType from '../helpers/color-type';
+import useTimedReRender from '../../../src/hooks/timed-rerender';
 
 const Preview = ({ content }) => {
   if (_.isString(content)) {
@@ -14,7 +15,13 @@ const Preview = ({ content }) => {
   }
 }
 
+
+
+
+
 const MessageList = ({ messages = [] }) => {
+  useTimedReRender(6e4);
+
   return (
     <List hover autoScroll size="sm">
       {messages.map((message, index) => (
