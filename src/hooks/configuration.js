@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import { Query, useQuery, useMutation } from 'react-apollo';
+import { useQuery, useMutation } from 'react-apollo';
 
 const GET_CONFIGURATION = gql`
 query($namespace: String) {

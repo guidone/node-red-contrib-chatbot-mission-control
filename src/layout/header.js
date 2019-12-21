@@ -10,6 +10,15 @@ import {
   Link
 } from 'react-router-dom';
 
+/*
+  <Nav.Item>News</Nav.Item>
+  <Nav.Item>Products</Nav.Item>
+  <Dropdown title="About">
+    <Dropdown.Item>Company</Dropdown.Item>
+    <Dropdown.Item>Team</Dropdown.Item>
+    <Dropdown.Item>Contact</Dropdown.Item>
+  </Dropdown>
+*/
 
  const AppHeader = ({ user }) => {
   return (
@@ -17,14 +26,7 @@ import {
       <Navbar appearance="inverse">
         <Navbar.Body>
           <Nav>
-            <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/mc">Home</Link>} />
-            <Nav.Item>News</Nav.Item>
-            <Nav.Item>Products</Nav.Item>
-            <Dropdown title="About">
-              <Dropdown.Item>Company</Dropdown.Item>
-              <Dropdown.Item>Team</Dropdown.Item>
-              <Dropdown.Item>Contact</Dropdown.Item>
-            </Dropdown>
+            <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/mc">Home</Link>} />            
           </Nav>
           <Nav pullRight>
             <Dropdown
@@ -35,17 +37,9 @@ import {
               <Dropdown.Item ><Icon icon="user" /> New User</Dropdown.Item>
               <Dropdown.Item ><Icon icon="group" /> New Group</Dropdown.Item>
             </Dropdown>
-          </Nav>
-          
-          
-
-          
-
-            
-          
+          </Nav>          
         </Navbar.Body>
       </Navbar>
-
     </Header>
   );
 }

@@ -12,10 +12,7 @@ const { isValidMessage } = require('../lib/utils/index');
 const CREATE_MESSAGE = gql`
 mutation($message: NewMessage!) {
   createMessage(message: $message) {
-    id,
-    chatId,
-    content,
-    type
+    id
   }
 }
 `;
@@ -52,6 +49,7 @@ module.exports = function(RED) {
             userId: String(msg.payload.userId),
             type: msg.payload.type,
             ts: moment(),
+            transport: msg.originalMessage.transport,
             content: _.isString(msg.payload.content) ? msg.payload.content : '<buffer>'
           }
         }

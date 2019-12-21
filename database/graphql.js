@@ -44,6 +44,10 @@ module.exports = ({ Configuration, Message }) => {
         type: GraphQLString,
         description: '',
       },
+      transport: {
+        type: GraphQLString,
+        description: '',
+      },
       ts: {
         type: GraphQLString,
         description: '',
@@ -76,6 +80,10 @@ module.exports = ({ Configuration, Message }) => {
         description: '',
       },
       type: {
+        type: GraphQLString,
+        description: '',
+      },
+      transport: {
         type: GraphQLString,
         description: '',
       },

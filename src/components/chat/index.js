@@ -2,6 +2,7 @@ import React from 'react';
 import { Icon } from 'rsuite';
 import classNames from 'classnames';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 
 import './chat.scss';
 
@@ -27,10 +28,10 @@ const Messages = ({ children }) => {
 };
 
 
-const Content = ({ children }) => {
+const Content = ({ children, firstOfGroup = false }) => {
 
   return (
-    <div className="ui-chat-content message">{children}</div>
+    <div className={classNames("ui-chat-content message", { 'first-of-group': firstOfGroup })}>{children}</div>
   );
 }
 
@@ -88,4 +89,88 @@ const UserStatus = ({ online = true }) => {
   )
 }
 
-export { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, MessageDate, MessageUser, UserStatus };
+
+const MessageText = ({ message, ...props }) => {
+  return (
+    <Message {...props}>
+      <Metadata>
+        <MessageDate date={moment()}/> &nbsp; &nbsp;
+        <MessageUser>Olia</MessageUser> <UserStatus />                
+      </Metadata>
+      <Content>
+        {message.content}
+      </Content>
+    </Message>
+  );
+};
+
+const Buttons = ({ children, layout = 'quick-replies' }) => {
+
+  return (
+    <div className={classNames(
+      'ui-chat-buttons', 
+      { 
+        'quick-replies': layout === 'quick-replies',
+        'inline': layout === 'inline',
+        'card': layout === 'card' 
+      }
+    )}
+    >
+      {children}
+    </div>
+  );
+};
+
+const Button = ({ value, children }) => {
+
+  return (
+    <div className="ui-chat-button">{children}</div>
+  );
+
+};
+
+
+const MessageButtons = ({ message, ...props }) => {
+  return (
+    <Message {...props}>
+      <Metadata>
+        <MessageDate date={moment()}/> &nbsp; &nbsp;
+        <MessageUser>Olia</MessageUser> <UserStatus />                
+      </Metadata>
+      <Content firstOfGroup>
+        {message.content}
+      </Content>
+      {message.buttons != null && message.buttons.length !== 0 && (
+        <Buttons layout="card">
+          {message.buttons.map(button => (
+            <Button {...button} key={`${button.value}-${button.label}`}>{button.label}</Button>
+          ))}
+        </Buttons>
+      )}
+    </Message>
+  );
+};
+MessageButtons.propTypes = {
+  layout: PropTypes.oneOf(['quick-replies', 'inline',  'card'])
+};
+
+
+
+
+
+export { 
+  Message, 
+  Messages, 
+  Content, 
+  Metadata, 
+  ChatWindow, 
+  MessageComposer, 
+  MessageDate, 
+  MessageUser, 
+  UserStatus,
+
+  MessageText,
+  MessageButtons 
+};
+
+

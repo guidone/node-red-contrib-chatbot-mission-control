@@ -32,6 +32,7 @@ module.exports = mcSettings => {
     userId: Sequelize.STRING,
     from: Sequelize.STRING,
     messageId: Sequelize.STRING,
+    transport: Sequelize.STRING,
     type: Sequelize.TEXT,
     content: Sequelize.TEXT,
     ts: Sequelize.DATE

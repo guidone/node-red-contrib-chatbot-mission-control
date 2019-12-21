@@ -7,7 +7,7 @@ import { plug } from '../../lib/code-plug';
 import './style.scss';
 
 import Panel from '../../src/components/grid-panel';
-import { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, MessageDate, MessageUser, UserStatus } from '../../src/components/chat';
+
 import useSocket from '../../src/hooks/socket';
 
 
@@ -113,6 +113,12 @@ const handleMessages = (state, action) => {
 };
 
 
+import { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, MessageDate, MessageUser, UserStatus, 
+  MessageText,
+  MessageButtons 
+} from '../../src/components/chat';
+
+
 const LastMessageWidget = () => {
   
   const { state, dispatch } = useSocket(handleMessages, { lastMessage: null });
@@ -129,16 +135,14 @@ const LastMessageWidget = () => {
       <ChatWindow style={{ height: '100%' }}>
         <Messages>
           {lastMessage != null && (
-            <Message inbound={false}>
-              <Metadata>
-                <MessageDate date={moment()}/> &nbsp; &nbsp;
-                <MessageUser>Olia</MessageUser> <UserStatus />
-                
-              </Metadata>
-              <Content>
-                {lastMessage.content}
-              </Content>
-            </Message>
+            [
+              lastMessage.type === 'text' && (
+              <MessageText message={lastMessage} inbound={false} />
+              ),
+              lastMessage.type === 'inline-buttons' && (
+                <MessageButtons message={lastMessage} inbound={false} />
+              )
+            ]
           )}
         </Messages>
       </ChatWindow>
