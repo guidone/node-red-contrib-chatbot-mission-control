@@ -265,5 +265,16 @@ $gray: #92959E;
     color: $orange;
   }
 
+}
 
+.ui-chat-message-photo {
+  .ui-chat-content {
+    padding: 0px;
+
+    img {
+      width: 100%;
+      border-radius: 7px;
+      border: 3px solid $green;
+    }
+  }
 }

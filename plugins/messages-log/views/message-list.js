@@ -1,8 +1,9 @@
 import React, { Fragment } from 'react';
 import { Tag, List, FlexboxGrid } from 'rsuite';
 
+import MessageType from '../../../src/components/message-type';
+
 import humanFileSize from '../helpers/human-file-size';
-import colorType from '../helpers/color-type';
 import useTimedReRender from '../../../src/hooks/timed-rerender';
 
 const Preview = ({ content }) => {
@@ -31,7 +32,7 @@ const MessageList = ({ messages = [] }) => {
               {message.ts.fromNow()}
             </FlexboxGrid.Item>
             <FlexboxGrid.Item colspan={3} className="cell-type">
-              <Tag color={colorType(message.type)}>{message.type}</Tag>
+              <MessageType type={message.type}/>
             </FlexboxGrid.Item>
             <FlexboxGrid.Item colspan={3} className="cell-chat-id ellipsis">
               {message.chatId}

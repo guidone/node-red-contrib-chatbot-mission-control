@@ -115,7 +115,8 @@ const handleMessages = (state, action) => {
 
 import { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, MessageDate, MessageUser, UserStatus, 
   MessageText,
-  MessageButtons 
+  MessageButtons,
+  MessagePhoto 
 } from '../../src/components/chat';
 
 
@@ -141,6 +142,9 @@ const LastMessageWidget = () => {
               ),
               lastMessage.type === 'inline-buttons' && (
                 <MessageButtons message={lastMessage} inbound={false} />
+              ),
+              lastMessage.type === 'photo' && (
+                <MessagePhoto message={lastMessage} inbound={false} />
               )
             ]
           )}
@@ -150,7 +154,7 @@ const LastMessageWidget = () => {
   );
 }
 
-plug('widgets', LastMessageWidget, { x: 0, y: 0, w: 2, h: 6,  isResizable: false, id: 'last-message' })
+plug('widgets', LastMessageWidget, { x: 0, y: 0, w: 2, h: 8,  isResizable: false, id: 'last-message' })
 
 plug('sidebar', null, { id: 'chat-demo', label: 'Chat Demo', url: '/mc/chat', icon: 'shield' })
 plug('pages', ChatPage, { url: '/mc/chat', id: 'chat', title: 'Chat Demo' });

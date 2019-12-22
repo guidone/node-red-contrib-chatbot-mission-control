@@ -6,10 +6,10 @@ import PropTypes from 'prop-types';
 
 import './chat.scss';
 
-const Message = ({ children, inbound = true }) => {
+const Message = ({ children, inbound = true, className }) => {
 
   return (
-    <li className={classNames('ui-chat-message', { clearfix: inbound, inbound, outbound: !inbound })}>
+    <li className={classNames('ui-chat-message', className, { clearfix: inbound, inbound, outbound: !inbound })}>
       {children}
     </li>
   );
@@ -154,6 +154,36 @@ MessageButtons.propTypes = {
   layout: PropTypes.oneOf(['quick-replies', 'inline',  'card'])
 };
 
+class MessagePhoto extends React.Component {
+
+  // use func and state
+  // inbound msg too
+  render() {
+
+    const { message } = this.props;
+
+    var arrayBufferView = new Uint8Array( message.content.data );
+    var blob = new Blob( [ arrayBufferView ], { type: "image/jpeg" } );
+    var urlCreator = window.URL || window.webkitURL;
+    var imageUrl = urlCreator.createObjectURL( blob );
+
+    return (
+      <Message {...this.props} className="ui-chat-message-photo">
+        <Metadata>
+          <MessageDate date={moment()}/> &nbsp; &nbsp;
+          <MessageUser>Olia</MessageUser> <UserStatus />                
+        </Metadata>
+        <Content>
+          <img src={imageUrl}/>
+        </Content>
+      </Message>
+
+    )
+
+  }
+
+}
+
 
 
 
@@ -170,7 +200,8 @@ export {
   UserStatus,
 
   MessageText,
-  MessageButtons 
+  MessageButtons,
+  MessagePhoto 
 };
 
 

@@ -6,6 +6,7 @@ import { Table } from 'rsuite';
 const { Column, HeaderCell, Cell, Pagination } = Table;
 
 import PageContainer from '../../../src/components/page-container';
+import MessageType from '../../../src/components/message-type';
 
 const MESSAGES = gql`
 query ($limit: Int, $offset: Int, $type: String) {
@@ -22,6 +23,7 @@ query ($limit: Int, $offset: Int, $type: String) {
   }
 }
 `;
+
 
 
 const MessageLogs = () => {
@@ -44,6 +46,7 @@ const MessageLogs = () => {
         <Table
           height={600}
           data={data.messages}
+          autoHeight
           onSortColumn={(sortColumn, sortType) => {
             console.log(sortColumn, sortType);
           }}
@@ -61,6 +64,13 @@ const MessageLogs = () => {
           <Column width={100} resizable>
             <HeaderCell>Transport</HeaderCell>
             <Cell dataKey="transport" />
+          </Column>
+
+          <Column width={100} resizable>
+            <HeaderCell>Type</HeaderCell>
+            <Cell dataKey="type">
+              {data => <MessageType type={data.type}/>}
+            </Cell>
           </Column>
 
           <Column width={100} resizable>
