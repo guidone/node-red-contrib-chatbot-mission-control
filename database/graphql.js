@@ -226,9 +226,17 @@ module.exports = ({ Configuration, Message }) => {
             offset: { type: GraphQLInt },
             limit: { type: GraphQLInt },
             order: { type: GraphQLString },
-            type: { type: GraphQLString }
+            type: { type: GraphQLString },
+            inbound: { type: GraphQLBoolean }
           },
-          resolve: resolver(Message)
+          resolve: resolver(Message, {
+            before: (findOptions, args, context) => {
+              console.log('???', args)
+              //findOptions.where = { /* Custom where arguments */ };
+              return findOptions;
+            },
+
+          })
         },
   
         counters: {

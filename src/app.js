@@ -1,4 +1,4 @@
-import React, { useReducer } from 'react';
+import React, { useReducer, useEffect, useState } from 'react';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { createHttpLink } from 'apollo-link-http';
 import { ApolloClient } from 'apollo-client';
@@ -103,14 +103,42 @@ plug('reducers', reducer2);
 // home page con le tiles
 
 
-const AppRouter = ({ codePlug }) => {
+const usePrefetchedData = () => {
+  
+  const [platforms, setPlatforms] = useState([]);
+  const [eventTypes, setEventTypes] = useState([]);
+  const [messageTypes, setMessageTypes] = useState([]);
 
+  useEffect(() => {
+    fetch('/redbot/platforms')
+      .then(response => response.json())
+      .then(response => {
+        console.log('caricato')
+        setPlatforms(response.platforms);
+      })
+      .then(() => fetch('/redbot/globals'))
+      .then(response => response.json())
+      .then(response => {
+        console.log('caricato', response)
+        setEventTypes(response.eventTypes);
+        setMessageTypes(response.messageTypes);
+      })
+
+
+  }, []);
+
+  return { platforms, eventTypes, messageTypes };
+}
+
+
+const AppRouter = ({ codePlug }) => {
+  const { platforms, eventTypes, messageTypes } = usePrefetchedData();
   const reducers = compose(...codePlug.getItems('reducers').map(item => item.view ));
   const [state, dispatch] = useReducer(reducers, initialState);
-
+console.log('REFRESH APP-->')
   return (
     <ApolloProvider client={client}>
-      <AppContext.Provider value={{ state, dispatch, client }}>
+      <AppContext.Provider value={{ state, dispatch, client, platforms, eventTypes, messageTypes }}>
         <WebSocket dispatch={dispatch}>
           <Router>
             <div className="mission-control-app">        

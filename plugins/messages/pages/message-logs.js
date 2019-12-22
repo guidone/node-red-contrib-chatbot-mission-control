@@ -3,11 +3,11 @@ import gql from 'graphql-tag';
 import { Query, useQuery, useMutation } from 'react-apollo';
 import classNames from 'classnames';
 
-import { Table, Icon } from 'rsuite';
+import { Table, Icon, SelectPicker } from 'rsuite';
 
 const { Column, HeaderCell, Cell, Pagination } = Table;
 
-
+import withMessageTypes from '../../../src/wrappers/with-message-types';
 
 import PageContainer from '../../../src/components/page-container';
 import MessageType from '../../../src/components/message-type';
@@ -17,13 +17,13 @@ import Breadcrumbs from '../../../src/components/breadcrumbs';
 import '../styles/message-logs.scss';
 
 const MESSAGES = gql`
-query ($limit: Int, $offset: Int, $type: String) {
+query ($limit: Int, $offset: Int, $inbound: Boolean, $type: String) {
   counters {
     messages {
      count
     }
   }
-  messages(limit: $limit, offset: $offset, type: $type) {
+  messages(limit: $limit, offset: $offset, inbound: $inbound, type: $type) {
     id
     chatId
     content,
@@ -38,25 +38,59 @@ query ($limit: Int, $offset: Int, $type: String) {
 }
 `;
 
+const SelectInbound = [
+  { value: true, label: 'Inbound' },
+  { value: false, label: 'Outbound' },
+]
 
 
-const MessageLogs = () => {
+const MessageLogs = ({ messageTypes }) => {
 
   const [ limit, setLimit ] = useState(10);
   const [ page, setPage ] = useState(1);
-  const [ filterType, setFilterType ] = useState(undefined);
-  const { loading, error, data } = useQuery(MESSAGES, {
-    variables: { limit, offset: (page - 1) * limit, type: filterType }
+  const [ messageType, setMessageType ] = useState(undefined);
+  const [ inbound, setInbound ] = useState(undefined);
+  const { loading, error, data, refetch } = useQuery(MESSAGES, {
+    variables: { limit, offset: (page - 1) * limit, type: messageType, inbound }
   });
 
 
-  console.log('limit, ', limit)
+  console.log('limit, ', limit, 'inbound', inbound)
   console.log('error', error)
 
   return (
     <PageContainer className="page-message-logs">
-       <Breadcrumbs pages={['Messages Log']}/>
-    
+      <Breadcrumbs pages={['Messages Log']}/>
+      <div className="filters" style={{ marginBottom: '10px' }}>
+        <SelectPicker 
+          value={inbound}
+          data={SelectInbound} 
+          onChange={inbound => {
+            setInbound(inbound)
+            refetch({ inbound })
+          }} 
+          onClean={() => setInbound(undefined)} 
+          cleanable
+          searchable={false}          
+          placeholder="Inbound or Inbound" 
+          size="md"
+        />
+        &nbsp;
+        <SelectPicker 
+          value={messageType}
+          data={messageTypes.map(type => ({ value: type.value, label: type.label }))} 
+          onChange={type => {
+            setMessageType(type)
+            refetch({ type })
+          }} 
+          onClean={() => setInbound(undefined)} 
+          cleanable
+          searchable={false}          
+          placeholder="Message type" 
+          size="md"
+        />
+      </div>
+
       {loading && <div>loading</div>}
       {error && <div>error</div>}
       {!error && !loading && (
@@ -139,5 +173,5 @@ const MessageLogs = () => {
 
 };
 
-export default MessageLogs;
+export default withMessageTypes(MessageLogs);
 
