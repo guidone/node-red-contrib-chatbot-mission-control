@@ -35,6 +35,7 @@ module.exports = mcSettings => {
     transport: Sequelize.STRING,
     type: Sequelize.TEXT,
     content: Sequelize.TEXT,
+    inbound: Sequelize.BOOLEAN,
     ts: Sequelize.DATE
   });
   

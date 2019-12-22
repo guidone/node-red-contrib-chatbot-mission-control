@@ -48,6 +48,10 @@ module.exports = ({ Configuration, Message }) => {
         type: GraphQLString,
         description: '',
       },
+      inbound: {
+        type: GraphQLBoolean,
+        description: ''
+      }, 
       ts: {
         type: GraphQLString,
         description: '',
@@ -91,6 +95,10 @@ module.exports = ({ Configuration, Message }) => {
         type: GraphQLString,
         description: '',
       },
+      inbound: {
+        type: GraphQLBoolean,
+        description: ''
+      },
       ts: {
         type: GraphQLString,
         description: '',
@@ -132,6 +140,34 @@ module.exports = ({ Configuration, Message }) => {
     })
   });
   
+
+  const messageCounterType = new GraphQLObjectType({ 
+    name: 'MessageCounters',
+    description: 'Message Counters',
+    fields: {
+      count: {
+        type: GraphQLInt,
+        description: 'Total messages',
+        resolve: () => Message.count()
+      }
+    }
+  });
+
+  const countersType = new GraphQLObjectType({
+    name: 'Counters',
+    description: 'Counters',
+    fields: {
+      messages: {
+        type: messageCounterType,
+        description: 'Counters for messages',
+        resolve: (root, args) => {
+          return {};
+        } 
+      }
+    }
+  });
+
+
   const schema = new GraphQLSchema({
     
     mutation: new GraphQLObjectType({
@@ -195,6 +231,13 @@ module.exports = ({ Configuration, Message }) => {
           resolve: resolver(Message)
         },
   
+        counters: {
+          type: countersType,
+          resolve: (root, args) => {
+            return {};
+          } 
+        },
+
         version: {
           type: GraphQLInt,
           resolve: () => 42

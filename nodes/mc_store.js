@@ -46,7 +46,9 @@ module.exports = function(RED) {
         variables: {
           message: {
             chatId: String(msg.payload.chatId),
-            userId: String(msg.payload.userId),
+            userId: msg.payload.userId != null ? String(msg.payload.userId) : undefined,
+            messageId: msg.payload.messageId != null ? String(msg.payload.messageId) : undefined,
+            inbound: msg.payload.inbound,
             type: msg.payload.type,
             ts: moment(),
             transport: msg.originalMessage.transport,
