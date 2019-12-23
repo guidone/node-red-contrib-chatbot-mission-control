@@ -1,4 +1,4 @@
-import React, { useReducer, useEffect, useState } from 'react';
+import React, { useReducer, useEffect, useState, useMemo} from 'react';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { createHttpLink } from 'apollo-link-http';
 import { ApolloClient } from 'apollo-client';
@@ -86,7 +86,8 @@ function reducer2(state, action) {
 function SocketReducers(state, action) {
   switch(action.type) {
     case 'socket.open':
-      Notification.success({ title: 'Connected!'});
+      
+       
       return state;
     default:
       return state;
@@ -95,47 +96,46 @@ function SocketReducers(state, action) {
 plug('reducers', SocketReducers);
 
 
-plug('reducers', reducer1);
-plug('reducers', reducer2);
-
-// TODO
-// wrapper per il socket passandogli il dispatch
-// home page con le tiles
+//plug('reducers', reducer1);
+//plug('reducers', reducer2);
 
 
 const usePrefetchedData = () => {
-  
   const [platforms, setPlatforms] = useState([]);
   const [eventTypes, setEventTypes] = useState([]);
   const [messageTypes, setMessageTypes] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetch('/redbot/platforms')
       .then(response => response.json())
-      .then(response => {
-        console.log('caricato')
-        setPlatforms(response.platforms);
-      })
+      .then(response => setPlatforms(response.platforms))
       .then(() => fetch('/redbot/globals'))
       .then(response => response.json())
       .then(response => {
-        console.log('caricato', response)
         setEventTypes(response.eventTypes);
         setMessageTypes(response.messageTypes);
-      })
+        setLoading(false);
+      });
 
 
   }, []);
 
-  return { platforms, eventTypes, messageTypes };
+  return { platforms, eventTypes, messageTypes, loading };
 }
 
 
 const AppRouter = ({ codePlug }) => {
-  const { platforms, eventTypes, messageTypes } = usePrefetchedData();
-  const reducers = compose(...codePlug.getItems('reducers').map(item => item.view ));
+  const { platforms, eventTypes, messageTypes, loading } = usePrefetchedData();
+
+  const reducers = useMemo(() => compose(...codePlug.getItems('reducers').map(item => item.view )));
   const [state, dispatch] = useReducer(reducers, initialState);
-console.log('REFRESH APP-->')
+
+  if (loading) {
+    return <div>Loading...</div>
+
+  }
+
   return (
     <ApolloProvider client={client}>
       <AppContext.Provider value={{ state, dispatch, client, platforms, eventTypes, messageTypes }}>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Notification } from 'rsuite';
 
 import socketListener from '../../lib/socket';
 const SocketContext = React.createContext({});
@@ -13,12 +14,15 @@ class WebSocket extends React.Component {
   }
 
   onMessage = (topic, payload) => this.props.dispatch({ type: 'socket.message', topic, payload });
-  onOpen = () => this.props.dispatch({ type: 'socket.open' });
+  onOpen = () => {
+    this.props.dispatch({ type: 'socket.open' });
+    Notification.success({ title: 'Connected!'});
+  }
 
   componentDidMount() {
     socketListener
       .on('message', this.onMessage)
-      .on('open', this.onOpen);
+      .on('open', () => this.onOpen());
   }
 
   componentWillUnmount() {

@@ -227,6 +227,7 @@ module.exports = ({ Configuration, Message }) => {
             limit: { type: GraphQLInt },
             order: { type: GraphQLString },
             type: { type: GraphQLString },
+            transport: { type: GraphQLString },
             inbound: { type: GraphQLBoolean }
           },
           resolve: resolver(Message, {

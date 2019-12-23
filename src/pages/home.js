@@ -73,8 +73,8 @@ class HomePage extends React.Component {
           margin={[20, 20]}
           layouts={this.state.layouts}
           onLayoutChange={(layout, layouts) => {
-            console.log('layout', layout);
-            console.log('layouts', layouts)
+            //console.log('layout', layout);
+            //console.log('layouts', layouts)
             this.onLayoutChange(layout, layouts)
           }}
         >

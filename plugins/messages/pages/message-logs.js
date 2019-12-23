@@ -8,6 +8,7 @@ import { Table, Icon, SelectPicker } from 'rsuite';
 const { Column, HeaderCell, Cell, Pagination } = Table;
 
 import withMessageTypes from '../../../src/wrappers/with-message-types';
+import withPlatforms from '../../../src/wrappers/with-platforms';
 
 import PageContainer from '../../../src/components/page-container';
 import MessageType from '../../../src/components/message-type';
@@ -17,13 +18,13 @@ import Breadcrumbs from '../../../src/components/breadcrumbs';
 import '../styles/message-logs.scss';
 
 const MESSAGES = gql`
-query ($limit: Int, $offset: Int, $inbound: Boolean, $type: String) {
+query ($limit: Int, $offset: Int, $inbound: Boolean, $type: String, $transport: String) {
   counters {
     messages {
      count
     }
   }
-  messages(limit: $limit, offset: $offset, inbound: $inbound, type: $type) {
+  messages(limit: $limit, offset: $offset, inbound: $inbound, type: $type, transport: $transport) {
     id
     chatId
     content,
@@ -44,24 +45,38 @@ const SelectInbound = [
 ]
 
 
-const MessageLogs = ({ messageTypes }) => {
+const MessageLogs = ({ messageTypes, platforms }) => {
 
   const [ limit, setLimit ] = useState(10);
   const [ page, setPage ] = useState(1);
   const [ messageType, setMessageType ] = useState(undefined);
+  const [ transport, setTransport ] = useState(undefined);
   const [ inbound, setInbound ] = useState(undefined);
   const { loading, error, data, refetch } = useQuery(MESSAGES, {
-    variables: { limit, offset: (page - 1) * limit, type: messageType, inbound }
+    variables: { limit, offset: (page - 1) * limit, type: messageType, inbound, transport }
   });
 
+  console.log('platforms', platforms)
 
-  console.log('limit, ', limit, 'inbound', inbound)
-  console.log('error', error)
 
   return (
     <PageContainer className="page-message-logs">
       <Breadcrumbs pages={['Messages Log']}/>
       <div className="filters" style={{ marginBottom: '10px' }}>
+        <SelectPicker 
+          value={transport}
+          data={platforms.map(transport => ({ value: transport.id, label: transport.name }))} 
+          onChange={transport => {
+            setTransport(transport);
+            refetch({ transport })
+          }} 
+          onClean={() => setTransport(undefined)} 
+          cleanable
+          searchable={false}          
+          placeholder="Transport" 
+          size="md"
+        />
+        &nbsp;
         <SelectPicker 
           value={inbound}
           data={SelectInbound} 
@@ -83,7 +98,7 @@ const MessageLogs = ({ messageTypes }) => {
             setMessageType(type)
             refetch({ type })
           }} 
-          onClean={() => setInbound(undefined)} 
+          onClean={() => setMessageType(undefined)} 
           cleanable
           searchable={false}          
           placeholder="Message type" 
@@ -97,6 +112,8 @@ const MessageLogs = ({ messageTypes }) => {
         <Table
           height={600}
           data={data.messages}
+          loading={loading}
+          renderEmpty={() => <div style={{ textAlign: 'center', padding: 80}}>No Messages</div>}
           autoHeight
           onSortColumn={(sortColumn, sortType) => {
             console.log(sortColumn, sortType);
@@ -173,5 +190,5 @@ const MessageLogs = ({ messageTypes }) => {
 
 };
 
-export default withMessageTypes(MessageLogs);
+export default withPlatforms(withMessageTypes(MessageLogs));
 
