@@ -7,7 +7,8 @@ const { createHttpLink } = require('apollo-link-http');
 const { ApolloLink } = require('apollo-link');
 const fetch = require('node-fetch').default;
 
-const { isValidMessage } = require('../lib/utils/index');
+const { isValidMessage, when } = require('../lib/utils/index');
+
 
 const CREATE_MESSAGE = gql`
 mutation($message: NewMessage!) {
@@ -40,26 +41,50 @@ module.exports = function(RED) {
         done();
         return;  
       }
-      // check for valid message
-      node.client.mutate({
-        mutation: CREATE_MESSAGE,
-        variables: {
-          message: {
-            chatId: String(msg.payload.chatId),
-            userId: msg.payload.userId != null ? String(msg.payload.userId) : undefined,
-            messageId: msg.payload.messageId != null ? String(msg.payload.messageId) : undefined,
-            inbound: msg.payload.inbound,
-            type: msg.payload.type,
-            ts: moment(),
-            transport: msg.originalMessage.transport,
-            content: _.isString(msg.payload.content) ? msg.payload.content : '<buffer>'
-          }
-        }
-      }).then(data => done())
-      .catch(error => done(error.networkError.result));
+      // get chat context
+      const chat = msg.chat();
+      when(chat.get('firstName', 'lastName', 'username', 'language', 'userId'))
+        .then(({ firstName, lastName, username, language, userId }) => {
 
-      send(msg);
-    });
+          console.log('saving with', firstName, lastName, username, language);
+
+          // if inbound get userId from chatContext
+
+          node.client
+            .mutate({
+              mutation: CREATE_MESSAGE,
+              variables: {
+                message: {
+                  user: {
+                    userId,
+                    first_name: firstName, 
+                    last_name: lastName, 
+                    username, 
+                    language
+                  },
+                  chatId: String(msg.payload.chatId),
+                  messageId: msg.payload.messageId != null ? String(msg.payload.messageId) : undefined,
+                  inbound: msg.payload.inbound,
+                  type: msg.payload.type,
+                  ts: moment(),
+                  transport: msg.originalMessage.transport,
+                  content: _.isString(msg.payload.content) ? msg.payload.content : '<buffer>'
+                }
+              }
+            })
+            .then(data => done())
+            .catch(error => {
+              console.log('errorascio', error.networkError.result)
+              done(error.networkError.result)
+            });
+    
+          send(msg);
+        });
+
+
+      });
+
+      
   }
 
   RED.nodes.registerType('mc-store', MissionControlStore);

@@ -1,5 +1,5 @@
-import React from 'react';
-import { Button, Container, Navbar, Dropdown, Nav, Footer, Content, Icon, Paragraph } from 'rsuite';
+import React, { useState, useEffect } from 'react';
+import { Button, Notification } from 'rsuite';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 
 import { Views, plug } from '../../lib/code-plug';
@@ -7,7 +7,7 @@ import withState from '../wrappers/with-state';
 import withSocket from '../wrappers/with-socket';
 import withDispatch from '../wrappers/with-dispatch';
 import Panel from '../components/grid-panel';
-
+import useConfiguration from '../hooks/configuration';
 
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
@@ -39,57 +39,52 @@ plug('reducers', (state, action) => {
   }
 });
 
-class HomePage extends React.Component {
+const HomePage = ({ codePlug, count, dispatch, user }) => {
 
-  constructor(props) {
-    super(props);
+  const { loading, saving, error, data, update } = useConfiguration({ 
+    namespace: 'dashboard',
+    onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' }) 
+  });  
+  const [isLoaded, setIsLoaded] = useState(false);
+  useEffect(() => setTimeout(() => setIsLoaded(true), 1000), []); 
 
-    this.state = {
-      layouts: {}
-    };
+  const items = codePlug.getItems('widgets');
+  
+  if (loading) {
+    return <div>loading</div>;
   }
 
-  onLayoutChange(layout, layouts) {
-    //saveToLS("layouts", layouts);
-    this.setState({ layouts });
-  }
 
-
-  render() {
-    const { codePlug } = this.props;
-
-
-    const items = codePlug.getItems('widgets');
-    
-    const { count, dispatch, user } = this.props;
-
-    return (
-      <div className="mc-home">
-        <ResponsiveReactGridLayout
-          className="layout"
-          cols={{ lg: 4, md: 4, sm: 3, xs: 2, xxs: 1 }}
-          draggableCancel=".ui-grid-panel *:not(.ui-panel-title)"
-          rowHeight={50}
-          margin={[20, 20]}
-          layouts={this.state.layouts}
-          onLayoutChange={(layout, layouts) => {
-            //console.log('layout', layout);
-            //console.log('layouts', layouts)
-            this.onLayoutChange(layout, layouts)
-          }}
-        >
-          {items.map(({ view: View, props }) => {
-            const { x, y, h, w, isResizable, minW, maxW } = props;
-            return (
-              <div key={props.id} data-grid={{x, y, w, h, isResizable, minW, maxW }}>
-                <View {...props}/>
-              </div>
-            );
-          })}  
-        </ResponsiveReactGridLayout>      
-      </div>
-    );
-  }
+  return (
+    <div className="mc-home">
+      <ResponsiveReactGridLayout
+        className="layout"
+        cols={{ lg: 4, md: 4, sm: 3, xs: 2, xxs: 1 }}
+        draggableCancel=".ui-grid-panel *:not(.ui-panel-title)"
+        rowHeight={50}
+        margin={[20, 20]}
+        layouts={data}
+        onLayoutChange={(layout, layouts) => {
+          //console.log('layout', layout);
+          //console.log('layouts', layouts)
+          //this.onLayoutChange(layout, layouts)
+          //setLayouts(layouts);
+          console.log('CHIUAMO stu bucchino', isLoaded)
+          isLoaded && update(layouts);
+        }}
+      >
+        {items.map(({ view: View, props }) => {
+          const { x, y, h, w, isResizable, minW, maxW } = props;
+          return (
+            <div key={props.id} data-grid={{x, y, w, h, isResizable, minW, maxW }}>
+              <View {...props}/>
+            </div>
+          );
+        })}  
+      </ResponsiveReactGridLayout>      
+    </div>
+  );
+  
 }
 
 export default withState(HomePage, ['count']);

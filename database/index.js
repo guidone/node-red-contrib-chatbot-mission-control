@@ -38,7 +38,19 @@ module.exports = mcSettings => {
     inbound: Sequelize.BOOLEAN,
     ts: Sequelize.DATE
   });
-  
+ 
+  const User = sequelize.define('user', {
+    userId: Sequelize.STRING,
+    email: Sequelize.STRING,
+    first_name: Sequelize.STRING,
+    last_name: Sequelize.STRING,
+    username: Sequelize.STRING,
+    language: Sequelize.STRING,
+    payload: Sequelize.TEXT
+  });
+ 
+
+
   if (!fs.existsSync(dbPath)) {
     sequelize.sync({ force: true });
     console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
@@ -50,11 +62,12 @@ module.exports = mcSettings => {
       + ' ' + lcd.grey(resolve(dbPath)));
   }
 
-  const graphQLServer = GraphQLServer({ Configuration, Message });
+  const graphQLServer = GraphQLServer({ Configuration, Message, User });
   
   exportCache = {
     Configuration,
     Message,
+    User,
     graphQLServer
   }
 

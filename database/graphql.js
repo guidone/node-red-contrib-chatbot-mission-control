@@ -14,12 +14,51 @@ const {
   GraphQLInputObjectType
 } = require('graphql');
 
-module.exports = ({ Configuration, Message }) => {
+module.exports = ({ Configuration, Message, User }) => {
+
+  const newUserType = new GraphQLInputObjectType({
+    name: 'NewUser',
+    description: 'tbd',
+    fields: {
+      userId: {
+        type: GraphQLString,
+        description: '',
+      },
+      email: {
+        type: GraphQLString,
+        description: '',
+      },
+      first_name: {
+        type: GraphQLString,
+        description: '',
+      },
+      last_name: {
+        type: GraphQLString,
+        description: '',
+      },
+      language: {
+        type: GraphQLString,
+        description: '',
+      },
+      username: {
+        type: GraphQLString,
+        description: '',
+      },
+      payload: {
+        type: GraphQLString,
+        description: '',
+      }
+    }
+  });
 
   const newMessageType = new GraphQLInputObjectType({
     name: 'NewMessage',
     description: 'tbd',
     fields: () => ({
+      user: {
+        type: newUserType,
+        description: 'User of the chat message'
+      },
       chatId: {
         type: GraphQLString,
         description: '',
@@ -100,6 +139,45 @@ module.exports = ({ Configuration, Message }) => {
         description: ''
       },
       ts: {
+        type: GraphQLString,
+        description: '',
+      }
+    }
+  });
+
+  const userType = new GraphQLObjectType({
+    name: 'User',
+    description: 'tbd',
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The internal id of the user',
+      },
+      userId: {
+        type: GraphQLString,
+        description: '',
+      },
+      email: {
+        type: GraphQLString,
+        description: '',
+      },
+      first_name: {
+        type: GraphQLString,
+        description: '',
+      },
+      last_name: {
+        type: GraphQLString,
+        description: '',
+      },
+      language: {
+        type: GraphQLString,
+        description: '',
+      },
+      username: {
+        type: GraphQLString,
+        description: '',
+      },
+      payload: {
         type: GraphQLString,
         description: '',
       }
@@ -197,11 +275,18 @@ module.exports = ({ Configuration, Message }) => {
           args: {
             message: { type: new GraphQLNonNull(newMessageType) }
           },
-          resolve(root, { message }) {
-            return Message.create(message);    
+          resolve: async function(root, { message }) {            
+            const { user, ...newMessage } = message;
+            // create user if doesn't exist
+            if (user != null && user.userId) {
+              const existingUser = await User.findOne({ where: { userId: user.userId }});
+              if (existingUser == null) {
+                await User.create(user);
+              }
+            }
+            return Message.create({ ...newMessage, userId: user.userId });    
           }
-        }
-        
+        }        
       }
     }),
     
@@ -218,6 +303,16 @@ module.exports = ({ Configuration, Message }) => {
             namespace: { type: GraphQLString }
           },
           resolve: resolver(Configuration)
+        },
+
+        users: {
+          type: new GraphQLList(userType),
+          args: {
+            offset: { type: GraphQLInt },
+            limit: { type: GraphQLInt },
+            order: { type: GraphQLString }
+          },
+          resolve: resolver(User)
         },
 
         messages: {
