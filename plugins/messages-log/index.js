@@ -91,7 +91,7 @@ const MessageInLogWidget = () => {
 }
 
 plug('widgets', MessageOutLogWidget, { x: 0, y: 0, w: 2, h: 4, minW: 2, isResizable: true, id: 'message-out-log' })
-plug('widgets', MessageInLogWidget, { x: 0, y: 2, w: 2, h: 4, minW: 2, isResizable: true, id: 'message-in-log' })
+plug('widgets', MessageInLogWidget, { x: 0, y: 0, w: 2, h: 4, minW: 2, isResizable: true, id: 'message-in-log' })
 
 
 

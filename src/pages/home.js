@@ -16,7 +16,7 @@ import '../../node_modules/react-grid-layout/css/styles.css';
 import '../../node_modules/react-resizable/css/styles.css';
 
 
-const Widget2 = ({ count, user, dispatch }) => (
+/*const Widget2 = ({ count, user, dispatch }) => (
   <Panel title="I am a title">
     <span>count: {count} {user}</span>
     <Views region="items"/>
@@ -37,7 +37,7 @@ plug('reducers', (state, action) => {
   } else {
     return state;
   }
-});
+});*/
 
 const HomePage = ({ codePlug, count, dispatch, user }) => {
 
@@ -46,7 +46,9 @@ const HomePage = ({ codePlug, count, dispatch, user }) => {
     onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' }) 
   });  
   const [isLoaded, setIsLoaded] = useState(false);
-  useEffect(() => setTimeout(() => setIsLoaded(true), 1000), []); 
+  useEffect(() => {
+    setTimeout(() => setIsLoaded(true), 1000);
+  }, []); 
 
   const items = codePlug.getItems('widgets');
   
@@ -59,17 +61,13 @@ const HomePage = ({ codePlug, count, dispatch, user }) => {
     <div className="mc-home">
       <ResponsiveReactGridLayout
         className="layout"
+        compactType="horizontal"
         cols={{ lg: 4, md: 4, sm: 3, xs: 2, xxs: 1 }}
         draggableCancel=".ui-grid-panel *:not(.ui-panel-title)"
         rowHeight={50}
         margin={[20, 20]}
         layouts={data}
         onLayoutChange={(layout, layouts) => {
-          //console.log('layout', layout);
-          //console.log('layouts', layouts)
-          //this.onLayoutChange(layout, layouts)
-          //setLayouts(layouts);
-          console.log('CHIUAMO stu bucchino', isLoaded)
           isLoaded && update(layouts);
         }}
       >
