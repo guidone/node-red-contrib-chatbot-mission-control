@@ -27,9 +27,6 @@ import WebSocket from './common/web-socket';
 // Import plugins
 import '../plugins';
 
-
-
-
 const cache = new InMemoryCache(); // where current data is stored
 const apolloLink = createHttpLink({ uri: '/graphql' });
 
@@ -39,30 +36,12 @@ const client = new ApolloClient({
 });
 
 
-
-
-const MyView1 = () => <div>My view 1</div>;
-MyView1.displayName = 'uno';
-const MyView2 = () => <div>My view 2</div>;
-MyView2.displayName = 'due';
-
-
-plug('items', MyView1);
-plug('items', MyView2);
-
-
-plug('sidebar', null, { id: 'item-1', label: 'My Item 1', url: '/mc/page1', icon: 'dashboard' })
-
-
-
-plug('pages', MyView1, { url: '/mc/page1' });
-
-
 const initialState = {
   count: 0,
   user: 'guidone'
 };
-function reducer1(state, action) {
+
+/*function reducer1(state, action) {
   switch (action.type) {
     case 'increment':
       return {...state, count: state.count + 1};
@@ -93,7 +72,7 @@ function SocketReducers(state, action) {
       return state;
   }
 }
-plug('reducers', SocketReducers);
+plug('reducers', SocketReducers);*/
 
 
 //plug('reducers', reducer1);

@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel } from 'rsuite';
+import { Button, FormControl, ButtonToolbar, FormGroup, ControlLabel } from 'rsuite';
 
 import { plug } from '../../lib/code-plug';
-import withState from '../../src/wrappers/with-state';
 import withSocket from '../../src/wrappers/with-socket';
 import Panel from '../../src/components/grid-panel';
 import { WidgetForm, Content, Footer } from '../../src/components/widget-form';
@@ -42,28 +41,5 @@ const SendMessageWidget = ({ sendMessage, stats }) => {
 }
 
 plug('widgets', withSocket(SendMessageWidget), { x: 0, y: 0, w: 2, h: 4, isResizable: true, id: 1 })
-
-
-
-
-
-
-class SendPage extends React.Component {
-  render() {
-    return (
-      <div>
-        sadas
-
-      </div>
-    );
-
-
-  }
-
-
-}
-
-plug('sidebar', null, { id: 'send-message', label: 'Send Message', url: '/mc/send-message', icon: 'shield' })
-plug('pages', SendPage, { url: '/mc/send-message', id: 'send-message', title: 'Send Message' });
 
 
