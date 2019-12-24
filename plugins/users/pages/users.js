@@ -41,11 +41,9 @@ const Users = () => {
   const [ limit, setLimit ] = useState(10);
   const [ page, setPage ] = useState(1);  
   const { loading, error, data, refetch } = useQuery(USERS, {
+    fetchPolicy: 'network-only',
     variables: { limit, offset: (page - 1) * limit, order: 'reverse:createdAt' }
   });
-
-
-
 
   return (
     <PageContainer className="page-users">

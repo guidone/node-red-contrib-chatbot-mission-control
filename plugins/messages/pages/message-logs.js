@@ -58,6 +58,7 @@ const MessageLogs = ({ messageTypes, platforms }) => {
   const [ transport, setTransport ] = useState(undefined);
   const [ inbound, setInbound ] = useState(undefined);
   const { loading, error, data, refetch } = useQuery(MESSAGES, {
+    fetchPolicy: 'network-only',
     variables: { 
       limit, 
       offset: (page - 1) * limit, 

@@ -17,7 +17,8 @@
       "mc_input": "nodes/mc_input.js",
       "mc_output": "nodes/mc_output.js",
       "mc-configuration": "nodes/mc_configuration.js",
-      "mc-store": "nodes/mc_store.js"
+      "mc-store": "nodes/mc_store.js",
+      "mc-event": "nodes/mc_event.js"
     }
   },
   "dependencies": {

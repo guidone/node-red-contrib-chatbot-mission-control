@@ -1,14 +1,9 @@
-const _ = require('lodash');
-const { ApolloClient } = require('apollo-boost');
+const _ = require('lodash')
 const moment = require('moment');
 const gql = require('graphql-tag');
-const { InMemoryCache } = require('apollo-cache-inmemory');
-const { createHttpLink } = require('apollo-link-http');
-const { ApolloLink } = require('apollo-link');
-const fetch = require('node-fetch').default;
 
 const { isValidMessage, when } = require('../lib/utils/index');
-
+const client = require('../database/client');
 
 const CREATE_MESSAGE = gql`
 mutation($message: NewMessage!) {
@@ -23,14 +18,7 @@ module.exports = function(RED) {
   function MissionControlStore(config) {
     RED.nodes.createNode(this, config);
     const node = this;
-    
-    const cache = new InMemoryCache();
-    const apolloLink = createHttpLink({ uri: 'http://localhost:1880/graphql', fetch: fetch });
-    this.client = new ApolloClient({
-      cache,
-      link: ApolloLink.from([apolloLink])
-    });
-
+  
     this.on('input', function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
@@ -50,7 +38,7 @@ module.exports = function(RED) {
 
           // if inbound get userId from chatContext
 
-          node.client
+          client
             .mutate({
               mutation: CREATE_MESSAGE,
               variables: {

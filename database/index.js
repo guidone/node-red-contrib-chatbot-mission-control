@@ -54,7 +54,12 @@ module.exports = mcSettings => {
     chatId: Sequelize.STRING,
     transport: Sequelize.STRING
   });
- 
+
+  const Event = sequelize.define('event', {
+    flow: Sequelize.STRING,
+    name: Sequelize.STRING,
+    count: Sequelize.INTEGER
+  });
 
 
   if (!fs.existsSync(dbPath)) {
@@ -68,14 +73,15 @@ module.exports = mcSettings => {
       + ' ' + lcd.grey(resolve(dbPath)));
   }
 
-  const graphQLServer = GraphQLServer({ Configuration, Message, User, ChatId });
+  const graphQLServer = GraphQLServer({ Configuration, Message, User, ChatId, Event });
   
   exportCache = {
     Configuration,
     Message,
     User,
     graphQLServer,
-    ChatId
+    ChatId,
+    Event
   }
 
   return exportCache;

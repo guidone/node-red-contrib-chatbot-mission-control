@@ -34,7 +34,7 @@ const DateType = new GraphQLScalarType({
   },
 });
 
-module.exports = ({ Configuration, Message, User, ChatId }) => {
+module.exports = ({ Configuration, Message, User, ChatId, Event }) => {
 
   const newUserType = new GraphQLInputObjectType({
     name: 'NewUser',
@@ -192,6 +192,48 @@ module.exports = ({ Configuration, Message, User, ChatId }) => {
   });
 
 
+  const eventType = new GraphQLObjectType({
+    name: 'Event',
+    description: 'tbd',
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The internal id of funnel record',
+      },
+      flow: {
+        type: GraphQLString,
+        description: '',
+      },
+      name: {
+        type: GraphQLString,
+        description: '',
+      },
+      count: {
+        type: GraphQLInt,
+        description: '',
+      }
+    }
+  });
+
+  const newEventType = new GraphQLInputObjectType({
+    name: 'NewEvent',
+    description: 'tbd',
+    fields: {
+      flow: {
+        type: GraphQLString,
+        description: '',
+      },
+      name: {
+        type: GraphQLString,
+        description: '',
+      },
+      count: {
+        type: GraphQLInt,
+        description: '',
+      }
+    }
+  });
+
   const userType = new GraphQLObjectType({
     name: 'User',
     description: 'tbd',
@@ -335,6 +377,23 @@ module.exports = ({ Configuration, Message, User, ChatId }) => {
       description: 'These are the things we can change',
       fields: {
         
+        createEvent: {
+          type: eventType,
+          args: {
+            event: { type: new GraphQLNonNull(newEventType) }
+          },
+          resolve: async function(root, { event }) {
+            const existingEvent = await Event.findOne({ where: { flow: event.flow, name: event.name }});
+            
+            if (existingEvent != null) {
+              await Event.update({ count: existingEvent.count + 1 }, { where: { flow: event.flow, name: event.name }})
+              existingEvent.count += 1;
+              return existingEvent;
+            }
+            return Event.create({ ...event, count: 1 });
+          }
+        },
+
         createConfiguration: {
           type: configurationType,
           args: {
@@ -406,6 +465,16 @@ module.exports = ({ Configuration, Message, User, ChatId }) => {
             order: { type: GraphQLString }
           },
           resolve: resolver(User)
+        },
+
+        events: {
+          type: new GraphQLList(eventType),
+          args: {
+            offset: { type: GraphQLInt },
+            limit: { type: GraphQLInt },
+            order: { type: GraphQLString }
+          },
+          resolve: resolver(Event)
         },
 
         chatIds: {
