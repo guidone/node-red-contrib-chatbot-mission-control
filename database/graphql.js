@@ -34,7 +34,7 @@ const DateType = new GraphQLScalarType({
   },
 });
 
-module.exports = ({ Configuration, Message, User }) => {
+module.exports = ({ Configuration, Message, User, ChatId }) => {
 
   const newUserType = new GraphQLInputObjectType({
     name: 'NewUser',
@@ -168,6 +168,30 @@ module.exports = ({ Configuration, Message, User }) => {
     }
   });
 
+  const chatIdType = new GraphQLObjectType({
+    name: 'ChatId',
+    description: 'tbd',
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The internal id of the user',
+      },
+      userId: {
+        type: GraphQLString,
+        description: ''
+      },
+      chatId: {
+        type: GraphQLString,
+        description: ''
+      },
+      transport: {
+        type: GraphQLString,
+        description: ''
+      }
+    }
+  });
+
+
   const userType = new GraphQLObjectType({
     name: 'User',
     description: 'tbd',
@@ -206,6 +230,19 @@ module.exports = ({ Configuration, Message, User }) => {
       payload: {
         type: GraphQLString,
         description: '',
+      },
+      chatIds: {
+        type: new GraphQLList(chatIdType),
+        args: {
+          transport: { type: GraphQLString }
+        },
+        resolve: (user, args) => {
+          const where = { userId: user.userId };
+          if (args.transport != null) {
+            where.transport = args.transport;  
+          } 
+          return ChatId.findAll({ where });
+        }
       }
     }
   });
@@ -322,12 +359,23 @@ module.exports = ({ Configuration, Message, User }) => {
           },
           resolve: async function(root, { message }) {            
             const { user, ...newMessage } = message;
-            // create user if doesn't exist
+            // if user with a valid id
             if (user != null && user.userId) {
+              // create user if doesn't exist
               const existingUser = await User.findOne({ where: { userId: user.userId }});
               if (existingUser == null) {
-                await User.create(user);
+                const newUser = await User.create(user);
               }
+              // check if exists userid / transport and create or update  
+              const existingChatId = await ChatId.findOne({ where: { userId: user.userId, transport: message.transport }});
+              if (existingChatId == null) {
+                // creating new triplet userId / transport / chatId
+                await ChatId.create({ userId: user.userId, chatId: message.chatId, transport: message.transport });
+              } else if (existingChatId != null && existingChatId.chatId != message.chatId) {
+                // it exists but with a different chatId, could be changed, then update
+                await ChatId.update({ chatId: message.chatId }, { where: { userId: user.userId, transport: message.transport }});
+              } 
+              // triplet already exists, doing nothing 
             }
             return Message.create({ ...newMessage, userId: user.userId });    
           }
@@ -358,6 +406,16 @@ module.exports = ({ Configuration, Message, User }) => {
             order: { type: GraphQLString }
           },
           resolve: resolver(User)
+        },
+
+        chatIds: {
+          type: new GraphQLList(chatIdType),
+          args: {
+            chatId: { type: GraphQLString },
+            userId: { type: GraphQLString },
+            transport: { type: GraphQLString }
+          },
+          resolve: resolver(ChatId)
         },
 
         messages: {

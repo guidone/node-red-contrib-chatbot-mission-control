@@ -48,6 +48,12 @@ module.exports = mcSettings => {
     language: Sequelize.STRING,
     payload: Sequelize.TEXT
   });
+
+  const ChatId = sequelize.define('chatid', {
+    userId: Sequelize.STRING,
+    chatId: Sequelize.STRING,
+    transport: Sequelize.STRING
+  });
  
 
 
@@ -62,13 +68,14 @@ module.exports = mcSettings => {
       + ' ' + lcd.grey(resolve(dbPath)));
   }
 
-  const graphQLServer = GraphQLServer({ Configuration, Message, User });
+  const graphQLServer = GraphQLServer({ Configuration, Message, User, ChatId });
   
   exportCache = {
     Configuration,
     Message,
     User,
-    graphQLServer
+    graphQLServer,
+    ChatId
   }
 
   return exportCache;
