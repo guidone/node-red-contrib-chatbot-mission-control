@@ -56,9 +56,6 @@ const MessageLogs = ({ messageTypes, platforms }) => {
     variables: { limit, offset: (page - 1) * limit, type: messageType, inbound, transport }
   });
 
-  console.log('platforms', platforms)
-
-
   return (
     <PageContainer className="page-message-logs">
       <Breadcrumbs pages={['Messages Log']}/>

@@ -231,6 +231,18 @@ module.exports = ({ Configuration, Message, User }) => {
     }
   });
 
+  const userCounterType = new GraphQLObjectType({ 
+    name: 'UserCounters',
+    description: 'User Counters',
+    fields: {
+      count: {
+        type: GraphQLInt,
+        description: 'Total users',
+        resolve: () => User.count()
+      }
+    }
+  });
+
   const countersType = new GraphQLObjectType({
     name: 'Counters',
     description: 'Counters',
@@ -238,6 +250,13 @@ module.exports = ({ Configuration, Message, User }) => {
       messages: {
         type: messageCounterType,
         description: 'Counters for messages',
+        resolve: (root, args) => {
+          return {};
+        } 
+      },
+      users: {
+        type: userCounterType,
+        description: 'Counters for users',
         resolve: (root, args) => {
           return {};
         } 
