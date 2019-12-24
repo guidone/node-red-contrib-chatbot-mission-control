@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import gql from 'graphql-tag';
 import { Query, useQuery, useMutation } from 'react-apollo';
 import classNames from 'classnames';
+import moment from 'moment';
 
 import { Table, Icon, SelectPicker } from 'rsuite';
 
@@ -14,17 +15,18 @@ import PageContainer from '../../../src/components/page-container';
 import MessageType from '../../../src/components/message-type';
 import Transport from '../../../src/components/transport';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
+import SmartDate from '../../../src/components/smart-date';
 
 import '../styles/message-logs.scss';
 
 const MESSAGES = gql`
-query ($limit: Int, $offset: Int, $inbound: Boolean, $type: String, $transport: String) {
+query ($limit: Int, $offset: Int, $order: String, $inbound: Boolean, $type: String, $transport: String) {
   counters {
     messages {
      count
     }
   }
-  messages(limit: $limit, offset: $offset, inbound: $inbound, type: $type, transport: $transport) {
+  messages(limit: $limit, offset: $offset, inbound: $inbound, order: $order, type: $type, transport: $transport) {
     id
     chatId
     content,
@@ -34,7 +36,8 @@ query ($limit: Int, $offset: Int, $inbound: Boolean, $type: String, $transport: 
     type,
     userId,
     from,
-    transport
+    transport,
+    createdAt
   }
 }
 `;
@@ -45,6 +48,8 @@ const SelectInbound = [
 ]
 
 
+
+
 const MessageLogs = ({ messageTypes, platforms }) => {
 
   const [ limit, setLimit ] = useState(10);
@@ -53,7 +58,14 @@ const MessageLogs = ({ messageTypes, platforms }) => {
   const [ transport, setTransport ] = useState(undefined);
   const [ inbound, setInbound ] = useState(undefined);
   const { loading, error, data, refetch } = useQuery(MESSAGES, {
-    variables: { limit, offset: (page - 1) * limit, type: messageType, inbound, transport }
+    variables: { 
+      limit, 
+      offset: (page - 1) * limit, 
+      type: messageType,
+      order: 'reverse:createdAt',
+      inbound, 
+      transport 
+    }
   });
 
   return (
@@ -119,6 +131,13 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           <Column width={60} align="center">
             <HeaderCell>Id</HeaderCell>
             <Cell dataKey="id" />
+          </Column>
+
+          <Column width={140} resizable>
+            <HeaderCell>Date</HeaderCell>            
+            <Cell>
+              {({ createdAt }) => <SmartDate date={createdAt} />}
+            </Cell>
           </Column>
 
           <Column width={40} resizable>

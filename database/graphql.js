@@ -1,6 +1,7 @@
 const { ApolloServer } = require('apollo-server-express');
 const { resolver } = require('graphql-sequelize');
 
+const { Kind } = require('graphql/language');
 
 const {
   GraphQLSchema,
@@ -11,8 +12,27 @@ const {
   GraphQLString,
   GraphQLList,
   GraphQLBoolean,
-  GraphQLInputObjectType
+  GraphQLInputObjectType,
+  GraphQLScalarType
 } = require('graphql');
+
+const DateType = new GraphQLScalarType({
+  name: 'Date',
+  description: 'Date type',
+  parseValue(value) {
+    return new Date(value); // value from the client
+  },
+  serialize(value) {
+    return value;
+    //return value.getTime(); // value sent to the client
+  },
+  parseLiteral(ast) {
+    if (ast.kind === Kind.INT) {
+      return new Date(ast.value) // ast value is always in string format
+    }
+    return null;
+  },
+});
 
 module.exports = ({ Configuration, Message, User }) => {
 
@@ -138,6 +158,9 @@ module.exports = ({ Configuration, Message, User }) => {
         type: GraphQLBoolean,
         description: ''
       },
+      createdAt: {
+        type: DateType
+      },
       ts: {
         type: GraphQLString,
         description: '',
@@ -176,6 +199,9 @@ module.exports = ({ Configuration, Message, User }) => {
       username: {
         type: GraphQLString,
         description: '',
+      },
+      createdAt: {
+        type: DateType
       },
       payload: {
         type: GraphQLString,

@@ -10,17 +10,18 @@ const { Column, HeaderCell, Cell, Pagination } = Table;
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import Language from '../../../src/components/language';
+import SmartDate from '../../../src/components/smart-date';
 
 import '../styles/users.scss';
 
 const USERS = gql`
-query ($limit: Int, $offset: Int) {
+query ($limit: Int, $offset: Int, $order: String) {
   counters {
     users {
      count
     }
   }
-  users(limit: $limit, offset: $offset) {
+  users(limit: $limit, offset: $offset, order: $order) {
     id,
     username,
     userId,
@@ -28,7 +29,8 @@ query ($limit: Int, $offset: Int) {
     last_name,
     username,
     language,
-    payload
+    payload,
+    createdAt
   }
 }
 `;
@@ -39,7 +41,7 @@ const Users = () => {
   const [ limit, setLimit ] = useState(10);
   const [ page, setPage ] = useState(1);  
   const { loading, error, data, refetch } = useQuery(USERS, {
-    variables: { limit, offset: (page - 1) * limit }
+    variables: { limit, offset: (page - 1) * limit, order: 'reverse:createdAt' }
   });
 
 
@@ -71,6 +73,13 @@ const Users = () => {
             <Cell>{({ userId }) => <span className="cell-type-id">{userId}</span>}</Cell>
           </Column>
 
+          <Column width={140} resizable>
+            <HeaderCell>Subscribed</HeaderCell>            
+            <Cell>
+              {({ createdAt }) => <SmartDate date={createdAt} />}
+            </Cell>
+          </Column>
+
           <Column width={150} resizable>
             <HeaderCell>Username</HeaderCell>
             <Cell dataKey="username"/>
@@ -86,16 +95,16 @@ const Users = () => {
             <Cell dataKey="last_name"/>
           </Column>
 
-          <Column width={300} resizable>
-            <HeaderCell>Email</HeaderCell>
-            <Cell dataKey="email"/>
-          </Column>
-
-          <Column width={100} resizable>
+          <Column width={50} resizable>
             <HeaderCell>Language</HeaderCell>
             <Cell>
               {({ language }) => <Language>{language}</Language>}
             </Cell>
+          </Column>
+
+          <Column width={300} flexGrow={1}>
+            <HeaderCell>Email</HeaderCell>
+            <Cell dataKey="email"/>
           </Column>
         </Table>
       )}
