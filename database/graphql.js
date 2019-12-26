@@ -34,7 +34,7 @@ const DateType = new GraphQLScalarType({
   },
 });
 
-module.exports = ({ Configuration, Message, User, ChatId, Event }) => {
+module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) => {
 
   const newUserType = new GraphQLInputObjectType({
     name: 'NewUser',
@@ -336,6 +336,42 @@ module.exports = ({ Configuration, Message, User, ChatId, Event }) => {
     }
   });
 
+  const aggregatedEvent = new GraphQLObjectType({
+    name: 'aggregatedEvent',
+    description: 'Aggregation of event',
+    fields: {
+      flow: {
+        type: GraphQLString
+      },
+      count: {
+        type: GraphQLInt
+      }
+    }
+  });
+
+  const eventCounterType = new GraphQLObjectType({ 
+    name: 'EventCounters',
+    description: 'Event Counters',
+    fields: {
+      count: {
+        type: GraphQLInt,
+        description: 'Total events',
+        resolve: () => Event.count()
+      },
+      events: {
+        type: new GraphQLList(aggregatedEvent),
+        resolve() {
+          return Event
+            .findAll({
+              group: ['flow'],
+              attributes: ['flow', [sequelize.fn('COUNT', 'flow'), 'count']],
+            })
+            .then(res => res.map(item => item.dataValues));
+        }
+      }
+    }
+  });
+
   const userCounterType = new GraphQLObjectType({ 
     name: 'UserCounters',
     description: 'User Counters',
@@ -365,6 +401,13 @@ module.exports = ({ Configuration, Message, User, ChatId, Event }) => {
         resolve: (root, args) => {
           return {};
         } 
+      },
+      events: {
+        type: eventCounterType,
+        description: 'Counters for events',
+        resolve: () => {
+          return {};
+        }
       }
     }
   });
@@ -470,9 +513,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event }) => {
         events: {
           type: new GraphQLList(eventType),
           args: {
-            offset: { type: GraphQLInt },
-            limit: { type: GraphQLInt },
-            order: { type: GraphQLString }
+            flow: { type: GraphQLString }
           },
           resolve: resolver(Event)
         },
