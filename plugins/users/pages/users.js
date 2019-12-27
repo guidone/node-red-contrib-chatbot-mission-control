@@ -3,9 +3,10 @@ import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo';
 import classNames from 'classnames';
 
-import { Table } from 'rsuite';
+import { Table, Placeholder } from 'rsuite';
 
 const { Column, HeaderCell, Cell, Pagination } = Table;
+const { Grid } = Placeholder;
 
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
@@ -48,7 +49,7 @@ const Users = () => {
   return (
     <PageContainer className="page-users">
       <Breadcrumbs pages={['Users']}/>    
-      {loading && <div>loading</div>}
+      {loading && <Grid columns={9} rows={3} />}
       {error && <div>error</div>}
       {!error && !loading && (
         <Table

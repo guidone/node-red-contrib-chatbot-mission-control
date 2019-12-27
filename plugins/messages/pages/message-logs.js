@@ -4,9 +4,10 @@ import { Query, useQuery, useMutation } from 'react-apollo';
 import classNames from 'classnames';
 import moment from 'moment';
 
-import { Table, Icon, SelectPicker } from 'rsuite';
+import { Table, Icon, SelectPicker, Placeholder } from 'rsuite';
 
 const { Column, HeaderCell, Cell, Pagination } = Table;
+const { Grid } = Placeholder
 
 import withMessageTypes from '../../../src/wrappers/with-message-types';
 import withPlatforms from '../../../src/wrappers/with-platforms';
@@ -116,7 +117,7 @@ const MessageLogs = ({ messageTypes, platforms }) => {
         />
       </div>
 
-      {loading && <div>loading</div>}
+      {loading && <Grid columns={9} rows={3} />}
       {error && <div>error</div>}
       {!error && !loading && (
         <Table

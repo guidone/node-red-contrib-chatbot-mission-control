@@ -4,10 +4,11 @@ import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo';
 import { ResponsiveSankey } from '@nivo/sankey'
 
-import './funnel.scss';
-
 import { plug } from '../../lib/code-plug';
 import Panel from '../../src/components/grid-panel';
+
+import toFunnel from './helpers/to-funnel';
+import './funnel.scss';
 
 const { Paragraph } = Placeholder;
 
@@ -37,45 +38,17 @@ query {
 
 
 const FunnelGraph = ({ flow, percentile = false }) => {
-  const { loading, error, data, refetch } = useQuery(EVENTS, {
+  const { loading, error, data } = useQuery(EVENTS, {
     fetchPolicy: 'network-only',
     variables: { flow }
   });
 
-  let funnel;
-  if (!loading && !error) {
-    const sorted = data.events.sort((a, b) => a.count < b.count ? 1 : -1);
-    funnel = {
-      nodes:  
-        [
-          { id: 'Start' },
-          ...sorted.map(event => ({ id: _.capitalize(event.name) }))
-        ],
-      links: sorted.map((event, idx) => {
-        let value = event.count;
-        if (percentile) {
-          if (idx !== 0) {
-            value = Math.round((event.count / sorted[0].count) * 100);
-          } else {
-            value = 100;
-          }
-          
-        }
-        return {
-          source: idx > 0 ? _.capitalize(sorted[idx - 1].name) : 'Start',
-          target: _.capitalize(event.name),
-          value
-        };
-      })
-    };
-  }
-
   return (
-    <div style={{width: '100%', height: '300px'}}>
-      {loading && <Paragraph rows={3}/>}      
+    <div style={{ width: '100%', height: '300px' }}>
+      {loading && <Paragraph rows={3} />}
       {!loading && !error && (
         <ResponsiveSankey
-          data={funnel}
+          data={toFunnel(data, { percentile })}
           margin={{ top: 20, right: 120, bottom: 20, left: 50 }}
           align="justify"
           colors={{ scheme: 'category10' }}
@@ -84,40 +57,40 @@ const FunnelGraph = ({ flow, percentile = false }) => {
           nodeInnerPadding={3}
           nodeSpacing={24}
           nodeBorderWidth={0}
-          nodeBorderColor={{ from: 'color', modifiers: [ [ 'darker', 0.8 ] ] }}
+          nodeBorderColor={{ from: 'color', modifiers: [['darker', 0.8]] }}
           linkOpacity={0.5}
           linkHoverOthersOpacity={0.1}
           enableLinkGradient={true}
           labelPosition="outside"
           labelOrientation="vertical"
           labelPadding={16}
-          labelTextColor={{ from: 'color', modifiers: [ [ 'darker', 1 ] ] }}
+          labelTextColor={{ from: 'color', modifiers: [['darker', 1]] }}
           animate={true}
           motionStiffness={140}
           motionDamping={13}
           legends={[
-              {
-                  anchor: 'bottom-right',
-                  direction: 'column',
-                  translateX: 130,
-                  itemWidth: 100,
-                  itemHeight: 14,
-                  itemDirection: 'right-to-left',
-                  itemsSpacing: 2,
-                  itemTextColor: '#999',
-                  symbolSize: 14,
-                  effects: [
-                      {
-                          on: 'hover',
-                          style: {
-                              itemTextColor: '#000'
-                          }
-                      }
-                  ]
-              }
+            {
+              anchor: 'bottom-right',
+              direction: 'column',
+              translateX: 130,
+              itemWidth: 100,
+              itemHeight: 14,
+              itemDirection: 'right-to-left',
+              itemsSpacing: 2,
+              itemTextColor: '#999',
+              symbolSize: 14,
+              effects: [
+                {
+                  on: 'hover',
+                  style: {
+                    itemTextColor: '#000'
+                  }
+                }
+              ]
+            }
           ]}
-      />
-    )}  
+        />
+      )}
     </div>
   );
 
@@ -147,17 +120,18 @@ const FunnelWidget = () => {
       {!error && !loading && (
         <div>
           <div>
-          <SelectPicker 
-            value={flow}
-            data={data.counters.events.events.map(event => ({ value: event.flow, label: event.flow }))} 
-            onChange={event => {
-              setFlow(event)
-            }} 
-            cleanable={false}
-            searchable={false}          
-            placeholder="Select flow" 
-            size="md"
-          />
+            <b>Flow</b>&nbsp;
+            <SelectPicker 
+              value={flow}
+              data={data.counters.events.events.map(event => ({ value: event.flow, label: event.flow }))} 
+              onChange={event => {
+                setFlow(event)
+              }} 
+              cleanable={false}
+              searchable={false}          
+              placeholder="Select flow" 
+              size="md"
+            />
             <div className="perc-toggle">
               <b>%</b>&nbsp;
               <Toggle size="sm" checked={percentile} onChange={() => setPercentile(!percentile)}/>
