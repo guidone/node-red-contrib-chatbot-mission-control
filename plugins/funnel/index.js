@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, FormControl, ButtonToolbar, FormGroup, ControlLabel, Placeholder, SelectPicker, Toggle } from 'rsuite';
+import { Placeholder, SelectPicker, Toggle } from 'rsuite';
 import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo';
 import { ResponsiveSankey } from '@nivo/sankey'
@@ -106,13 +106,11 @@ const FunnelWidget = () => {
     onCompleted: ({ counters: { events: { events }}}) => setFlow(events.length !== 0 ? events[0].flow : null)
   });
 
-  console.log('error', error)
-  console.log('data', data)
-
-  // <Placeholder.Table rows={6} columns={2} />
-
   return (
-    <Panel title="Funnel" className="widget-funnel">
+    <Panel 
+      title="Funnel" 
+      className="widget-funnel"
+    >
       {loading && <Paragraph rows={3}/>}
       {error && (
         <div>error</div>
@@ -141,9 +139,7 @@ const FunnelWidget = () => {
         </div>
       )}
     </Panel>
-
-  )
-
+  );
 };
 
 plug('widgets', FunnelWidget, { x: 0, y: 0, w: 2, h: 8, isResizable: true, id: 'funnel-widget' });

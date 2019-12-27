@@ -17,7 +17,17 @@ const SendMessageWidget = ({ sendMessage, stats }) => {
         <Content>
           <FormGroup>
             <ControlLabel>Message to send</ControlLabel>
-            <FormControl name="message" componentClass="textarea" style={{ height: '100%' }}/>
+            <FormControl 
+              name="message" 
+              componentClass="textarea" 
+              style={{ height: '100%' }}
+              onKeyUp={event => {
+                if (event.keyCode === 91) {
+                  sendMessage('send', formValue.message);
+                  setFormValue({ message: '' });
+                }
+              }}
+            />
           </FormGroup>
         </Content>
         <Footer>
@@ -29,7 +39,10 @@ const SendMessageWidget = ({ sendMessage, stats }) => {
               }}>
                 Send Message
               </Button>
-              <Button appearance="default" onClick={() => setFormValue({ message: '' }) }>
+              <div className="key-hint">
+                ⌘ + Enter to Send
+              </div>
+              <Button style={{ float: 'right' }} appearance="default" onClick={() => setFormValue({ message: '' }) }>
                 Cancel
               </Button> 
             </ButtonToolbar>
