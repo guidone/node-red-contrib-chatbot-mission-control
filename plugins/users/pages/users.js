@@ -1,9 +1,5 @@
 import React, { useState } from 'react';
-import gql from 'graphql-tag';
-import { useQuery } from 'react-apollo';
-import classNames from 'classnames';
-
-import { Table, Placeholder } from 'rsuite';
+import { Table, Placeholder, Icon, ButtonGroup, Button } from 'rsuite';
 
 const { Column, HeaderCell, Cell, Pagination } = Table;
 const { Grid } = Placeholder;
@@ -14,37 +10,12 @@ import Language from '../../../src/components/language';
 import SmartDate from '../../../src/components/smart-date';
 
 import '../styles/users.scss';
-
-const USERS = gql`
-query ($limit: Int, $offset: Int, $order: String) {
-  counters {
-    users {
-     count
-    }
-  }
-  users(limit: $limit, offset: $offset, order: $order) {
-    id,
-    username,
-    userId,
-    first_name,
-    last_name,
-    username,
-    language,
-    payload,
-    createdAt
-  }
-}
-`;
-
+import useUsers from '../hooks/users';
 
 const Users = () => {
-
   const [ limit, setLimit ] = useState(10);
-  const [ page, setPage ] = useState(1);  
-  const { loading, error, data, refetch } = useQuery(USERS, {
-    fetchPolicy: 'network-only',
-    variables: { limit, offset: (page - 1) * limit, order: 'reverse:createdAt' }
-  });
+  const [ page, setPage ] = useState(1);
+  const { loading, saving, error, data, deleteUser, refetch } = useUsers({ limit, page });
 
   return (
     <PageContainer className="page-users">
@@ -105,6 +76,38 @@ const Users = () => {
             <HeaderCell>Email</HeaderCell>
             <Cell dataKey="email"/>
           </Column>
+          
+          <Column width={80}>
+            <HeaderCell>Action</HeaderCell>
+            <Cell>
+              {({ id, first_name, last_name, userId }) => (
+                <ButtonGroup>
+                  <Button 
+                    disabled={saving} 
+                    size="xs"
+                    onClick={() => {
+                      if (confirm(`Delete user "${[first_name, last_name].join(' ')}" (${userId})?`)) {
+                        deleteUser({ variables: { id }})
+                          .then(refetch);  
+                      }
+                    }}
+                  >
+                    <Icon icon="trash" />
+                  </Button>
+                  <Button 
+                    disabled={saving} 
+                    size="xs"
+                    onClick={() => {
+                      
+                    }}
+                  >
+                    <Icon icon="edit2" />
+                  </Button>
+              </ButtonGroup>
+              )}
+            </Cell>
+          </Column>
+
         </Table>
       )}
       {!error && !loading && (

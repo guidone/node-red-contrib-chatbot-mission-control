@@ -60,20 +60,17 @@ module.exports = function(RED) {
                 }
               }
             })
-            .then(data => done())
+            .then(data => {
+              send(msg);
+              done();
+            })
             .catch(error => {
               console.log(error)
               console.log('errorascio', error.networkError.result)
               done(error.networkError.result)
             });
-    
-          send(msg);
         });
-
-
       });
-
-      
   }
 
   RED.nodes.registerType('mc-store', MissionControlStore);

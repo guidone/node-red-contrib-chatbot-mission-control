@@ -454,6 +454,23 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
           }
         },
 
+        deleteUser: {
+          type: userType,
+          args: {
+            id: { type: new GraphQLNonNull(GraphQLInt)}
+          },
+          resolve(root, { id }) {
+            return User.findByPk(id)
+              .then(user => {
+                if (user != null) {
+                  user.destroy();
+                }
+                // todo: destroy also chatId
+                return user;
+              });
+          }
+        },
+
         createMessage: {
           type: messageType,
           args: {
