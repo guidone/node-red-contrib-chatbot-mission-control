@@ -17,7 +17,12 @@ query ($limit: Int, $offset: Int, $order: String) {
     username,
     language,
     payload,
-    createdAt
+    createdAt,
+    email,
+    chatIds {
+      transport,
+      chatId
+    }
   }
 }
 `;
@@ -26,6 +31,22 @@ const DELETE_USER = gql`
 mutation($id: Int!) {
   deleteUser(id: $id) {
     id
+  }
+}`;
+
+const EDIT_USER = gql`
+mutation($id: Int!, $user: NewUser!) {
+  editUser(id:$id, user: $user) {
+    id,
+    username,
+    userId,
+    first_name,
+    last_name,
+    username,
+    language,
+    payload,
+    createdAt,
+    email
   }
 }`;
 
@@ -40,13 +61,18 @@ export default ({ limit, page, onCompleted = () => {} }) => {
     deleteUser,
     { loading: mutationLoading, error: mutationError },
   ] = useMutation(DELETE_USER, { onCompleted });
+  const [
+    editUser,
+    { loading: editLoading, error: editError },
+  ] = useMutation(EDIT_USER, { onCompleted });
 
   return { 
     loading: loading, 
-    saving: mutationLoading,
-    error: error || mutationError, 
+    saving: mutationLoading || mutationLoading,
+    error: error || mutationError || editError, 
     data,
     deleteUser,
+    editUser,
     refetch
   };
 };

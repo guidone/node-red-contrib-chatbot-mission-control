@@ -454,6 +454,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
           }
         },
 
+        editUser: {
+          type: userType,
+          args: {
+            id: { type: new GraphQLNonNull(GraphQLInt)},
+            user: { type: new GraphQLNonNull(newUserType) }
+          },
+          resolve(root, { id, user: value }) {
+            return User.update(value, { where: { id } })
+              .then(() => User.findByPk(id));
+          }
+        },
+
         deleteUser: {
           type: userType,
           args: {

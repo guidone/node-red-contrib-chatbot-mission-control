@@ -6,3 +6,21 @@
     font-size: 13px;
   }
 }
+
+.modal-user {
+  .ace_editor {
+    border-radius: 5px;
+  }
+  .chat-ids {
+    .chat-id-item {
+      .transport {
+        width: 200px;
+        display: inline-block;
+      }
+      .chat-id {
+        display: inline-block;
+        font-style: italic;
+      }
+    }
+  }
+}

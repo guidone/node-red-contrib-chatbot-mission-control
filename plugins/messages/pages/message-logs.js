@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import gql from 'graphql-tag';
-import { Query, useQuery, useMutation } from 'react-apollo';
+import { useQuery } from 'react-apollo';
 import classNames from 'classnames';
-import moment from 'moment';
 
 import { Table, Icon, SelectPicker, Placeholder } from 'rsuite';
 
@@ -11,7 +10,6 @@ const { Grid } = Placeholder
 
 import withMessageTypes from '../../../src/wrappers/with-message-types';
 import withPlatforms from '../../../src/wrappers/with-platforms';
-
 import PageContainer from '../../../src/components/page-container';
 import MessageType from '../../../src/components/message-type';
 import Transport from '../../../src/components/transport';
@@ -48,13 +46,9 @@ const SelectInbound = [
   { value: false, label: 'Outbound' },
 ]
 
-
-
-
 const MessageLogs = ({ messageTypes, platforms }) => {
 
-  const [ limit, setLimit ] = useState(10);
-  const [ page, setPage ] = useState(1);
+  const [ { limit, page }, setPage ] = useState({ page: 1, limit: 10 });
   const [ messageType, setMessageType ] = useState(undefined);
   const [ transport, setTransport ] = useState(undefined);
   const [ inbound, setInbound ] = useState(undefined);
@@ -196,9 +190,9 @@ const MessageLogs = ({ messageTypes, platforms }) => {
         <Pagination
           activePage={page}
           displayLength={limit}
-          onChangePage={setPage}
+          onChangePage={page => setPage({ page, limit })}
           lengthMenu={[{ label: '10', value: 10 }, { label: '20', value: 20 }, { label: '30', value: 30 } ]}
-          onChangeLength={setLimit}
+          onChangeLength={limit => setPage({ limit, page: 1 })}
           total={data.counters.messages.count}
       />
       )}

@@ -11,15 +11,31 @@ import SmartDate from '../../../src/components/smart-date';
 
 import '../styles/users.scss';
 import useUsers from '../hooks/users';
+import ModalUser from '../views/modal-user';
 
 const Users = () => {
-  const [ limit, setLimit ] = useState(10);
-  const [ page, setPage ] = useState(1);
-  const { loading, saving, error, data, deleteUser, refetch } = useUsers({ limit, page });
+  const [ { limit, page }, setPage ] = useState({ page: 1, limit: 10 });
+  const [ user, setUser ] = useState(null);
+  const { loading, saving, error, data, deleteUser, editUser, refetch } = useUsers({ limit, page });
 
   return (
     <PageContainer className="page-users">
       <Breadcrumbs pages={['Users']}/>    
+      {user != null && (
+        <ModalUser 
+          user={user}
+          disabled={saving}
+          onCancel={() => setUser(null)}
+          onSubmit={user => {
+            console.log('saving', user.id, user)
+            editUser({ variables: { id: user.id, user: _.omit(user, ['id', 'createdAt', '__typename', 'chatIds']) }})
+              .then(() => {
+                setUser(null);
+                refetch();
+              });
+
+          }}
+        />)}
       {loading && <Grid columns={9} rows={3} />}
       {error && <div>error</div>}
       {!error && !loading && (
@@ -29,9 +45,6 @@ const Users = () => {
           loading={loading}
           renderEmpty={() => <div style={{ textAlign: 'center', padding: 80}}>No Users</div>}
           autoHeight
-          onSortColumn={(sortColumn, sortType) => {
-            console.log(sortColumn, sortType);
-          }}
         >
           <Column width={60} align="center">
             <HeaderCell>Id</HeaderCell>
@@ -80,14 +93,14 @@ const Users = () => {
           <Column width={80}>
             <HeaderCell>Action</HeaderCell>
             <Cell>
-              {({ id, first_name, last_name, userId }) => (
+              {user => (
                 <ButtonGroup>
                   <Button 
                     disabled={saving} 
                     size="xs"
                     onClick={() => {
-                      if (confirm(`Delete user "${[first_name, last_name].join(' ')}" (${userId})?`)) {
-                        deleteUser({ variables: { id }})
+                      if (confirm(`Delete user "${[user.first_name, user.last_name].join(' ')}" (${user.userId})?`)) {
+                        deleteUser({ variables: { id: user.id }})
                           .then(refetch);  
                       }
                     }}
@@ -98,7 +111,7 @@ const Users = () => {
                     disabled={saving} 
                     size="xs"
                     onClick={() => {
-                      
+                      setUser(user)  
                     }}
                   >
                     <Icon icon="edit2" />
@@ -114,9 +127,9 @@ const Users = () => {
         <Pagination
           activePage={page}
           displayLength={limit}
-          onChangePage={setPage}
+          onChangePage={page => setPage({ page, limit })}
           lengthMenu={[{ label: '10', value: 10 }, { label: '20', value: 20 }, { label: '30', value: 30 } ]}
-          onChangeLength={setLimit}
+          onChangeLength={limit => setPage({ page: 1, limit })}
           total={data.counters.users.count}
       />
       )}
