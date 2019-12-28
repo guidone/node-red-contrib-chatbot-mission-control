@@ -5,6 +5,8 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { Table, Icon, SelectPicker, Placeholder, Input } from 'rsuite';
 
+import { useHistory } from 'react-router-dom';
+
 const { Column, HeaderCell, Cell, Pagination } = Table;
 const { Grid } = Placeholder
 
@@ -60,10 +62,11 @@ const SelectInbound = [
 
 
 const MessageLogs = ({ messageTypes, platforms }) => {
-  const { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId } = useRouterQuery();
-  const [ { limit, page }, setPage ] = useState({ page: 1, limit: 10 });
+  const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId }, setQuery } = useRouterQuery();
+  const [ cursor, setCursor ] = useState({ page: 1, limit: 10 });
   const [ filters, setFilters ] = useState({ chatId: urlChatId, userId: urlUserId, messageId: urlMessageId });
   const { messageType, transport, inbound, chatId, userId, messageId } = filters;
+  const { limit, page } = cursor;
   
   const { loading, error, data, refetch } = useQuery(MESSAGES, {
     fetchPolicy: 'network-only',
@@ -89,6 +92,7 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           data={platforms.map(transport => ({ value: transport.id, label: transport.name }))} 
           onChange={transport => {
             setFilters({ ...filters, transport });
+            setCursor({ ...cursor, page: 1 });
             refetch({ transport });
           }} 
           onClean={() => setFilters({ ...filters, transport: undefined })} 
@@ -103,6 +107,7 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           data={SelectInbound} 
           onChange={inbound => {
             setFilters({ ...filters, inbound });
+            setCursor({ ...cursor, page: 1 });
             refetch({ inbound });
           }} 
           onClean={() => setFilters({ ...filters, inbound: undefined })} 
@@ -117,6 +122,7 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           data={messageTypes.map(type => ({ value: type.value, label: type.label }))} 
           onChange={messageType => {
             setFilters({ ...filters, messageType });
+            setCursor({ ...cursor, page: 1 });
             refetch({ type: messageType });
           }} 
           onClean={() => setFilters({ ...filters, messageType: undefined })} 
@@ -133,7 +139,9 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           onKeyUp={e => {
             if (e.keyCode === 13) {
               setFilters({ ...filters, messageId: e.target.value });
-              refetch({ messageId });  
+              setCursor({ ...cursor, page: 1 });
+              setQuery({ messageId: e.target.value })
+              refetch({ messageId: e.target.value });  
             }
           }}
         />
@@ -145,7 +153,9 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           onKeyUp={e => {
             if (e.keyCode === 13) {
               setFilters({ ...filters, chatId: e.target.value });
-              refetch({ chatId });  
+              setCursor({ ...cursor, page: 1 });
+              setQuery({ chatId: e.target.value });
+              refetch({ chatId: e.target.value });  
             }
           }}
         />
@@ -157,7 +167,9 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           onKeyUp={e => {
             if (e.keyCode === 13) {
               setFilters({ ...filters, userId: e.target.value });
-              refetch({ userId });  
+              setCursor({ ...cursor, page: 1 });
+              setQuery({ userId: e.target.value});
+              refetch({ userId: e.target.value });  
             }
           }}
         />        
@@ -239,9 +251,9 @@ const MessageLogs = ({ messageTypes, platforms }) => {
         <Pagination
           activePage={page}
           displayLength={limit}
-          onChangePage={page => setPage({ page, limit })}
+          onChangePage={page => setCursor({ ...cursor, page })}
           lengthMenu={[{ label: '10', value: 10 }, { label: '20', value: 20 }, { label: '30', value: 30 } ]}
-          onChangeLength={limit => setPage({ limit, page: 1 })}
+          onChangeLength={limit => setCursor({ ...cursor, page: 1 })}
           total={data.counters.messages.count}
       />
       )}
