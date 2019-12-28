@@ -130,12 +130,12 @@ const AppRouter = ({ codePlug }) => {
                       {codePlug
                         .getItems('pages')
                         .map(({ view: View, props }) => (
-                          <Route key={props.url} path={props.url}>
-                            <View {...props} dispatch={dispatch}/>
+                          <Route key={props.url} path={props.url} children={<View {...props} dispatch={dispatch}/>}>
+                            
                           </Route>
                         ))}
-                      <Route path="/mc">
-                        <HomePage dispatch={dispatch} codePlug={codePlug} />
+                      <Route path="/mc" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}>
+                        
                       </Route>
                     </Switch>
                   </Content>

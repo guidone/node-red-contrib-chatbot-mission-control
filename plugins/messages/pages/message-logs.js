@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo';
 import classNames from 'classnames';
-
-import { Table, Icon, SelectPicker, Placeholder } from 'rsuite';
+import _ from 'lodash';
+import { Table, Icon, SelectPicker, Placeholder, Input } from 'rsuite';
 
 const { Column, HeaderCell, Cell, Pagination } = Table;
 const { Grid } = Placeholder
@@ -15,17 +15,28 @@ import MessageType from '../../../src/components/message-type';
 import Transport from '../../../src/components/transport';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmartDate from '../../../src/components/smart-date';
+import useRouterQuery from '../../../src/hooks/router-query';
 
 import '../styles/message-logs.scss';
 
 const MESSAGES = gql`
-query ($limit: Int, $offset: Int, $order: String, $inbound: Boolean, $type: String, $transport: String) {
+query ($limit: Int, $offset: Int, $order: String, $inbound: Boolean, $type: String, $transport: String, $messageId: String, $chatId: String, $userId: String) {
   counters {
     messages {
      count
     }
   }
-  messages(limit: $limit, offset: $offset, inbound: $inbound, order: $order, type: $type, transport: $transport) {
+  messages(
+    limit: $limit, 
+    offset: $offset, 
+    inbound: $inbound, 
+    order: $order, 
+    type: $type, 
+    transport: $transport,
+    chatId: $chatId,
+    messageId: $messageId,
+    userId: $userId
+  ) {
     id
     chatId
     content,
@@ -46,12 +57,14 @@ const SelectInbound = [
   { value: false, label: 'Outbound' },
 ]
 
-const MessageLogs = ({ messageTypes, platforms }) => {
 
+
+const MessageLogs = ({ messageTypes, platforms }) => {
+  const { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId } = useRouterQuery();
   const [ { limit, page }, setPage ] = useState({ page: 1, limit: 10 });
-  const [ messageType, setMessageType ] = useState(undefined);
-  const [ transport, setTransport ] = useState(undefined);
-  const [ inbound, setInbound ] = useState(undefined);
+  const [ filters, setFilters ] = useState({ chatId: urlChatId, userId: urlUserId, messageId: urlMessageId });
+  const { messageType, transport, inbound, chatId, userId, messageId } = filters;
+  
   const { loading, error, data, refetch } = useQuery(MESSAGES, {
     fetchPolicy: 'network-only',
     variables: { 
@@ -60,7 +73,10 @@ const MessageLogs = ({ messageTypes, platforms }) => {
       type: messageType,
       order: 'reverse:createdAt',
       inbound, 
-      transport 
+      transport,
+      chatId: !_.isEmpty(chatId) ? chatId : undefined,
+      userId: !_.isEmpty(userId) ? userId : undefined,
+      messageId: !_.isEmpty(messageId) ? messageId : undefined
     }
   });
 
@@ -72,10 +88,10 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           value={transport}
           data={platforms.map(transport => ({ value: transport.id, label: transport.name }))} 
           onChange={transport => {
-            setTransport(transport);
-            refetch({ transport })
+            setFilters({ ...filters, transport });
+            refetch({ transport });
           }} 
-          onClean={() => setTransport(undefined)} 
+          onClean={() => setFilters({ ...filters, transport: undefined })} 
           cleanable
           searchable={false}          
           placeholder="Transport" 
@@ -86,10 +102,10 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           value={inbound}
           data={SelectInbound} 
           onChange={inbound => {
-            setInbound(inbound)
-            refetch({ inbound })
+            setFilters({ ...filters, inbound });
+            refetch({ inbound });
           }} 
-          onClean={() => setInbound(undefined)} 
+          onClean={() => setFilters({ ...filters, inbound: undefined })} 
           cleanable
           searchable={false}          
           placeholder="Inbound or Inbound" 
@@ -99,16 +115,52 @@ const MessageLogs = ({ messageTypes, platforms }) => {
         <SelectPicker 
           value={messageType}
           data={messageTypes.map(type => ({ value: type.value, label: type.label }))} 
-          onChange={type => {
-            setMessageType(type)
-            refetch({ type })
+          onChange={messageType => {
+            setFilters({ ...filters, messageType });
+            refetch({ type: messageType });
           }} 
-          onClean={() => setMessageType(undefined)} 
+          onClean={() => setFilters({ ...filters, messageType: undefined })} 
           cleanable
           searchable={false}          
           placeholder="Message type" 
           size="md"
         />
+        &nbsp;
+        <Input
+          defaultValue={messageId}
+          style={{ width: '150px', display: 'inline-block' }}
+          placeholder="messageId"
+          onKeyUp={e => {
+            if (e.keyCode === 13) {
+              setFilters({ ...filters, messageId: e.target.value });
+              refetch({ messageId });  
+            }
+          }}
+        />
+        &nbsp;
+        <Input
+          defaultValue={chatId}
+          style={{ width: '150px', display: 'inline-block' }}
+          placeholder="chatId"
+          onKeyUp={e => {
+            if (e.keyCode === 13) {
+              setFilters({ ...filters, chatId: e.target.value });
+              refetch({ chatId });  
+            }
+          }}
+        />
+        &nbsp;
+        <Input
+          defaultValue={userId}
+          style={{ width: '150px', display: 'inline-block' }}
+          placeholder="userId"
+          onKeyUp={e => {
+            if (e.keyCode === 13) {
+              setFilters({ ...filters, userId: e.target.value });
+              refetch({ userId });  
+            }
+          }}
+        />        
       </div>
 
       {loading && <Grid columns={9} rows={3} />}
@@ -120,9 +172,6 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           loading={loading}
           renderEmpty={() => <div style={{ textAlign: 'center', padding: 80}}>No Messages</div>}
           autoHeight
-          onSortColumn={(sortColumn, sortType) => {
-            console.log(sortColumn, sortType);
-          }}
         >
           <Column width={60} align="center">
             <HeaderCell>Id</HeaderCell>

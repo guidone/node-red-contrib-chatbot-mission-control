@@ -565,6 +565,9 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
             order: { type: GraphQLString },
             type: { type: GraphQLString },
             transport: { type: GraphQLString },
+            messageId: { type: GraphQLString },
+            chatId: { type: GraphQLString },
+            userId: { type: GraphQLString },
             inbound: { type: GraphQLBoolean }
           },
           resolve: resolver(Message, {
