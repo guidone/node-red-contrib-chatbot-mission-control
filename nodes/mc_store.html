@@ -1,24 +1,14 @@
 <script type="text/javascript">
   RED.nodes.registerType('mc-store', {
     category: 'Mission Control',
-    color: '#FFCC66',
-    defaults: {
-      name: {
-        value: ''
-      },
-      topic: {
-        value: ''
-      },
-      payload: {
-        value: ''
-      }
-    },
+    color: '#6699CC',
+    defaults: {},
     inputs: 1,
     outputs: 1,
     paletteLabel: 'MC Store',
     icon: 'chatbot-command.png',
     label: function() {        
-      return 'MC store';
+      return 'MC Store';
     },
     oneditprepare: function() {
       var widget = $('#node-input-payload');
@@ -39,6 +29,7 @@
 </script>
 
 <script type="text/x-red" data-help-name="mc-store">
+  Store the message - inbound or outbound - in Mission Control logs.
 </script>
   
   

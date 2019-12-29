@@ -6,11 +6,9 @@ const fs = require('fs');
 const moment = require('moment');
 
 const lcd = require('./lib/lcd/index');
-
 const DatabaseSchema = require('./database/index');
 
 let initialized = false;
-let settings = {};
 const Events = new events.EventEmitter();
 
 
@@ -50,7 +48,6 @@ function sendMessage(topic, payload) {
 
 
 function bootstrap(server, app, log, redSettings) {
-
   // print version
   const jsonPackage = fs.readFileSync(__dirname + '/package.json');
   try {
@@ -75,18 +72,26 @@ function bootstrap(server, app, log, redSettings) {
     mcSettings.dbPath = mcSettings.dbPath.replace(/\/$/, '') + '/mission-control.sqlite';
   }
   console.log(lcd.timestamp() + '  ' + lcd.green('dbPath: ') + lcd.grey(mcSettings.dbPath));
+  if (mcSettings.root == null) {
+    mcSettings.root = '/mc';
+  } else {
+    mcSettings.root = mcSettings.root.replace(/\/$/, '');
+  }
+  console.log(lcd.timestamp() + '  ' + lcd.green('root: ') + lcd.grey(mcSettings.root));
+  mcSettings.port = redSettings.uiPort;
+  console.log(lcd.timestamp() + '  ' + lcd.green('port: ') + lcd.grey(mcSettings.port));
 
   // todo put db schema here
   const databaseSchema = DatabaseSchema(mcSettings)
   const { Configuration, graphQLServer } = databaseSchema;
 
 
-  const uiSettings = redSettings.ui || {};
+  /*const uiSettings = redSettings.ui || {};
   if ((uiSettings.hasOwnProperty('path')) && (typeof uiSettings.path === 'string')) {
     settings.path = uiSettings.path;
   } else { 
     settings.path = 'mc'; 
-  }
+  }*/
 
   //const fullPath = join(redSettings.httpNodeRoot, settings.path);
   //const socketIoPath = join(fullPath, 'socket.io');
@@ -96,10 +101,10 @@ function bootstrap(server, app, log, redSettings) {
   // eslint-disable-next-line no-console
   console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
   + ' - [info] GraphQL ready at :')
-  + ' ' + lcd.green(`http://localhost:1880${graphQLServer.graphqlPath}`));
+  + ' ' + lcd.green(`http://localhost:${mcSettings.port}${graphQLServer.graphqlPath}`));
 
   // serve a configuration given the namespace
-  app.get('/mc/api/configuration/:namespace', (req, res) => {
+  app.get(`${mcSettings.root}/api/configuration/:namespace`, (req, res) => {
     Configuration.findOne({ where: { namespace: req.params.namespace }})
       .then(found => {
         if (found == null) {
@@ -119,9 +124,10 @@ function bootstrap(server, app, log, redSettings) {
         }
       });
   });
+
   // serve mission control page and assets
-  app.use('^\/mc', (req, res, next) => res.sendFile(`${__dirname}/src/index.html`));
-  app.use('/mc/main.js', serveStatic(path.join(__dirname, 'dist/main.js')));
+  app.use('^' + mcSettings.root, (req, res, next) => res.sendFile(`${__dirname}/src/index.html`));
+  app.use(`${mcSettings.root}/main.js`, serveStatic(path.join(__dirname, 'dist/main.js')));
 
   // Setup web socket
   const wss = new WebSocket.Server({ port: 1942 });

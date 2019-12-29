@@ -1,6 +1,5 @@
 const { ApolloServer } = require('apollo-server-express');
 const { resolver } = require('graphql-sequelize');
-
 const { Kind } = require('graphql/language');
 
 const {
@@ -570,14 +569,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
             userId: { type: GraphQLString },
             inbound: { type: GraphQLBoolean }
           },
-          resolve: resolver(Message, {
-            before: (findOptions, args, context) => {
-              console.log('???', args)
-              //findOptions.where = { /* Custom where arguments */ };
-              return findOptions;
-            },
-
-          })
+          resolve: resolver(Message)
         },
   
         counters: {

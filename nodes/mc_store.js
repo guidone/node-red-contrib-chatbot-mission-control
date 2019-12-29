@@ -34,8 +34,6 @@ module.exports = function(RED) {
       when(chat.get('firstName', 'lastName', 'username', 'language', 'userId'))
         .then(({ firstName, lastName, username, language, userId }) => {
 
-          console.log('saving with', firstName, lastName, username, language);
-
           // if inbound get userId from chatContext
 
           client

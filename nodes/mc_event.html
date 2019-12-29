@@ -1,13 +1,15 @@
 <script type="text/javascript">
   RED.nodes.registerType('mc-event', {
     category: 'Mission Control',
-    color: '#FFCC66',
+    color: '#6699CC',
     defaults: {
       flow: {
-        value: ''
+        value: '',
+        required: true
       },
       name: {
-        value: ''
+        value: '',
+        required: true
       }
     },
     inputs: 1,
@@ -15,7 +17,7 @@
     paletteLabel: 'MC Event',
     icon: 'chatbot-command.png',
     label: function() {        
-      return 'MC Event';
+      return 'MC Event' + (this.name != null ? ' (' + this.name + ')' : '');
     }
   });
 </script>

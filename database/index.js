@@ -25,6 +25,10 @@ module.exports = mcSettings => {
     namespace: Sequelize.STRING,
     payload: Sequelize.TEXT,
     ts: Sequelize.DATE
+  }, {
+    indexes: [
+      { name: 'configuration_namespace', using: 'BTREE', fields: ['namespace'] }
+    ]
   });
 
   const Message = sequelize.define('message', {
@@ -37,6 +41,17 @@ module.exports = mcSettings => {
     content: Sequelize.TEXT,
     inbound: Sequelize.BOOLEAN,
     ts: Sequelize.DATE
+  }, {
+    indexes: [
+      { name: 'message_chatid', using: 'BTREE', fields: ['chatId'] },
+      { name: 'message_userid', using: 'BTREE', fields: ['userId'] },
+      { name: 'message_from', using: 'BTREE', fields: ['from'] },
+      { name: 'message_messageid', using: 'BTREE', fields: ['messageId'] },
+      { name: 'message_transport', using: 'BTREE', fields: ['transport'] },
+      { name: 'message_type', using: 'BTREE', fields: ['type'] },
+      { name: 'message_inbound', using: 'BTREE', fields: ['inbound'] },
+      { name: 'message_ts', using: 'BTREE', fields: ['ts'] }
+    ]
   });
  
   const User = sequelize.define('user', {
@@ -47,18 +62,36 @@ module.exports = mcSettings => {
     username: Sequelize.STRING,
     language: Sequelize.STRING,
     payload: Sequelize.TEXT
+  }, {
+    indexes: [
+      { name: 'user_userid', using: 'BTREE', fields: ['userId'] },
+      { name: 'user_email', using: 'BTREE', fields: ['email'] },
+      { name: 'user_username', using: 'BTREE', fields: ['username'] },
+      { name: 'user_language', using: 'BTREE', fields: ['language'] }
+    ]
   });
 
   const ChatId = sequelize.define('chatid', {
     userId: Sequelize.STRING,
     chatId: Sequelize.STRING,
     transport: Sequelize.STRING
+  }, {
+    indexes: [
+      { name: 'chatid_userid', using: 'BTREE', fields: ['userId'] },
+      { name: 'chatid_chatid', using: 'BTREE', fields: ['chatId'] },
+      { name: 'chatid_transport', using: 'BTREE', fields: ['transport'] }
+    ]
   });
 
   const Event = sequelize.define('event', {
     flow: Sequelize.STRING,
     name: Sequelize.STRING,
     count: Sequelize.INTEGER
+  }, {
+    indexes: [
+      { name: 'event_flow', using: 'BTREE', fields: ['flow'] },
+      { name: 'event_name', using: 'BTREE', fields: ['name'] }
+    ]
   });
 
 

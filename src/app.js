@@ -4,7 +4,7 @@ import { createHttpLink } from 'apollo-link-http';
 import { ApolloClient } from 'apollo-client';
 import { ApolloLink } from "apollo-link";
 import { ApolloProvider } from 'react-apollo';
-import { Button, Container, Navbar, Dropdown, Nav, Footer, Content, Icon, Notification } from 'rsuite';
+import { Container, Content } from 'rsuite';
 import {
   BrowserRouter as Router,
   Switch,
@@ -12,13 +12,11 @@ import {
   Link
 } from 'react-router-dom';
 
-import { Plugin, CodePlug, Views, plug } from '../lib/code-plug';
+import { CodePlug } from '../lib/code-plug';
 
 import compose from './helpers/compose-reducers';
 import withState from './wrappers/with-state';
 import AppContext from './common/app-context';
-
-
 import Sidebar from './layout/sidebar';
 import Header from './layout/header';
 import HomePage from './pages/home';
@@ -119,7 +117,7 @@ const AppRouter = ({ codePlug }) => {
     <ApolloProvider client={client}>
       <AppContext.Provider value={{ state, dispatch, client, platforms, eventTypes, messageTypes }}>
         <WebSocket dispatch={dispatch}>
-          <Router>
+          <Router basename="/mc/">
             <div className="mission-control-app">        
               <Container className="mc-main-container">          
                 <Sidebar/>

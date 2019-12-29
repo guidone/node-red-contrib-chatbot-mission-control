@@ -23,7 +23,7 @@ const SendMessageWidget = ({ sendMessage, stats }) => {
               style={{ height: '100%' }}
               onKeyUp={event => {
                 if (event.keyCode === 91) {
-                  sendMessage('send', formValue.message);
+                  sendMessage('message.send', formValue.message);
                   setFormValue({ message: '' });
                 }
               }}
@@ -34,7 +34,7 @@ const SendMessageWidget = ({ sendMessage, stats }) => {
           <FormGroup>
             <ButtonToolbar>
               <Button appearance="primary" onClick={() => {
-                sendMessage('send', formValue.message);
+                sendMessage('message.send', formValue.message);
                 setFormValue({ message: '' });
               }}>
                 Send Message

@@ -10,14 +10,14 @@ module.exports = function(RED) {
     this.topic = config.topic;
 
     const handler = (topic, payload) => {
-      console.log('arrivato nel nodo', topic, payload)
-      node.send({ topic, payload });
+      if (topic === node.topic) {
+        node.send({ topic, payload });
+      }
     }
 
     Events.on('message', handler);
 
     this.on('close', done => {
-      consolelog('rimosso handler');
       Events.removeListener('message', handler);
       done();
     });

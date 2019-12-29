@@ -17,6 +17,7 @@ const JSONEditor = (props) => (
     name="json_editor"
     editorProps={{ $blockScrolling: true }}
     {...props}
+    value={props.value || ''}
   />
 );
 
