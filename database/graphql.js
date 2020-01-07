@@ -500,15 +500,14 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
           args: {
             id: { type: new GraphQLNonNull(GraphQLInt)}
           },
-          resolve(root, { id }) {
-            return User.findByPk(id)
-              .then(user => {
-                if (user != null) {
-                  user.destroy();
-                }
-                // todo: destroy also chatId
-                return user;
-              });
+          resolve: async function(root, { id }) {
+            const user = await User.findByPk(id);
+            // destroy user and related chatIds
+            if (user != null) {
+              await user.destroy();
+            }
+            await ChatId.destroy({ where: { userId: user.userId }});
+            return user;
           }
         },
 

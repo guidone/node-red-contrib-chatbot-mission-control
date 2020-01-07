@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, ButtonToolbar } from 'rsuite';
+import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, HelpBlock } from 'rsuite';
 import AceEditor from "react-ace";
 
 import 'ace-builds/src-noconflict/mode-javascript';
@@ -31,12 +31,17 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
         <Modal.Title>Edit User <em>(id: {user.id})</em></Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form formValue={formValue} onChange={formValue => setFormValue(formValue)} fluid>
-          <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>
+        <Form formValue={formValue} onChange={formValue => setFormValue(formValue)} fluid autoComplete="off">
+          <FormGroup className="chat-id">
+            <ControlLabel>UserId</ControlLabel>
+            <FormControl readOnly name="userId" className="user-id"/>
+            <HelpBlock tooltip>userid cannot be modified for referencial integrity</HelpBlock>            
+          </FormGroup>
+          <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
             <FlexboxGrid.Item colspan={11}>
               <FormGroup>
                 <ControlLabel>First Name</ControlLabel>
-                <FormControl readOnly={disabled} name="first_name" />
+                <FormControl autoComplete="off" readOnly={disabled} name="first_name" />
               </FormGroup>
             </FlexboxGrid.Item>            
             <FlexboxGrid.Item colspan={11}>
@@ -50,10 +55,7 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
             <ControlLabel>Username</ControlLabel>
             <FormControl readOnly={disabled} name="username" />
           </FormGroup>
-          <FormGroup>
-            <ControlLabel>UserId</ControlLabel>
-            <FormControl readOnly={disabled} name="userId" />            
-          </FormGroup>
+
           <FormGroup>
             <ControlLabel>Email</ControlLabel>
             <FormControl readOnly={disabled} name="email" />
