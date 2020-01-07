@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, HelpBlock } from 'rsuite';
-import AceEditor from "react-ace";
+import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, HelpBlock, SelectPicker } from 'rsuite';
+import AceEditor from 'react-ace';
 
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/theme-monokai';
 
 import Transport from '../../../src/components/transport';
+
+import Languages from '../helpers/languages';
 
 const JSONEditor = (props) => (
   <AceEditor            
@@ -62,6 +64,17 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
           <FormGroup>
             <ControlLabel>Username</ControlLabel>
             <FormControl readOnly={disabled} name="username" />
+          </FormGroup>
+          <FormGroup>
+            <ControlLabel>Language</ControlLabel>
+            <FormControl 
+              readOnly={disabled} 
+              name="language" 
+              cleanable={false}
+              block
+              accepter={SelectPicker}
+              data={Languages.map(item => ({ value: item.code, label: item.name }))} 
+            />
           </FormGroup>
           <FormGroup>
             <ControlLabel>Email</ControlLabel>
