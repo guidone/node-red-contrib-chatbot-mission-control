@@ -22,20 +22,28 @@ const JSONEditor = (props) => (
 );
 
 const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
+  const [formValue, setFormValue] = useState({ ...user, payload: JSON.stringify(user.payload) });
+  const [formError, setFormError] = useState(null);
 
-  const [formValue, setFormValue] = useState(user);
-  console.log(user)
   return (
     <Modal backdrop show onHide={onCancel} className="modal-user">
       <Modal.Header>
         <Modal.Title>Edit User <em>(id: {user.id})</em></Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Form formValue={formValue} onChange={formValue => setFormValue(formValue)} fluid autoComplete="off">
+        <Form 
+          formValue={formValue} 
+          formError={formError} 
+          onChange={formValue => {
+            setFormValue(formValue);
+            setFormError(null);
+          }} 
+          fluid autoComplete="off"
+        >
           <FormGroup className="chat-id">
             <ControlLabel>UserId</ControlLabel>
             <FormControl readOnly name="userId" className="user-id"/>
-            <HelpBlock tooltip>userid cannot be modified for referencial integrity</HelpBlock>            
+            <HelpBlock tooltip>userId cannot be modified for referencial integrity</HelpBlock>            
           </FormGroup>
           <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
             <FlexboxGrid.Item colspan={11}>
@@ -55,7 +63,6 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
             <ControlLabel>Username</ControlLabel>
             <FormControl readOnly={disabled} name="username" />
           </FormGroup>
-
           <FormGroup>
             <ControlLabel>Email</ControlLabel>
             <FormControl readOnly={disabled} name="email" />
@@ -84,10 +91,21 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
       </Modal.Body>
       <Modal.Footer>
         <Button 
-        appearance="primary"
-        disabled={disabled} 
-        appearance="primary" 
-        onClick={() => onSubmit(formValue)}
+          appearance="primary"
+          disabled={disabled} 
+          appearance="primary" 
+          onClick={() => {
+            let payload;
+            try {
+              payload = JSON.parse(formValue.payload);
+            } catch(e) {
+              console.log('invalid json')
+              setFormError({ payload: 'Invalid JSON '});
+              // TODO: fix if not valid
+              return;
+            }
+            onSubmit({ ...formValue, payload });
+          }}
         >
           Save
         </Button>

@@ -6,6 +6,15 @@ $sidebag-hover-background: #087CA7;
   font-weight: bold;
 }
 
+.rs-tooltip {
+  .rs-tooltip-inner {
+    text-align: left;
+    line-height: 16px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+}
+
 .mission-control-app {
 
   .title {

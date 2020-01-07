@@ -68,7 +68,20 @@ module.exports = mcSettings => {
       { name: 'user_email', using: 'BTREE', fields: ['email'] },
       { name: 'user_username', using: 'BTREE', fields: ['username'] },
       { name: 'user_language', using: 'BTREE', fields: ['language'] }
-    ]
+    ],
+    /*getterMethods: {
+      payload: function() {
+        let result;
+        try {
+          console.log('parso', this.getDataValue('payload'))
+          result = JSON.parse(this.getDataValue('payload'));
+        } catch(e) {
+          // do nothing
+          console.log(e)
+        }
+        return result;
+      }
+    }*/
   });
 
   const ChatId = sequelize.define('chatid', {

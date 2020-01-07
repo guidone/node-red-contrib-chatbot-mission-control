@@ -33,6 +33,26 @@ const DateType = new GraphQLScalarType({
   },
 });
 
+const JSONType = new GraphQLScalarType({
+  name: 'JSON',
+  description: 'JSON data type',
+  parseValue(value) {
+    return JSON.stringify(value);
+  },
+  serialize(value) {
+    let result;
+    try {
+      result = JSON.parse(value);
+    } catch(e) {
+      // do nothing
+    }
+    return result;
+  },
+  parseLiteral(ast) {
+    return null;
+  },
+});
+
 module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) => {
 
   const newUserType = new GraphQLInputObjectType({
@@ -64,7 +84,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
         description: '',
       },
       payload: {
-        type: GraphQLString,
+        type: JSONType,
         description: '',
       }
     }
@@ -129,7 +149,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
         type: DateType
       },
       payload: {
-        type: GraphQLString,
+        type: JSONType,
         description: '',
       },
       chatIds: {
