@@ -70,6 +70,106 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
     }
   });
 
+  const chatIdType = new GraphQLObjectType({
+    name: 'ChatId',
+    description: 'tbd',
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The internal id of the user',
+      },
+      userId: {
+        type: GraphQLString,
+        description: ''
+      },
+      chatId: {
+        type: GraphQLString,
+        description: ''
+      },
+      transport: {
+        type: GraphQLString,
+        description: ''
+      }
+    }
+  });
+
+  const userType = new GraphQLObjectType({
+    name: 'User',
+    description: 'tbd',
+    fields: () => ({
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The internal id of the user',
+      },
+      userId: {
+        type: GraphQLString,
+        description: '',
+      },
+      email: {
+        type: GraphQLString,
+        description: '',
+      },
+      first_name: {
+        type: GraphQLString,
+        description: '',
+      },
+      last_name: {
+        type: GraphQLString,
+        description: '',
+      },
+      language: {
+        type: GraphQLString,
+        description: '',
+      },
+      username: {
+        type: GraphQLString,
+        description: '',
+      },
+      createdAt: {
+        type: DateType
+      },
+      payload: {
+        type: GraphQLString,
+        description: '',
+      },
+      chatIds: {
+        type: new GraphQLList(chatIdType),
+        args: {
+          transport: { type: GraphQLString }
+        },
+        resolve: (user, args) => {
+          const where = { userId: user.userId };
+          if (args.transport != null) {
+            where.transport = args.transport;  
+          } 
+          return ChatId.findAll({ where });
+        }
+      },
+      messages: {
+        type: GraphQLList(messageType),
+        args: {
+          offset: { type: GraphQLInt },
+          limit: { type: GraphQLInt },
+          order: { type: GraphQLString }
+        },
+        resolve: (user, args = {}) => {
+          let order;
+          if (args.order != null) {
+            order = [
+              [args.order.replace('reverse:', ''), args.order.startsWith('reverse:') ? 'ASC' : 'DESC']
+            ]; 
+          }
+          return Message.findAll({ 
+            where: { userId: user.userId},
+            limit: args.limit,
+            offset: args.offset,
+            order
+          });
+        }
+      }
+    })
+  });
+
   const newMessageType = new GraphQLInputObjectType({
     name: 'NewMessage',
     description: 'tbd',
@@ -163,29 +263,12 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
       ts: {
         type: GraphQLString,
         description: '',
-      }
-    }
-  });
-
-  const chatIdType = new GraphQLObjectType({
-    name: 'ChatId',
-    description: 'tbd',
-    fields: {
-      id: {
-        type: new GraphQLNonNull(GraphQLInt),
-        description: 'The internal id of the user',
       },
-      userId: {
-        type: GraphQLString,
-        description: ''
-      },
-      chatId: {
-        type: GraphQLString,
-        description: ''
-      },
-      transport: {
-        type: GraphQLString,
-        description: ''
+      user: {
+        type: userType,
+        resolve: (message, args) => {
+          return User.findOne({ where: { userId: message.userId }});
+        }
       }
     }
   });
@@ -233,60 +316,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
     }
   });
 
-  const userType = new GraphQLObjectType({
-    name: 'User',
-    description: 'tbd',
-    fields: {
-      id: {
-        type: new GraphQLNonNull(GraphQLInt),
-        description: 'The internal id of the user',
-      },
-      userId: {
-        type: GraphQLString,
-        description: '',
-      },
-      email: {
-        type: GraphQLString,
-        description: '',
-      },
-      first_name: {
-        type: GraphQLString,
-        description: '',
-      },
-      last_name: {
-        type: GraphQLString,
-        description: '',
-      },
-      language: {
-        type: GraphQLString,
-        description: '',
-      },
-      username: {
-        type: GraphQLString,
-        description: '',
-      },
-      createdAt: {
-        type: DateType
-      },
-      payload: {
-        type: GraphQLString,
-        description: '',
-      },
-      chatIds: {
-        type: new GraphQLList(chatIdType),
-        args: {
-          transport: { type: GraphQLString }
-        },
-        resolve: (user, args) => {
-          const where = { userId: user.userId };
-          if (args.transport != null) {
-            where.transport = args.transport;  
-          } 
-          return ChatId.findAll({ where });
-        }
-      }
-    }
-  });
+  
 
   const configurationType = new GraphQLObjectType({
     name: 'Configuration',
@@ -533,7 +563,8 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
           args: {
             offset: { type: GraphQLInt },
             limit: { type: GraphQLInt },
-            order: { type: GraphQLString }
+            order: { type: GraphQLString },
+            userId: { type: GraphQLString },
           },
           resolve: resolver(User)
         },
