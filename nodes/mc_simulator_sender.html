@@ -1,0 +1,40 @@
+<script type="text/javascript">
+  RED.nodes.registerType('mc-simulator-sender', {
+    category: 'Mission Control',
+    color: '#6699CC',
+    defaults: {
+      name: {
+        value: ''
+      },
+      topic: {
+        value: ''
+      },
+      payload: {
+        value: ''
+      }
+    },
+    inputs: 1,
+    outputs: 1,
+    paletteLabel: 'Simulator Out',
+    icon: 'chatbot-command.png',
+    label: function() {        
+      return 'Simulator Out';
+    },
+    oneditprepare: function() {
+      
+    },
+    oneditsave: function() {
+      
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="mc-simulator-sender">
+ 
+</script>
+
+<script type="text/x-red" data-help-name="mc-simulator-sender">
+</script>
+  
+  
+  

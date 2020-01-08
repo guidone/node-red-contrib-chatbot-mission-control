@@ -7,6 +7,7 @@ import { ResponsiveSankey } from '@nivo/sankey'
 import { plug } from '../../lib/code-plug';
 import Panel from '../../src/components/grid-panel';
 import withSocket from '../../src/wrappers/with-socket';
+import useSocket from '../../src/hooks/socket';
 import Transport from '../../src/components/transport';
 
 import { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, MessageDate, MessageUser, UserStatus, 
@@ -65,12 +66,24 @@ const PanelMenu = ({ transport, onChange }) => {
 
 };
 
+const handleMessages = (state, action) => {
+  switch(action.type) {
+    case 'socket.message':
+      console.log('arrivato messaggio', action);
+      return state;
+    default:
+      return state; 
+  }
+};
+
 
 
 const SimulatorWidget = ({ sendMessage }) => {
-  
+  const { state, dispatch } = useSocket(handleMessages, { messages: [] });
   const [transport, setTransport] = useState('telegram');
   
+  console.log('-->', state)
+
   return (
     <Panel 
       title="Chat Simulator" 
@@ -161,7 +174,16 @@ const SimulatorWidget = ({ sendMessage }) => {
 
         </Messages>
         <MessageComposer
-          onSend={message => console.log('send', message)}
+          onSend={message => {
+            console.log('send', message);
+            sendMessage('simulator', { 
+              transport, 
+              payload: {
+                content: message, 
+                type: 'message'
+              }
+            });
+          }}
         /> 
         </ChatWindow>
     </Panel>

@@ -19,7 +19,9 @@
       "mc-configuration": "nodes/mc_configuration.js",
       "mc-store": "nodes/mc_store.js",
       "mc-query": "nodes/mc_query.js",
-      "mc-event": "nodes/mc_event.js"
+      "mc-event": "nodes/mc_event.js",
+      "mc-simulator-receiver": "nodes/mc_simulator_receiver.js",
+      "mc-simulator-sender": "nodes/mc_simulator_sender.js"
     }
   },
   "dependencies": {
