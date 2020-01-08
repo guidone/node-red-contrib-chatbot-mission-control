@@ -37,6 +37,7 @@ module.exports = function(RED) {
       }
 
       sendMessage(topic, payload);
+      // pass through
       send(msg);
       done();
     });

@@ -2,7 +2,7 @@ const _ = require('lodash')
 const moment = require('moment');
 const gql = require('graphql-tag');
 
-const { isValidMessage, when } = require('../lib/utils/index');
+const { isValidMessage, isSimulator, when } = require('../lib/utils/index');
 const client = require('../database/client');
 
 const CREATE_MESSAGE = gql`
@@ -23,8 +23,8 @@ module.exports = function(RED) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
       done = done || function(error) { node.error.call(node, error, msg) };
-      // check if valid redbot message
-      if (!isValidMessage(msg, node)) {
+      // check if valid redbot message or simulator, pass thru
+      if (!isValidMessage(msg, node) || isSimulator(msg)) {
         send(msg);
         done();
         return;  

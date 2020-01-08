@@ -35,6 +35,7 @@ module.exports = function(RED) {
           userId,
           inbound: true
         };
+        msg.originalMessage.simulator = true;
         // send back the evaluated message so also originated messages are visible in the simulator
         sendMessage('simulator', {...msg.payload, messageId: _.uniqueId('msg_'), transport: msg.originalMessage.transport });
         // continue the flow
