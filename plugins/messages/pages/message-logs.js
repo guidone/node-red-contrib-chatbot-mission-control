@@ -253,7 +253,7 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           displayLength={limit}
           onChangePage={page => setCursor({ ...cursor, page })}
           lengthMenu={[{ label: '10', value: 10 }, { label: '20', value: 20 }, { label: '30', value: 30 } ]}
-          onChangeLength={limit => setCursor({ ...cursor, page: 1 })}
+          onChangeLength={limit => setCursor({ limit, page: 1 })}
           total={data.counters.messages.count}
       />
       )}
