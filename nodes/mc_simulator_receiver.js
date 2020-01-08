@@ -1,8 +1,8 @@
-
+const _ = require('lodash');
 
 module.exports = function(RED) {
 
-  const { Events } = require('../mc')(RED);
+  const { Events, sendMessage } = require('../mc')(RED);
   
   function MissionControlSimulatorReceiver(config) {
     RED.nodes.createNode(this, config);
@@ -16,21 +16,28 @@ module.exports = function(RED) {
         
         // TODO: use platform to select the right chat server
 
-        const serverNode = RED.nodes.getNode("e0289538.2f1698")
-        //console.log('nodo master', node)
-        //node.send({ topic, payload });
+        const serverNode = RED.nodes.getNode(message.nodeId);
+
+        if (serverNode == null || serverNode.chat == null) {
+          node.error(`Unable to find a RedBot chat node with id ${message.nodeId}`);
+          return;
+        }
+
         const chatServer = serverNode.chat;
         const chatId = 'sim42';
         const userId = 'user42';
-        const msgId = 'msg42'; // TODO: random
-        const msg = await chatServer.createMessage(chatId, userId, msgId, {})
+        const messageId = _.uniqueId('msg_');;
+        const msg = await chatServer.createMessage(chatId, userId, messageId, {})
         msg.payload = {
           ...message.payload,
           chatId,
-          msgId,
+          messageId,
           userId,
           inbound: true
         };
+        // send back the evaluated message so also originated messages are visible in the simulator
+        sendMessage('simulator', {...msg.payload, messageId: _.uniqueId('msg_'), transport: msg.originalMessage.transport });
+        // continue the flow
         node.send(msg);
       }
     }

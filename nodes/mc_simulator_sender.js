@@ -14,15 +14,11 @@ module.exports = function(RED) {
       done = done || function(error) { node.error.call(node, error, msg) };
 
       // TODO: implement here continuation
-
-      sendMessage('simulator', msg.payload);
+      sendMessage('simulator', {...msg.payload, transport: msg.originalMessage.transport });
       send(msg);
       done();
     });
-
-
   }
-
 
   RED.nodes.registerType('mc-simulator-sender', MissionControlSimulatorSender);
 };

@@ -42,49 +42,31 @@ $gray: #92959E;
   padding: 10px 10px 0px 10px;
   flex: 0 0 auto;
   width: 100%;
-    
+  display: flex;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-content: stretch;
+  align-items: stretch;
+
+  .editor {
+    flex: 1 0;
     textarea {
       width: 100%;
       border: none;
       padding: 10px 10px;
-      margin-bottom: 10px;
+      margin-bottom: 5px;
       border-radius: 5px;
-      resize: none;
-      
+      resize: none;  
+      outline: none;    
     }
-    
-    .fa-file-o, .fa-file-image-o {
-      font-size: 16px;
-      color: gray;
-      cursor: pointer;
-      
-    }
-    
-    button {
-      float: right;
-      color: $blue;
-      font-size: 16px;
-      text-transform: uppercase;
-      border: none;
-      cursor: pointer;
-      font-weight: bold;
-      background: #F2F5F8;
-      
-      &:hover {
-        color: darken($blue, 7%);
-      }
-    }
-  
-  &.clearfix:after {
-    visibility: hidden;
-    display: block;
-    font-size: 0;
-    content: " ";
-    clear: both;
-    height: 0;
   }
 
-  
+  .buttons {
+    flex: 0 0 auto;
+    margin-left: 10px;
+  }
 }
 
 .ui-chat-message {

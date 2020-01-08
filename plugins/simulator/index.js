@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import _ from 'lodash';
 import { Placeholder, SelectPicker, Toggle } from 'rsuite';
-import gql from 'graphql-tag';
-import { useQuery } from 'react-apollo';
-import { ResponsiveSankey } from '@nivo/sankey'
+
 
 import { plug } from '../../lib/code-plug';
 import Panel from '../../src/components/grid-panel';
 import withSocket from '../../src/wrappers/with-socket';
+import withActiveChatbots from '../../src/wrappers/with-active-chatbots';
 import useSocket from '../../src/hooks/socket';
 import Transport from '../../src/components/transport';
 
 import { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, MessageDate, MessageUser, UserStatus, 
   MessageText,
   MessageButtons,
-  MessagePhoto 
+  MessagePhoto,
+  GenericMessage 
 } from '../../src/components/chat';
 
 import './simulator.scss';
@@ -28,7 +29,7 @@ const Transports = [
 
 const TransportValue = (value, item) => {
 
-  console.log('valie', value)
+  console.log('valie', value, item)
   return (
     <Transport transport={value}/>
   )
@@ -38,14 +39,18 @@ const TransportValue = (value, item) => {
 const MenuItem = (label, item) => {
 
   return (
-    <Transport transport={item.value}/>
+    <div className="picker-item-transport">
+      <Transport transport={item.value}/>
+      &nbsp;<em>(id: {item.nodeId})</em>
+    </div>
+
   );
 
 } 
 
 
-const PanelMenu = ({ transport, onChange }) => {
-  console.log('transport in panelmenu', transport)
+const PanelMenu = ({ transport, onChange, data }) => {
+
   return (
     <div className="simulator-transport-menu">
       <SelectPicker 
@@ -57,7 +62,7 @@ const PanelMenu = ({ transport, onChange }) => {
         appearance="subtle"
         value={transport}
         onChange={onChange}
-        data={Transports}
+        data={data}
       />
       
       
@@ -68,9 +73,25 @@ const PanelMenu = ({ transport, onChange }) => {
 
 const handleMessages = (state, action) => {
   switch(action.type) {
+    
     case 'socket.message':
-      console.log('arrivato messaggio', action);
-      return state;
+      // add message to the right queue
+      const { payload } = action;
+      const current = _.isArray(state.messages[payload.transport]) ? state.messages[payload.transport] : [];
+      const messages = { 
+        ...state.messages, 
+        [payload.transport]: [...current, payload]
+      }
+      return { ...state, messages };
+    
+    case 'globals':
+      // set globals
+      return { ...state, globals: action.globals };
+      
+    case 'transport':
+      // switch transport
+      return { ...state, transport: action.transport };
+
     default:
       return state; 
   }
@@ -78,116 +99,57 @@ const handleMessages = (state, action) => {
 
 
 
-const SimulatorWidget = ({ sendMessage }) => {
-  const { state, dispatch } = useSocket(handleMessages, { messages: [] });
-  const [transport, setTransport] = useState('telegram');
-  
-  console.log('-->', state)
+const SimulatorWidget = ({ sendMessage, activeChatbots }) => {
+  const { state, dispatch } = useSocket(handleMessages, { 
+    messages: {},
+    transport: !_.isEmpty(activeChatbots) ? activeChatbots[0].transport : null,
+    nodeId: !_.isEmpty(activeChatbots) ? activeChatbots[0].nodeId : null,
+    globals: null 
+  });
+
+  const { messages, transport, nodeId } = state; 
+  const loading = activeChatbots == null;
+
+  console.log('-->', messages[transport])
+  console.log('availableTransports', activeChatbots)
 
   return (
     <Panel 
       title="Chat Simulator" 
       className="chat-simulator"
-      menu={<PanelMenu 
+      menu={!loading && <PanelMenu 
         transport={transport} 
-        onChange={value => {
-          console.log('seletto', value)
-          setTransport(value)
-        }}
+        data={activeChatbots.map(chatbot => ({ value: chatbot.transport, label: chatbot.transport, nodeId: chatbot.nodeId }))}
+        onChange={value => dispatch({ type: 'transport', transport: value })}
       />}
     >
+      {loading && (
+        <div>loading</div>
+      )}
       
-      <ChatWindow>
-        <Messages>
-
-        <Message inbound>
-            <Metadata>
-              <MessageDate>10:10 AM, Today</MessageDate> &nbsp; &nbsp;
-              <MessageUser>Olia</MessageUser> <UserStatus />
-              
-            </Metadata>
-            <Content>
-              Hi Vincent, how are you? How is the project coming along?
-            </Content>
-          </Message>
-          <Message inbound>
-            <Metadata>
-              <MessageDate>10:10 AM, Today</MessageDate> &nbsp; &nbsp;
-              <MessageUser>Olia</MessageUser> <UserStatus />
-              
-            </Metadata>
-            <Content>
-              Hi Vincent, how are you? How is the project coming along?
-            </Content>
-          </Message>
-          <Message inbound>
-            <Metadata>
-              <MessageDate>10:10 AM, Today</MessageDate> &nbsp; &nbsp;
-              <MessageUser>Olia</MessageUser> <UserStatus />
-              
-            </Metadata>
-            <Content>
-              Hi Vincent, how are you? How is the project coming along?
-            </Content>
-          </Message>
-          <Message inbound>
-            <Metadata>
-              <MessageDate>10:10 AM, Today</MessageDate> &nbsp; &nbsp;
-              <MessageUser>Olia</MessageUser> <UserStatus />
-              
-            </Metadata>
-            <Content>
-              Hi Vincent, how are you? How is the project coming along?
-            </Content>
-          </Message>
-          <Message inbound>
-            <Metadata>
-              <MessageDate>10:10 AM, Today</MessageDate> &nbsp; &nbsp;
-              <MessageUser>Olia</MessageUser> <UserStatus />
-              
-            </Metadata>
-            <Content>
-              Hi Vincent, how are you? How is the project coming along?
-            </Content>
-          </Message>
-          <Message inbound>
-            <Metadata>
-              <MessageDate>10:10 AM, Today</MessageDate> &nbsp; &nbsp;
-              <MessageUser>Olia</MessageUser> <UserStatus />
-              
-            </Metadata>
-            <Content>
-              Hi Vincent, how are you? How is the project coming along?
-            </Content>
-          </Message>
-          <Message inbound>
-            <Metadata>
-              <MessageDate>10:10 AM, Today</MessageDate> &nbsp; &nbsp;
-              <MessageUser>Olia</MessageUser> <UserStatus />
-              
-            </Metadata>
-            <Content>
-              Hi Vincent, how are you? How is the project coming along?
-            </Content>
-          </Message>
-
-
-        </Messages>
-        <MessageComposer
-          onSend={message => {
-            console.log('send', message);
-            sendMessage('simulator', { 
-              transport, 
-              payload: {
-                content: message, 
-                type: 'message'
-              }
-            });
-          }}
-        /> 
+      {!loading && (
+        <ChatWindow>
+          <Messages>
+            {messages[transport] != null && messages[transport].map(message => (
+              <GenericMessage key={message.messageId} message={message} />
+            ))}
+          </Messages>
+          <MessageComposer
+            onSend={message => {
+              sendMessage('simulator', { 
+                transport, 
+                nodeId,
+                payload: {
+                  content: message, 
+                  type: 'message'
+                }
+              });
+            }}
+          /> 
         </ChatWindow>
+      )}
     </Panel>
   );
 };
 
-plug('widgets', withSocket(SimulatorWidget), { x: 0, y: 0, w: 2, h: 8, isResizable: true, id: 'simulator-widget' });
+plug('widgets', withActiveChatbots(withSocket(SimulatorWidget)), { x: 0, y: 0, w: 2, h: 8, isResizable: true, id: 'simulator-widget' });

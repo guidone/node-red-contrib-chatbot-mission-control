@@ -22,7 +22,7 @@ const SendMessageWidget = ({ sendMessage, stats }) => {
               componentClass="textarea" 
               style={{ height: '100%' }}
               onKeyUp={event => {
-                if (event.keyCode === 91) {
+                if (event.shiftKey && event.keyCode === 13) {
                   sendMessage('message.send', formValue.message);
                   setFormValue({ message: '' });
                 }
@@ -40,7 +40,7 @@ const SendMessageWidget = ({ sendMessage, stats }) => {
                 Send Message
               </Button>
               <div className="key-hint">
-                ⌘ + Enter to Send
+                Shift + Enter to Send
               </div>
               <Button style={{ float: 'right' }} appearance="default" onClick={() => setFormValue({ message: '' }) }>
                 Cancel

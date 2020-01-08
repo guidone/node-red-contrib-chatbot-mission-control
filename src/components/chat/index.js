@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { Icon } from 'rsuite';
 import classNames from 'classnames';
+import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
+import { IconButton, Icon } from 'rsuite';
 
 import './chat.scss';
 
@@ -53,21 +54,37 @@ const ChatWindow = ({ children, width = '100%', style }) => {
 
 
 const MessageComposer = ({ onSend = () => {} }) => {
-
-  const [message, setMessage] = useState("");
+  const [message, setMessage] = useState('');
+  const sendMessage = () => {
+    if (_.isEmpty(message)) {
+      return;
+    }
+    onSend(message);
+    setMessage('');
+  };
 
   return (
     <div className="ui-chat-message-composer">
-      <textarea 
-        name="message-to-send"
-        value={message}
-        onChange={e => setMessage(e.target.value)} 
-        id="message-to-send" placeholder ="Type your message" rows="3"></textarea>
-                    
-      <button onClick={() => {
-        onSend(message);
-        setMessage("");
-      }}>Send</button>
+      <div className="editor">
+        <textarea 
+          name="message-to-send"
+          value={message}
+          onChange={e => setMessage(e.target.value)}
+          onKeyUp={event => {
+            if (event.shiftKey && event.keyCode === 13) {
+              sendMessage();
+            }
+          }} 
+          id="message-to-send" placeholder ="Type your message" rows="3"></textarea>
+      </div>
+      <div className="buttons">
+        <IconButton 
+          icon={<Icon icon="send" />}  
+          appearance="primary"
+          size="sm"
+          onClick={sendMessage} 
+        />
+      </div>
     </div>
   );
 }
@@ -189,7 +206,18 @@ class MessagePhoto extends React.Component {
 
 }
 
-
+const GenericMessage = ({ message = {} }) => {
+  switch (message.type) {
+    case 'message':
+      return <MessageText message={message} inbound={message.inbound} />;
+    case 'photo':
+      return <MessagePhoto message={message} inbound={message.inbound} />;
+    case 'inline-buttons':
+      return <MessageButtons message={message} inbound={message.inbound} />; 
+    default:
+      return <div>Unsupported message type</div>;
+  }
+};
 
 
 
@@ -206,7 +234,9 @@ export {
 
   MessageText,
   MessageButtons,
-  MessagePhoto 
+  MessagePhoto,
+  
+  GenericMessage
 };
 
 

@@ -81,6 +81,7 @@ const usePrefetchedData = () => {
   const [platforms, setPlatforms] = useState([]);
   const [eventTypes, setEventTypes] = useState([]);
   const [messageTypes, setMessageTypes] = useState([]);
+  const [activeChatbots, setActiveChatbots] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -92,30 +93,41 @@ const usePrefetchedData = () => {
       .then(response => {
         setEventTypes(response.eventTypes);
         setMessageTypes(response.messageTypes);
+
+        setActiveChatbots(Object.keys(response)
+          .filter(key => key.match(/^.*_master_.*$/))
+          .map(key => {
+            const split = key.split('_');
+            return {
+              transport: split[0],
+              nodeId: response[key]
+            }
+          }));
+
+
         setLoading(false);
       });
 
 
   }, []);
 
-  return { platforms, eventTypes, messageTypes, loading };
+  return { platforms, eventTypes, messageTypes, activeChatbots, loading };
 }
 
 
 const AppRouter = ({ codePlug }) => {
-  const { platforms, eventTypes, messageTypes, loading } = usePrefetchedData();
+  const { platforms, eventTypes, messageTypes, activeChatbots, loading } = usePrefetchedData();
 
   const reducers = useMemo(() => compose(...codePlug.getItems('reducers').map(item => item.view )));
   const [state, dispatch] = useReducer(reducers, initialState);
 
   if (loading) {
     return <div>Loading...</div>
-
   }
 
   return (
     <ApolloProvider client={client}>
-      <AppContext.Provider value={{ state, dispatch, client, platforms, eventTypes, messageTypes }}>
+      <AppContext.Provider value={{ state, dispatch, client, platforms, eventTypes, messageTypes, activeChatbots }}>
         <WebSocket dispatch={dispatch}>
           <Router basename="/mc/">
             <div className="mission-control-app">        
