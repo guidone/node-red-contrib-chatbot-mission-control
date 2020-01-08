@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Icon } from 'rsuite';
 import classNames from 'classnames';
 import moment from 'moment';
@@ -52,19 +52,24 @@ const ChatWindow = ({ children, width = '100%', style }) => {
 }
 
 
-const MessageComposer = () => {
+const MessageComposer = ({ onSend = () => {} }) => {
+
+  const [message, setMessage] = useState("");
+
   return (
     <div className="ui-chat-message-composer">
-        <textarea name="message-to-send" id="message-to-send" placeholder ="Type your message" rows="3"></textarea>
-                
-        <i className="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
-        <i className="fa fa-file-image-o"></i>
-        
-        <button>Send</button>
-
-      </div>
+      <textarea 
+        name="message-to-send"
+        value={message}
+        onChange={e => setMessage(e.target.value)} 
+        id="message-to-send" placeholder ="Type your message" rows="3"></textarea>
+                    
+      <button onClick={() => {
+        onSend(message);
+        setMessage("");
+      }}>Send</button>
+    </div>
   );
-
 }
 
 const MessageDate = ({ children, date }) => {

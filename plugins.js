@@ -6,3 +6,4 @@ import './plugins/messages';
 import './plugins/users';
 import './plugins/chat-demo';
 import './plugins/funnel';
+import './plugins/simulator';

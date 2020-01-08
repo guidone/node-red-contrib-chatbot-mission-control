@@ -4,18 +4,27 @@ $orange: #E38968;
 $gray: #92959E;
 
 .ui-chat-window {
-
+  height: 100%;
   float:left;
   background: #F2F5F8;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
   
   color: #434651;
+
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-content: stretch;
+  align-items: flex-start;
 }
 
 .ui-chat-messages {
   padding: 20px 20px 20px;
   overflow-y: scroll;
+  flex: 1 0;
+  width: 100%;
 
   ul {
     padding-left: 0px;
@@ -30,13 +39,14 @@ $gray: #92959E;
 }
 
 .ui-chat-message-composer {
-  padding: 30px;
+  padding: 10px 10px 0px 10px;
+  flex: 0 0 auto;
+  width: 100%;
     
     textarea {
       width: 100%;
       border: none;
-      padding: 10px 20px;
-      font: 14px/22px "Lato", Arial, sans-serif;
+      padding: 10px 10px;
       margin-bottom: 10px;
       border-radius: 5px;
       resize: none;
