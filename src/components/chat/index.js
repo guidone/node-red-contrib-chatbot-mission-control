@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import classNames from 'classnames';
 import _ from 'lodash';
 import moment from 'moment';
@@ -18,9 +18,14 @@ const Message = ({ children, inbound = true, className }) => {
 };
 
 const Messages = ({ children }) => {
+  const messagesEndRef = useRef(null);
+  useEffect(() => {
+    const el = messagesEndRef.current;
+    el.scrollTo(0, el.scrollHeight);
+  }, [children]);
 
   return (
-    <div className="ui-chat-messages chat-history">
+    <div className="ui-chat-messages chat-history" ref={messagesEndRef}>
       <ul>
         {children}
       </ul>
