@@ -99,7 +99,8 @@ const Users = () => {
                     disabled={saving} 
                     size="xs"
                     onClick={() => {
-                      if (confirm(`Delete user "${[user.first_name, user.last_name].join(' ')}" (${user.userId})?`)) {
+                      const name = [user.first_name, user.last_name].join(' ');
+                      if (confirm(`Delete user${!_.isEmpty(name.trim()) ? ` "${name}"` : ''} (${user.userId})?`)) {
                         deleteUser({ variables: { id: user.id }})
                           .then(refetch);  
                       }
