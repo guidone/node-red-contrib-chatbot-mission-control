@@ -19,61 +19,36 @@ import { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, Mess
 
 import './simulator.scss';
 
-const Transports = [
-  { value: 'telegram', label: 'Telegram' },
-  { value: 'facebook', label: 'Facebook' },
-  { value: 'slack', label: 'Slack' },
 
+const TransportValue = (value, item) => <Transport transport={item.transport}/>;
 
-]
+const MenuItem = (label, item) => (
+  <div className="picker-item-transport">
+    <b>{item.name}</b><br/>
+    <Transport transport={item.transport}/>
+    &nbsp;<em>(id: {item.nodeId})</em>
+  </div>
+); 
 
-const TransportValue = (value, item) => {
+const PanelMenu = ({ nodeId, onChange, data }) => (
+  <div className="simulator-transport-menu">
+    <SelectPicker 
+      renderValue={TransportValue}
+      renderMenuItem={MenuItem}
+      searchable={false}
+      size="sm"
+      cleanable={false}
+      appearance="subtle"
+      value={nodeId}
+      onChange={nodeId => onChange(data.find(item => item.nodeId === nodeId))}
+      data={data}
+    />      
+  </div>
+);
 
-  console.log('valie', value, item)
-  return (
-    <Transport transport={value}/>
-  )
-
-} 
-
-const MenuItem = (label, item) => {
-
-  return (
-    <div className="picker-item-transport">
-      <Transport transport={item.value}/>
-      &nbsp;<em>(id: {item.nodeId})</em>
-    </div>
-
-  );
-
-} 
-
-
-const PanelMenu = ({ transport, onChange, data }) => {
-
-  return (
-    <div className="simulator-transport-menu">
-      <SelectPicker 
-        renderValue={TransportValue}
-        renderMenuItem={MenuItem}
-        searchable={false}
-        size="sm"
-        cleanable={false}
-        appearance="subtle"
-        value={transport}
-        onChange={onChange}
-        data={data}
-      />
-      
-      
-    </div>
-  );
-
-};
 
 const handleMessages = (state, action) => {
-  switch(action.type) {
-    
+  switch(action.type) {    
     case 'socket.message':
       // add message to the right queue
       const { payload } = action;
@@ -88,9 +63,9 @@ const handleMessages = (state, action) => {
       // set globals
       return { ...state, globals: action.globals };
       
-    case 'transport':
+    case 'chatBot':
       // switch transport
-      return { ...state, transport: action.transport };
+      return { ...state, transport: action.chatBot.transport, nodeId: action.chatBot.nodeId };
 
     default:
       return state; 
@@ -110,23 +85,17 @@ const SimulatorWidget = ({ sendMessage, activeChatbots }) => {
   const { messages, transport, nodeId } = state; 
   const loading = activeChatbots == null;
 
-  console.log('-->', messages[transport])
-  console.log('availableTransports', activeChatbots)
-
   return (
     <Panel 
       title="Chat Simulator" 
       className="chat-simulator"
       menu={!loading && <PanelMenu 
+        nodeId={nodeId}
         transport={transport} 
-        data={activeChatbots.map(chatbot => ({ value: chatbot.transport, label: chatbot.transport, nodeId: chatbot.nodeId }))}
-        onChange={value => dispatch({ type: 'transport', transport: value })}
+        data={activeChatbots.map(chatbot => ({ value: chatbot.nodeId, label: chatbot.transport, ...chatbot }))}
+        onChange={chatBot => dispatch({ type: 'chatBot', chatBot })}
       />}
-    >
-      {loading && (
-        <div>loading</div>
-      )}
-      
+    >      
       {!loading && (
         <ChatWindow>
           <Messages>

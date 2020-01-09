@@ -27,7 +27,7 @@ module.exports = function(RED) {
         variables = msg.payload.variables;
       }  
       const query = gql`${node.query}`;
-
+      // TODO: implement templating here
       client.query({ query, variables })
         .then(
           response => {
@@ -36,6 +36,7 @@ module.exports = function(RED) {
           },
           error => {
             // format error
+            // TODO: generalize query error
             if (error != null && error.networkError != null && error.networkError.result != null && error.networkError.result.errors != null) {
               let errors = error.networkError.result.errors.map(error => {
                 let errorMsg = error.message;

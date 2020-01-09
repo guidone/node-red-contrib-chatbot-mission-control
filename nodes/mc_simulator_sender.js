@@ -13,6 +13,7 @@ module.exports = function(RED) {
       send = send || function() { node.send.apply(node, arguments) };
       done = done || function(error) { node.error.call(node, error, msg) };
 
+      
       // TODO: implement here continuation
       sendMessage('simulator', {...msg.payload, transport: msg.originalMessage.transport });
       send(msg);

@@ -33,9 +33,6 @@ module.exports = function(RED) {
       const chat = msg.chat();
       when(chat.get('firstName', 'lastName', 'username', 'language', 'userId'))
         .then(({ firstName, lastName, username, language, userId }) => {
-
-          // if inbound get userId from chatContext
-
           client
             .mutate({
               mutation: CREATE_MESSAGE,
@@ -64,7 +61,8 @@ module.exports = function(RED) {
             })
             .catch(error => {
               console.log(error)
-              console.log('errorascio', error.networkError.result)
+              // TODO: improve error handling here
+              console.log('error', error.networkError.result)
               done(error.networkError.result)
             });
         });

@@ -93,22 +93,9 @@ const usePrefetchedData = () => {
       .then(response => {
         setEventTypes(response.eventTypes);
         setMessageTypes(response.messageTypes);
-
-        setActiveChatbots(Object.keys(response)
-          .filter(key => key.match(/^.*_master_.*$/))
-          .map(key => {
-            const split = key.split('_');
-            return {
-              transport: split[0],
-              nodeId: response[key]
-            }
-          }));
-
-
+        setActiveChatbots(response.activeChatbots);
         setLoading(false);
       });
-
-
   }, []);
 
   return { platforms, eventTypes, messageTypes, activeChatbots, loading };
