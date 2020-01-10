@@ -160,9 +160,7 @@ function bootstrap(server, app, log, redSettings) {
   // Setup web socket
   // TODO: set in global params
   const wss = new WebSocket.Server({ port: 1942 });
-
   wss.on('connection', ws => {
-    
     const sendHandler = (topic, payload) => ws.send(JSON.stringify({ topic, payload }));
     ws.on('message', message => {
       // console.log('received: %s', message);
@@ -176,11 +174,9 @@ function bootstrap(server, app, log, redSettings) {
         Events.emit('message', parsed.topic, parsed.payload);
       } 
     });
-  
     ws.on('close', () => {
       Events.removeListener('send', sendHandler);  
     });
-    
     Events.on('send', (topic, payload) => {
       sendHandler(topic, payload);
     });

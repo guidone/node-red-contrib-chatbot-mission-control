@@ -12,8 +12,12 @@ module.exports = function(RED) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
       done = done || function(error) { node.error.call(node, error, msg) };
+      // skip messages not from the simulator
+      if (!msg.originalMessage.simulator) {
+        done();
+        return;
+      }
 
-      
       // TODO: implement here continuation
       sendMessage('simulator', {...msg.payload, transport: msg.originalMessage.transport });
       send(msg);

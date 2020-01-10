@@ -92,8 +92,8 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
 
   const chatIdType = new GraphQLObjectType({
     name: 'ChatId',
-    description: 'tbd',
-    fields: {
+    description: 'ChatId record, relation between a platform specific chatId and the userId',
+    fields: () => ({
       id: {
         type: new GraphQLNonNull(GraphQLInt),
         description: 'The internal id of the user',
@@ -109,8 +109,13 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
       transport: {
         type: GraphQLString,
         description: ''
+      },
+      user: {
+        type: userType,
+        description: 'User related to this chatId',
+        resolve: (chatId, args) => User.findOne({ where: { userId: chatId.userId }}) 
       }
-    }
+    })
   });
 
   const userType = new GraphQLObjectType({
