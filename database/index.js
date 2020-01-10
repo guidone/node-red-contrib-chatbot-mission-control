@@ -54,6 +54,32 @@ module.exports = mcSettings => {
     ]
   });
  
+  const Admin = sequelize.define('admin', {
+    username: Sequelize.STRING,
+    password: Sequelize.STRING,
+    first_name: Sequelize.STRING,
+    last_name: Sequelize.STRING,
+    avatar: Sequelize.STRING
+  }, {
+    indexes: [
+      { name: 'admin_username', using: 'BTREE', fields: ['username'] },
+      { name: 'admin_password', using: 'BTREE', fields: ['password'] }
+    ],
+    /*getterMethods: {
+      payload: function() {
+        let result;
+        try {
+          console.log('parso', this.getDataValue('payload'))
+          result = JSON.parse(this.getDataValue('payload'));
+        } catch(e) {
+          // do nothing
+          console.log(e)
+        }
+        return result;
+      }
+    }*/
+  });
+
   const User = sequelize.define('user', {
     userId: Sequelize.STRING,
     email: Sequelize.STRING,
@@ -127,8 +153,9 @@ module.exports = mcSettings => {
     User,
     graphQLServer,
     ChatId,
-    Event
-  }
+    Event,
+    Admin
+  };
 
   return exportCache;
 };

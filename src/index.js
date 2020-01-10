@@ -9,5 +9,4 @@ import './styles/header.css';
 
 import App from './app';
 
-
-ReactDOM.render(<App/>, document.querySelector('#mission-control'));
+ReactDOM.render(<App bootstrap={bootstrap}/>, document.querySelector('#mission-control'));

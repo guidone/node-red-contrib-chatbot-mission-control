@@ -4,8 +4,11 @@ const events = require('events');
 const WebSocket = require('ws');
 const fs = require('fs');
 const moment = require('moment');
+const passport = require('passport');
+const { BasicStrategy } = require('passport-http');  
 
 const lcd = require('./lib/lcd/index');
+const { hash } = require('./lib/utils/index');
 const DatabaseSchema = require('./database/index');
 
 let initialized = false;
@@ -83,18 +86,30 @@ function bootstrap(server, app, log, redSettings) {
 
   // todo put db schema here
   const databaseSchema = DatabaseSchema(mcSettings)
-  const { Configuration, graphQLServer } = databaseSchema;
+  const { Configuration, graphQLServer, Admin } = databaseSchema;
 
-
-  /*const uiSettings = redSettings.ui || {};
-  if ((uiSettings.hasOwnProperty('path')) && (typeof uiSettings.path === 'string')) {
-    settings.path = uiSettings.path;
-  } else { 
-    settings.path = 'mc'; 
-  }*/
-
-  //const fullPath = join(redSettings.httpNodeRoot, settings.path);
-  //const socketIoPath = join(fullPath, 'socket.io');
+  //passport authentication
+  passport.use(new BasicStrategy(async function (username, password, done) {
+    try {
+      user = await Admin.findOne({ where: { username } });
+      if (user == null) {
+        done(null, false);
+      } else {
+        // TODO: set salt in config
+        const hashedPassword = hash(password, { salt: 'mysalt' });
+        //console.log('Hashed password: ', hashedPassword);
+        //console.log('DB password', user.password);
+        if (user.password === hashedPassword) {
+          done(null, { username: user.username, firstName: user.first_name, lastName: user.last_name, avatar: user.avatar });
+        } else {
+          done(null, false);
+        }
+      }
+    } catch (e) {
+      done(e);
+    }
+  }));
+  app.use(passport.initialize());
 
   // install graphql server
   app.use(graphQLServer.getMiddleware())
@@ -126,10 +141,24 @@ function bootstrap(server, app, log, redSettings) {
   });
 
   // serve mission control page and assets
-  app.use('^' + mcSettings.root, (req, res, next) => res.sendFile(`${__dirname}/src/index.html`));
+  app.use(
+    '^' + mcSettings.root, 
+    passport.authenticate('basic', { session: false }),
+    (req, res, next) => {
+      // inject user info into template
+      fs.readFile(`${__dirname}/src/index.html`, (err, data) => {
+        const template = data.toString();
+        const bootstrap = { user: req.user };
+        const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};</script>`;        
+        res.send(template.replace('{{data}}', json));
+     });
+    }
+  );
+  // assets
   app.use(`${mcSettings.root}/main.js`, serveStatic(path.join(__dirname, 'dist/main.js')));
 
   // Setup web socket
+  // TODO: set in global params
   const wss = new WebSocket.Server({ port: 1942 });
 
   wss.on('connection', ws => {

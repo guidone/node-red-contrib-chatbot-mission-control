@@ -113,7 +113,6 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
               payload = JSON.parse(formValue.payload);
             } catch(e) {
               setFormError({ payload: 'Invalid JSON '});
-              // TODO: fix if not valid
               return;
             }
             onSubmit({ ...formValue, payload });

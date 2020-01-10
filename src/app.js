@@ -36,7 +36,7 @@ const client = new ApolloClient({
 
 const initialState = {
   count: 0,
-  user: 'guidone'
+  user: null
 };
 
 /*function reducer1(state, action) {
@@ -102,11 +102,11 @@ const usePrefetchedData = () => {
 }
 
 
-const AppRouter = ({ codePlug }) => {
+const AppRouter = ({ codePlug, bootstrap }) => {
   const { platforms, eventTypes, messageTypes, activeChatbots, loading } = usePrefetchedData();
 
   const reducers = useMemo(() => compose(...codePlug.getItems('reducers').map(item => item.view )));
-  const [state, dispatch] = useReducer(reducers, initialState);
+  const [state, dispatch] = useReducer(reducers, { ...initialState, ...bootstrap });
 
   if (loading) {
     return <div>Loading...</div>
@@ -131,7 +131,7 @@ const AppRouter = ({ codePlug }) => {
                             
                           </Route>
                         ))}
-                      <Route path="/mc" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}>
+                      <Route path="/" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}>
                         
                       </Route>
                     </Switch>
@@ -147,9 +147,9 @@ const AppRouter = ({ codePlug }) => {
 
 };
 
-const App = () => (
+const App = ({ bootstrap }) => (
   <CodePlug>
-    {codePlug => <AppRouter codePlug={codePlug} />}        
+    {codePlug => <AppRouter codePlug={codePlug} bootstrap={bootstrap}/>}        
   </CodePlug>
 );
 

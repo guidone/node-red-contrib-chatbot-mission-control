@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button, Container, Header, Navbar, Dropdown, Nav, Footer, Content, Icon, Sidebar, Sidenav, Avatar } from 'rsuite';
 
 import withState from '../wrappers/with-state';
@@ -20,22 +21,22 @@ import {
   </Dropdown>
 */
 
- const AppHeader = ({ user }) => {
+const AppHeader = ({ user }) => {
   return (
     <Header className="mc-header">
       <Navbar appearance="inverse">
         <Navbar.Body>
           <Nav>
-            <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/mc">Home</Link>} />            
+            <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/">Home</Link>} />            
           </Nav>
           <Nav pullRight>
             <Dropdown
               className="mc-avatar"
               placement="bottomEnd"
-              renderTitle={()=> <Avatar circle>RS</Avatar>}
+              renderTitle={()=> (
+                <Avatar src={user.avatar} circle>{user.username.substr(0,2)}</Avatar>)}
             >
-              <Dropdown.Item ><Icon icon="user" /> New User</Dropdown.Item>
-              <Dropdown.Item ><Icon icon="group" /> New Group</Dropdown.Item>
+              <Dropdown.Item ><Icon icon="user" /> Logout</Dropdown.Item>
             </Dropdown>
           </Nav>          
         </Navbar.Body>
@@ -43,5 +44,13 @@ import {
     </Header>
   );
 }
+AppHeader.propTypes = {
+  user: PropTypes.shape({
+    username: PropTypes.string,
+    firstName: PropTypes.string,
+    lastName: PropTypes.string,
+    avatar: PropTypes.string
+  })
+};
 
 export default withState(AppHeader, ['user']);
