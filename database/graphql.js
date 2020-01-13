@@ -544,7 +544,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
           resolve: async function(root, { message }) {            
             const { user, ...newMessage } = message;
             // if user with a valid id
-            if (user != null && user.userId) {
+            if (user != null && user.userId != null) {
               // create user if doesn't exist
               const existingUser = await User.findOne({ where: { userId: user.userId }});
               if (existingUser == null) {

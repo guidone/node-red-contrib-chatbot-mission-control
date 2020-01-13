@@ -39,7 +39,7 @@ module.exports = function(RED) {
               variables: {
                 message: {
                   user: {
-                    userId: String(userId),
+                    userId: userId != null ? String(userId) : null,
                     first_name: firstName, 
                     last_name: lastName, 
                     username, 

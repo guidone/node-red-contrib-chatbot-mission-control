@@ -6,10 +6,12 @@ const fs = require('fs');
 const moment = require('moment');
 const passport = require('passport');
 const { BasicStrategy } = require('passport-http');  
+const _ = require('lodash');
 
 const lcd = require('./lib/lcd/index');
 const { hash } = require('./lib/utils/index');
 const DatabaseSchema = require('./database/index');
+const Settings = require('./src/settings');
 
 let initialized = false;
 const Events = new events.EventEmitter();
@@ -148,7 +150,7 @@ function bootstrap(server, app, log, redSettings) {
       // inject user info into template
       fs.readFile(`${__dirname}/src/index.html`, (err, data) => {
         const template = data.toString();
-        const bootstrap = { user: req.user };
+        const bootstrap = { user: req.user, settings: mcSettings };
         const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};</script>`;        
         res.send(template.replace('{{data}}', json));
      });
@@ -158,8 +160,7 @@ function bootstrap(server, app, log, redSettings) {
   app.use(`${mcSettings.root}/main.js`, serveStatic(path.join(__dirname, 'dist/main.js')));
 
   // Setup web socket
-  // TODO: set in global params
-  const wss = new WebSocket.Server({ port: 1942 });
+  const wss = new WebSocket.Server({ port: Settings.wsPort });
   wss.on('connection', ws => {
     const sendHandler = (topic, payload) => ws.send(JSON.stringify({ topic, payload }));
     ws.on('message', message => {
