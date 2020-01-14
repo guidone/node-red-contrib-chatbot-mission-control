@@ -19,7 +19,12 @@ module.exports = function(RED) {
       }
 
       // TODO: implement here continuation
-      sendMessage('simulator', {...msg.payload, transport: msg.originalMessage.transport });
+      sendMessage('simulator', {
+        ...msg.payload, 
+        userId: msg.originalMessage.userId,
+        username: msg.originalMessage.username,
+        transport: msg.originalMessage.transport 
+      });
       send(msg);
       done();
     });

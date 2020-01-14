@@ -14,8 +14,6 @@ module.exports = function(RED) {
         // ok sending message
         console.log('simulator in', message)
         
-        // TODO: use platform to select the right chat server
-
         const serverNode = RED.nodes.getNode(message.nodeId);
 
         if (serverNode == null || serverNode.chat == null) {
@@ -24,8 +22,9 @@ module.exports = function(RED) {
         }
 
         const chatServer = serverNode.chat;
-        const chatId = 'sim42';
-        const userId = 'user42';
+        const chatId = 'sim42'; // TODO: fix chat id with something meaningful
+        const userId = String(message.userId); // TODO: select right userid
+        const username = message.username;
         const messageId = _.uniqueId('msg_');;
         const msg = await chatServer.createMessage(chatId, userId, messageId, {})
         msg.payload = {
@@ -35,9 +34,22 @@ module.exports = function(RED) {
           userId,
           inbound: true
         };
-        msg.originalMessage.simulator = true;
+        
+        msg.originalMessage = {
+          ...msg.originalMessage,
+          simulator: true,
+          userId: userId,
+          username: username
+        }
+        await msg.chat().set({ username, userId});
         // send back the evaluated message so also originated messages are visible in the simulator
-        sendMessage('simulator', {...msg.payload, messageId: _.uniqueId('msg_'), transport: msg.originalMessage.transport });
+        sendMessage('simulator', {
+          ...msg.payload, 
+          messageId: _.uniqueId('msg_'), 
+          transport: msg.originalMessage.transport,
+          userId: userId,
+          username: username 
+        });
         // continue the flow
         node.send(msg);
       }
@@ -50,7 +62,6 @@ module.exports = function(RED) {
       done();
     });
   }
-
 
   RED.nodes.registerType('mc-simulator-receiver', MissionControlSimulatorReceiver);
 };

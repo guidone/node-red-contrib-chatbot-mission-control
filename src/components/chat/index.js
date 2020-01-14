@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import momentPropTypes from 'react-moment-proptypes';
 import classNames from 'classnames';
 import _ from 'lodash';
 import moment from 'moment';
@@ -34,8 +35,17 @@ const Messages = ({ children }) => {
 };
 
 
-const Content = ({ children, firstOfGroup = false }) => {
-
+const Content = ({ children, firstOfGroup = false, text = null }) => {
+  if (!_.isEmpty(text)) {
+    return (
+      <div 
+        className={classNames("ui-chat-content message", { 'first-of-group': firstOfGroup })}
+        dangerouslySetInnerHTML={{
+          __html: text.replace(/\n/g, '<br/>')
+        }}
+      />
+    );
+  }
   return (
     <div className={classNames("ui-chat-content message", { 'first-of-group': firstOfGroup })}>{children}</div>
   );
@@ -122,13 +132,19 @@ const MessageText = ({ message, ...props }) => {
     <Message {...props}>
       <Metadata>
         <MessageDate date={moment()}/> &nbsp; &nbsp;
-        <MessageUser>Olia</MessageUser> <UserStatus />                
+        <MessageUser>{message.username}</MessageUser> <UserStatus />                
       </Metadata>
-      <Content>
-        {message.content}
-      </Content>
+      <Content text={message.content}/>
     </Message>
   );
+};
+MessageText.propTypes = {
+  message: PropTypes.shape({
+    content: PropTypes.string,
+    userId: PropTypes.string,
+    username: PropTypes.string,
+    date: PropTypes.momentPropTypes
+  })
 };
 
 const Buttons = ({ children, layout = 'quick-replies' }) => {

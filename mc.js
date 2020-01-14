@@ -85,6 +85,12 @@ function bootstrap(server, app, log, redSettings) {
   console.log(lcd.timestamp() + '  ' + lcd.green('root: ') + lcd.grey(mcSettings.root));
   mcSettings.port = redSettings.uiPort;
   console.log(lcd.timestamp() + '  ' + lcd.green('port: ') + lcd.grey(mcSettings.port));
+  if (mcSettings.salt == null) {
+    mcSettings.salt = 'mysalt';
+    console.log(lcd.timestamp() + '  ' + lcd.green('salt: ') + lcd.grey('default'));
+  } else {
+    console.log(lcd.timestamp() + '  ' + lcd.green('salt: ') + lcd.grey('****'));
+  }
 
   // todo put db schema here
   const databaseSchema = DatabaseSchema(mcSettings)
@@ -97,12 +103,17 @@ function bootstrap(server, app, log, redSettings) {
       if (user == null) {
         done(null, false);
       } else {
-        // TODO: set salt in config
-        const hashedPassword = hash(password, { salt: 'mysalt' });
+        const hashedPassword = hash(password, { salt: mcSettings.salt });
         //console.log('Hashed password: ', hashedPassword);
         //console.log('DB password', user.password);
         if (user.password === hashedPassword) {
-          done(null, { username: user.username, firstName: user.first_name, lastName: user.last_name, avatar: user.avatar });
+          done(null, { 
+            id: user.id,
+            username: user.username, 
+            firstName: user.first_name, 
+            lastName: user.last_name, 
+            avatar: user.avatar 
+          });
         } else {
           done(null, false);
         }

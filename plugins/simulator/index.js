@@ -7,6 +7,7 @@ import { plug } from '../../lib/code-plug';
 import Panel from '../../src/components/grid-panel';
 import withSocket from '../../src/wrappers/with-socket';
 import withActiveChatbots from '../../src/wrappers/with-active-chatbots';
+import withState from '../../src/wrappers/with-state';
 import useSocket from '../../src/hooks/socket';
 import Transport from '../../src/components/transport';
 
@@ -78,7 +79,7 @@ const handleMessages = (state, action) => {
 
 
 
-const SimulatorWidget = ({ sendMessage, activeChatbots }) => {
+const SimulatorWidget = ({ sendMessage, activeChatbots, user }) => {
   const { state, dispatch } = useSocket(handleMessages, { 
     messages: {},
     transport: !_.isEmpty(activeChatbots) ? activeChatbots[0].transport : null,
@@ -104,7 +105,10 @@ const SimulatorWidget = ({ sendMessage, activeChatbots }) => {
         <ChatWindow>
           <Messages>
             {messages[transport] != null && messages[transport].map(message => (
-              <GenericMessage key={message.messageId} message={message} />
+              <GenericMessage 
+                key={message.messageId} 
+                message={!message.inbound ? { ...message, username: 'chatbot'} : message } 
+              />
             ))}
           </Messages>
           <MessageComposer
@@ -112,6 +116,8 @@ const SimulatorWidget = ({ sendMessage, activeChatbots }) => {
               sendMessage('simulator', { 
                 transport, 
                 nodeId,
+                userId: user.id,
+                username: user.username,
                 payload: {
                   content: message, 
                   type: 'message'
@@ -125,4 +131,8 @@ const SimulatorWidget = ({ sendMessage, activeChatbots }) => {
   );
 };
 
-plug('widgets', withActiveChatbots(withSocket(SimulatorWidget)), { x: 0, y: 0, w: 2, h: 8, isResizable: true, id: 'simulator-widget' });
+plug(
+  'widgets', 
+  withState(withActiveChatbots(withSocket(SimulatorWidget)), 'user'), 
+  { x: 0, y: 0, w: 2, h: 8, isResizable: true, id: 'simulator-widget' }
+);
