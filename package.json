@@ -38,6 +38,7 @@
     "graphql": "^14.5.8",
     "graphql-relay": "^0.6.0",
     "graphql-sequelize": "^9.3.6",
+    "jodit-react": "^1.0.35",
     "lodash": "^4.17.15",
     "md5": "^2.2.1",
     "moment": "^2.24.0",

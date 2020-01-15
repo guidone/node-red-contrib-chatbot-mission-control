@@ -61,15 +61,20 @@ const Contents = ({ messageTypes, platforms }) => {
           disabled={saving}
           onCancel={() => setContent(null)}
           onSubmit={async content => {
-            console.log('saving', content.id, content)
-            await editContent({ variables: { id: content.id, content: _.omit(content, ['id', 'createdAt', '__typename']) }})              
+
+            if (content.id != null) {
+              await editContent({ variables: { id: content.id, content: _.omit(content, ['id', 'createdAt', '__typename']) }})
+            } else {
+              await createContent({ variables: { content } });
+            }
+            // TODO: catch errorrs                          
             setContent(null);
             refetch();        
           }}
         />)}
 
       <div className="filters" style={{ marginBottom: '10px' }}>
-             
+        <Button disabled={loading || saving} onClick={() => setContent({})}>Create Content</Button>    
       </div>
 
       {loading && <Grid columns={9} rows={3} />}

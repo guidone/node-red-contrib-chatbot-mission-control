@@ -36,7 +36,7 @@ mutation($id: Int!, $content: NewContent!) {
 `;
 
 const CREATE_CONTENT = gql`
-mutation($content: newContentType) {
+mutation($content: NewContent!) {
   createContent(content: $content) {
     id,
     slug,

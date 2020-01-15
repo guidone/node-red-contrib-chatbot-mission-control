@@ -1,6 +1,46 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, HelpBlock, SelectPicker } from 'rsuite';
 
+import JoditEditor from 'jodit-react';
+
+const EditorConfig = {
+  sourceEditor: 'area',
+  buttons: [
+    'bold',
+    'strikethrough',
+    'underline',
+    'italic',
+    '|',
+    'superscript',
+    'subscript',
+    '|',
+    'ul',
+    'ol',
+    '|',
+    'outdent',
+    'indent',
+    '|',
+    'font',
+    'fontsize',
+    'brush',
+    'paragraph',
+    'eraser',
+    '|',
+    'table',
+    'link',
+    '|',
+    'align',
+    'hr',
+    'symbol'
+  ]
+};
+
+
+const VisualEditor = props => {
+  console.log('--', props)
+  return (
+  <JoditEditor {...props} value={props.value || ''}/>
+)};
 
 
 const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
@@ -40,8 +80,8 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
             </FlexboxGrid.Item>
           </FlexboxGrid>                
           <FormGroup>
-            <ControlLabel>Payload</ControlLabel>
-            <FormControl readOnly={disabled} name="body" componentClass="textarea" />
+            <ControlLabel>Body</ControlLabel>
+            <FormControl readOnly={disabled} name="body" accepter={VisualEditor} config={EditorConfig}/>
           </FormGroup>
         </Form>
       </Modal.Body>
