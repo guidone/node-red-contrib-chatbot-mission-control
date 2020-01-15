@@ -53,6 +53,7 @@ module.exports = mcSettings => {
 
   const Field = sequelize.define('field', {
     name: Sequelize.STRING,
+    type: Sequelize.STRING,
     value: Sequelize.TEXT
   }, {
     indexes: [
@@ -167,10 +168,13 @@ module.exports = mcSettings => {
 
 
   if (!fs.existsSync(dbPath)) {
-    sequelize.sync({ force: true });
-    console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
-    + ' - [info] Initialized RedBot Mission Control database:')
-    + ' ' + lcd.grey(resolve(dbPath)));
+    sequelize.sync({ force: true })
+      .then(() => {
+        Admin.create({ username: 'guidone', password: 'mysalt$10$d5b9be8303d735591db5e83f2cc547dc' })
+        console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
+        + ' - [info] Initialized RedBot Mission Control database:')
+        + ' ' + lcd.grey(resolve(dbPath)));
+      });
   } else {
     console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
       + ' - [info] Mounted RedBot Mission Control database:')

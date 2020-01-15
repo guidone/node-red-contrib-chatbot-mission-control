@@ -21,21 +21,7 @@ import useRouterQuery from '../../../src/hooks/router-query';
 
 // import '../styles/message-logs.scss';
 
-const CONTENTS = gql`
-query($offset: Int, $limit: Int) {
-  counters {
-    contents {
-     count
-    }
-  }
-  contents(offset: $offset, limit: $limit) {
-    id,
-    slug,
-    title,
-    body 
-  }
-}
-`;
+
 
 import useContents from '../hooks/content';
 import ModalContent from '../views/modal-content';
@@ -45,11 +31,10 @@ const Contents = ({ messageTypes, platforms }) => {
   const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId }, setQuery } = useRouterQuery();
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10 });
   const [ filters, setFilters ] = useState({ chatId: urlChatId, userId: urlUserId, messageId: urlMessageId });
-  //const { messageType, transport, inbound, chatId, userId, messageId } = filters;
-  const { limit, page } = cursor;
-  
   const [ content, setContent ] = useState(null);
 
+  const { limit, page } = cursor;
+  // TODO: implement destroy
   const { loading, saving, error, data, deleteContent, editContent, createContent, refetch } = useContents({ limit, page });
   
   return (
@@ -63,7 +48,7 @@ const Contents = ({ messageTypes, platforms }) => {
           onSubmit={async content => {
 
             if (content.id != null) {
-              await editContent({ variables: { id: content.id, content: _.omit(content, ['id', 'createdAt', '__typename']) }})
+              await editContent({ variables: { id: content.id, content }})
             } else {
               await createContent({ variables: { content } });
             }
@@ -74,7 +59,7 @@ const Contents = ({ messageTypes, platforms }) => {
         />)}
 
       <div className="filters" style={{ marginBottom: '10px' }}>
-        <Button disabled={loading || saving} onClick={() => setContent({})}>Create Content</Button>    
+        <Button disabled={loading || saving} onClick={() => setContent({ title: '', body: '', fields: [] })}>Create Content</Button>    
       </div>
 
       {loading && <Grid columns={9} rows={3} />}

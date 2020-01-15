@@ -1,6 +1,9 @@
 const { ApolloServer } = require('apollo-server-express');
 const { resolver } = require('graphql-sequelize');
 const { Kind } = require('graphql/language');
+const _ = require('lodash');
+
+const { when } = require('../lib/utils');
 
 const {
   GraphQLSchema,
@@ -362,6 +365,54 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     }
   });
 
+  const newFieldType = new GraphQLInputObjectType({
+    name: 'NewField',
+    description: 'tbd',
+    fields: {  
+      id: {
+        type: GraphQLInt,
+        description: 'The id of the field',
+      },  
+      name: {
+        type: GraphQLString,
+        description: '',
+      },
+      type: {
+        type: GraphQLString,
+        description: '',
+      },
+      value: {
+        type: GraphQLString,
+        description: '',
+      }
+    }
+  });
+
+
+  const fieldType = new GraphQLObjectType({
+    name: 'Field',
+    description: 'tbd',
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The id of the field',
+      },
+      name: {
+        type: GraphQLString,
+        description: '',
+      },
+      type: {
+        type: GraphQLString,
+        description: '',
+      },
+      value: {
+        type: GraphQLString,
+        description: '',
+      }
+    }
+  });
+
+
   const newContentType = new GraphQLInputObjectType({
     name: 'NewContent',
     description: 'tbd',
@@ -377,9 +428,14 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       body: {
         type: GraphQLString,
         description: '',
+      },
+      fields: {
+        type: new GraphQLList(newFieldType),
+        description: ''        
       }
     }
   });
+
 
 
   const contentType = new GraphQLObjectType({
@@ -401,6 +457,12 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       body: {
         type: GraphQLString,
         description: '',
+      },
+      fields: {
+        type: new GraphQLList(fieldType),
+        resolve(root) {
+          return root.getFields({ limit: 9999 });
+        }
       }
     }
   });
@@ -575,8 +637,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           args: {
             content: { type: new GraphQLNonNull(newContentType) }
           },
-          resolve: async function(root, { content }) {
-            return Content.create(content);
+          resolve: function(root, { content }) {
+            return Content.create(content, {
+              include: [Content.Fields]
+            });
           }
         },
 
@@ -586,9 +650,45 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             id: { type: new GraphQLNonNull(GraphQLInt)},
             content: { type: new GraphQLNonNull(newContentType) }
           },
-          resolve(root, { id, content }) {
-            return Content.update(content, { where: { id } })
-              .then(() => Content.findByPk(id));
+          resolve: async (root, { id, content }) => {
+            // TODO: cleanup
+            await Content.update(content, { where: { id } })
+            const updatedContent = await Content.findByPk(id, { include: [Content.Fields]} );
+            
+            const currentFieldIds = updatedContent.fields.map(field => field.id);
+            console.log('currentFieldIds:', currentFieldIds)
+            if (_.isArray(content.fields) && content.fields.length !== 0) {
+              let task = when(true); 
+              const newFieldIds = _.compact(content.fields.map(field => field.id));
+              console.log('newFieldIds', newFieldIds)
+              // now add or update each field present in the payload
+              content.fields.forEach(field => {
+                console.log('----tratto', field)
+                if (field.id != null) {
+                  console.log('update field')
+                  task = task.then(() => Field.update(field, { where: { id: field.id } }));
+                } else {
+                  console.log('create field')
+                  task = task.then(() => updatedContent.createField(field));
+                }
+
+              });
+              // remove all current id field that are not included in the list of new ids
+              currentFieldIds
+                .filter(id => !newFieldIds.includes(id))
+                .forEach(id => {
+                  task = task.then(() => Field.destroy({ where: { id }}));
+                })
+
+              await task;
+              console.log('finito task')
+              return Content.findByPk(id, { include: [Content.Fields]} );
+
+            } else {
+              return updatedContent;
+            }
+
+            
           }
         },
 

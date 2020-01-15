@@ -1,6 +1,8 @@
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from 'react-apollo';
 
+import withoutParams from '../../../src/helpers/without-params';
+
 const CONTENTS = gql`
 query($offset: Int, $limit: Int) {
   counters {
@@ -12,7 +14,13 @@ query($offset: Int, $limit: Int) {
     id,
     slug,
     title,
-    body 
+    body,
+    fields {
+      id,
+      name,
+      value,
+      type
+    } 
   }
 }
 `;
@@ -30,7 +38,13 @@ mutation($id: Int!, $content: NewContent!) {
     id,
     slug,
     title,
-    body
+    body,
+    fields {
+      id,
+      name,
+      value,
+      type
+    }
   }
 }
 `;
@@ -41,10 +55,18 @@ mutation($content: NewContent!) {
     id,
     slug,
     title,
-    body
+    body,
+    fields {
+      id,
+      name,
+      value,
+      type
+    }
   }
 }
 `;
+
+
 
 export default ({ limit, page, onCompleted = () => {} }) => {
   
@@ -72,8 +94,8 @@ export default ({ limit, page, onCompleted = () => {} }) => {
     error: error || deleteError || editError || createError, 
     data,
     deleteContent,
-    createContent,
-    editContent,
+    createContent: withoutParams(createContent),
+    editContent: withoutParams(editContent),
     refetch
   };
 };

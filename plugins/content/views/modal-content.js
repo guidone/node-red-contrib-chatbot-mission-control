@@ -3,6 +3,8 @@ import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid,
 
 import JoditEditor from 'jodit-react';
 
+import FieldsEditor from '../../../src/components/fields-editor';
+
 const EditorConfig = {
   sourceEditor: 'area',
   buttons: [
@@ -37,7 +39,6 @@ const EditorConfig = {
 
 
 const VisualEditor = props => {
-  console.log('--', props)
   return (
   <JoditEditor {...props} value={props.value || ''}/>
 )};
@@ -82,6 +83,10 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
           <FormGroup>
             <ControlLabel>Body</ControlLabel>
             <FormControl readOnly={disabled} name="body" accepter={VisualEditor} config={EditorConfig}/>
+          </FormGroup>
+          <FormGroup>
+            <ControlLabel>Fields</ControlLabel>
+            <FormControl readOnly={disabled} name="fields" accepter={FieldsEditor}/>
           </FormGroup>
         </Form>
       </Modal.Body>
