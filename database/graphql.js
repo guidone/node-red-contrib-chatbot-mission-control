@@ -53,7 +53,7 @@ const JSONType = new GraphQLScalarType({
   },
 });
 
-module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) => {
+module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, sequelize }) => {
 
   const newUserType = new GraphQLInputObjectType({
     name: 'NewUser',
@@ -361,6 +361,49 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
       }
     }
   });
+
+  const newContentType = new GraphQLInputObjectType({
+    name: 'NewContent',
+    description: 'tbd',
+    fields: {
+      title: {
+        type: GraphQLString,
+        description: '',
+      },
+      slug: {
+        type: GraphQLString,
+        description: '',
+      },
+      body: {
+        type: GraphQLString,
+        description: '',
+      }
+    }
+  });
+
+
+  const contentType = new GraphQLObjectType({
+    name: 'Content',
+    description: 'tbd',
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The id of the content',
+      },
+      title: {
+        type: GraphQLString,
+        description: '',
+      },
+      slug: {
+        type: GraphQLString,
+        description: '',
+      },
+      body: {
+        type: GraphQLString,
+        description: '',
+      }
+    }
+  });
   
   const newConfigurationType = new GraphQLInputObjectType({
     name: 'NewConfiguration',
@@ -438,6 +481,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
     }
   });
 
+  const contentCounterType = new GraphQLObjectType({ 
+    name: 'ContentCounters',
+    description: 'Content Counters',
+    fields: {
+      count: {
+        type: GraphQLInt,
+        description: 'Total contents',
+        resolve: () => Content.count()
+      }
+    }
+  });
+
   const countersType = new GraphQLObjectType({
     name: 'Counters',
     description: 'Counters',
@@ -459,6 +514,13 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
       events: {
         type: eventCounterType,
         description: 'Counters for events',
+        resolve: () => {
+          return {};
+        }
+      },
+      contents: {
+        type: contentCounterType,
+        description: 'Counters for content',
         resolve: () => {
           return {};
         }
@@ -505,6 +567,28 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
                 } 
                 return Configuration.create(configuration);
               });
+          }
+        },
+
+        createContent: {
+          type: contentType,
+          args: {
+            content: { type: new GraphQLNonNull(newContentType) }
+          },
+          resolve: async function(root, { content }) {
+            return Content.create(content);
+          }
+        },
+
+        editContent: {
+          type: contentType,
+          args: {
+            id: { type: new GraphQLNonNull(GraphQLInt)},
+            content: { type: new GraphQLNonNull(newContentType) }
+          },
+          resolve(root, { id, content }) {
+            return Content.update(content, { where: { id } })
+              .then(() => Content.findByPk(id));
           }
         },
 
@@ -599,6 +683,16 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, sequelize }) =>
             flow: { type: GraphQLString }
           },
           resolve: resolver(Event)
+        },
+
+        contents: {
+          type: new GraphQLList(contentType),
+          args: {
+            slug: { type: GraphQLString },
+            offset: { type: GraphQLInt },
+            limit: { type: GraphQLInt }
+          },
+          resolve: resolver(Content)
         },
 
         chatIds: {

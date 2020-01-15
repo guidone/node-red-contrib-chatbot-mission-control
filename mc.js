@@ -104,7 +104,7 @@ function bootstrap(server, app, log, redSettings) {
         done(null, false);
       } else {
         const hashedPassword = hash(password, { salt: mcSettings.salt });
-        //console.log('Hashed password: ', hashedPassword);
+        console.log('Hashed password: ', hashedPassword);
         //console.log('DB password', user.password);
         if (user.password === hashedPassword) {
           done(null, { 

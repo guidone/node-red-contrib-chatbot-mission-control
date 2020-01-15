@@ -31,6 +31,38 @@ module.exports = mcSettings => {
     ]
   });
 
+  const Content = sequelize.define('content', {
+    title: Sequelize.STRING,
+    slug: Sequelize.STRING,  
+    body: Sequelize.TEXT
+  }, {
+    indexes: [
+      { name: 'content_title', using: 'BTREE', fields: ['title'] },
+      { name: 'content_slug', using: 'BTREE', fields: ['slug'] },
+      { name: 'content_content', using: 'BTREE', fields: ['body'] }
+    ]
+  });
+
+  const Category = sequelize.define('category', {
+    name: Sequelize.STRING
+  }, {
+    indexes: [
+      { name: 'category_name', using: 'BTREE', fields: ['name'] }
+    ]
+  });
+
+  const Field = sequelize.define('field', {
+    name: Sequelize.STRING,
+    value: Sequelize.TEXT
+  }, {
+    indexes: [
+      { name: 'field_name', using: 'BTREE', fields: ['name'] }
+    ]
+  });
+
+  Content.Category = Content.hasOne(Category);
+  Content.Fields = Content.hasMany(Field);
+
   const Message = sequelize.define('message', {
     chatId: Sequelize.STRING,
     userId: Sequelize.STRING,
@@ -145,7 +177,7 @@ module.exports = mcSettings => {
       + ' ' + lcd.grey(resolve(dbPath)));
   }
 
-  const graphQLServer = GraphQLServer({ Configuration, Message, User, ChatId, Event, sequelize });
+  const graphQLServer = GraphQLServer({ Configuration, Message, User, ChatId, Event, Content, Category,Field, sequelize });
   
   exportCache = {
     Configuration,
@@ -154,7 +186,10 @@ module.exports = mcSettings => {
     graphQLServer,
     ChatId,
     Event,
-    Admin
+    Admin,
+    Content,
+    Category,
+    Field
   };
 
   return exportCache;
