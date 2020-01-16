@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo';
 import classNames from 'classnames';
 import _ from 'lodash';
-import { Table, Icon, SelectPicker, Placeholder, Input, ButtonGroup, Button } from 'rsuite';
+import { Table, Icon, SelectPicker, Placeholder, Input, ButtonGroup, Button, FlexboxGrid } from 'rsuite';
 
 import { useHistory } from 'react-router-dom';
 
@@ -19,14 +19,20 @@ import useContents from '../hooks/content';
 import ModalContent from '../views/modal-content';
 
 
+
 const Contents = ({ messageTypes, platforms }) => {
   const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId }, setQuery } = useRouterQuery();
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10, sortField: 'createdAt', sortType: 'desc' });
-  const [ filters, setFilters ] = useState({ chatId: urlChatId, userId: urlUserId, messageId: urlMessageId });
+  const [ filters, setFilters ] = useState({ categoryId: null });
   const [ content, setContent ] = useState(null);
+
   const { limit, page, sortField, sortType } = cursor;
-  const { loading, saving, error, data, deleteContent, editContent, createContent, refetch } = useContents({ limit, page, sortField, sortType });
+  const { categoryId } = filters;
+  const { loading, saving, error, data, deleteContent, editContent, createContent, refetch } = useContents({ limit, page, sortField, sortType, categoryId });
   
+
+  
+
   return (
     <PageContainer className="page-contents">
       <Breadcrumbs pages={['Contents']}/>
@@ -34,6 +40,7 @@ const Contents = ({ messageTypes, platforms }) => {
         <ModalContent 
           content={content}
           disabled={saving}
+          categories={data.categories}
           onCancel={() => setContent(null)}
           onSubmit={async content => {
             if (content.id != null) {
@@ -47,13 +54,35 @@ const Contents = ({ messageTypes, platforms }) => {
           }}
         />)}
 
-      <div className="filters" style={{ marginBottom: '10px' }}>
-        <Button 
-          appearance="primary"
-          disabled={loading || saving} 
-          onClick={() => setContent({ title: '', body: '', fields: [] })}>Create Content
-        </Button>    
-      </div>
+      {!error && !loading && (
+        <div className="filters" style={{ marginBottom: '10px' }}>
+          <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
+            <FlexboxGrid.Item colspan={18}>
+              <SelectPicker           
+                readOnly={loading || saving} 
+                value={categoryId}
+                cleanable
+                placeholder="Filter by category"
+                onChange={categoryId => setFilters({ ...filters, categoryId })}
+                data={data.categories.map(category => ({ value: category.id, label: category.name }))}
+              />  
+            </FlexboxGrid.Item>            
+            <FlexboxGrid.Item colspan={6} align="right">
+              <Button 
+                appearance="primary"
+                disabled={loading || saving} 
+                onClick={() => setContent({ title: '', body: '', fields: [] })}>Create Content
+              </Button>
+
+            </FlexboxGrid.Item>
+          </FlexboxGrid>      
+          
+          
+          
+          
+              
+        </div>
+      )}
 
       {loading && <Grid columns={9} rows={3} />}
       {error && <div>error</div>}
@@ -88,6 +117,13 @@ const Contents = ({ messageTypes, platforms }) => {
           <Column width={80} align="left" sortable resizable>
             <HeaderCell>Slug</HeaderCell>
             <Cell dataKey="slug" />
+          </Column>
+
+          <Column width={80} align="left" resizable>
+            <HeaderCell>Category</HeaderCell>
+            <Cell dataKey="category">
+              {({ category }) => <span>{category.name}</span>}
+            </Cell>
           </Column>
 
           <Column width={300} flexGrow={1}>

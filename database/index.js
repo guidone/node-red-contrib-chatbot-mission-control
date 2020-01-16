@@ -61,7 +61,7 @@ module.exports = mcSettings => {
     ]
   });
 
-  Content.Category = Content.hasOne(Category);
+  Content.Category = Content.belongsTo(Category);
   Content.Fields = Content.hasMany(Field);
 
   const Message = sequelize.define('message', {

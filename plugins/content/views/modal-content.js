@@ -14,8 +14,6 @@ import {
 } from 'rsuite';
 import JoditEditor from 'jodit-react';
 
-
-
 const { StringType, ArrayType, ObjectType } = Schema.Types;
 
 const contentModel = Schema.Model({
@@ -83,7 +81,7 @@ const VisualEditor = props => {
 )};
 
 
-const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
+const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabled = false, categories }) => {
   const [formValue, setFormValue] = useState(content);
   const [formError, setFormError] = useState(null);
   const [tab, setTab] = useState('content');
@@ -132,7 +130,18 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
                   </FormGroup>
                 </FlexboxGrid.Item>            
                 <FlexboxGrid.Item colspan={11}>
-                  empty
+                  <FormGroup>
+                    <ControlLabel>Category</ControlLabel>
+                    <FormControl 
+                      autoComplete="off" 
+                      readOnly={disabled} 
+                      name="categoryId"
+                      block
+                      cleanable={false}
+                      data={categories.map(category => ({ value: category.id, label: category.name }))}
+                      accepter={SelectPicker} 
+                    />
+                  </FormGroup>
                 </FlexboxGrid.Item>
               </FlexboxGrid>                
               <FormGroup>

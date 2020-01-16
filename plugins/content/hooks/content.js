@@ -4,17 +4,27 @@ import { useQuery, useMutation } from 'react-apollo';
 import withoutParams from '../../../src/helpers/without-params';
 
 const CONTENTS = gql`
-query($offset: Int, $limit: Int, $order: String) {
+query($offset: Int, $limit: Int, $order: String, $categoryId: Int) {
   counters {
     contents {
      count
     }
   }
-  contents(offset: $offset, limit: $limit, order: $order) {
+  categories {
+    id,
+    name
+  }
+  contents(offset: $offset, limit: $limit, order: $order, categoryId: $categoryId) {
     id,
     slug,
     title,
     body,
+    categoryId,
+    createdAt,
+    category {
+      id,
+      name
+    }
     fields {
       id,
       name,
@@ -69,11 +79,16 @@ mutation($content: NewContent!) {
 
 const makeOrder = (sortField, sortType) => `${sortType === 'desc' ? 'reverse:' : ''}${sortField}`;
 
-export default ({ limit, page, sortField, sortType, onCompleted = () => {} }) => {
-  
+export default ({ limit, page, sortField, sortType, categoryId, onCompleted = () => {} }) => {
   const { loading, error, data, refetch } = useQuery(CONTENTS, {
     fetchPolicy: 'network-only',
-    variables: { limit, offset: (page - 1) * limit, order: makeOrder(sortField, sortType) }
+    variables: { 
+      limit, 
+      offset: (page - 1) * limit,
+      sortField, sortType, 
+      order: makeOrder(sortField, sortType), 
+      categoryId
+    }
   });
 
   const [
@@ -95,8 +110,8 @@ export default ({ limit, page, sortField, sortType, onCompleted = () => {} }) =>
     error: error || deleteError || editError || createError, 
     data,
     deleteContent,
-    createContent: withoutParams(createContent),
-    editContent: withoutParams(editContent),
+    createContent: withoutParams(createContent, ['id', 'updatedAt', 'createdAt', '__typename', 'cid', 'category']),
+    editContent: withoutParams(editContent, ['id', 'updatedAt', 'createdAt', '__typename', 'cid', 'category']),
     refetch
   };
 };

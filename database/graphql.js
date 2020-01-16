@@ -5,6 +5,20 @@ const _ = require('lodash');
 
 const { when } = require('../lib/utils');
 
+const compactObject = obj => {
+  return Object.entries(obj)
+    .reduce((accumulator, current) => {
+      return current[1] != null ? { ...accumulator, [current[0]]: current[1] } : accumulator; 
+    }, {});
+}
+
+const splitOrder = order => {
+  if (!_.isEmpty(order)) {
+    return [[order.replace('reverse:', ''), order.startsWith('reverse:') ? 'DESC' : 'ASC']];
+  }
+  return null;
+}
+
 const {
   GraphQLSchema,
   GraphQLObjectType,
@@ -268,6 +282,21 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     })
   });
 
+  const categoryType = new GraphQLObjectType({
+    name: 'Category',
+    description: 'tbd',
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The id of the category',
+      },
+      name: {
+        type: GraphQLString,
+        description: '',
+      }
+    }
+  });
+
   const messageType = new GraphQLObjectType({
     name: 'Message',
     description: 'tbd',
@@ -455,11 +484,12 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       fields: {
         type: new GraphQLList(newFieldType),
         description: ''        
+      },
+      categoryId: {
+        type: GraphQLInt
       }
     }
   });
-
-
 
   const contentType = new GraphQLObjectType({
     name: 'Content',
@@ -487,11 +517,23 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           return root.getFields({ limit: 9999 });
         }
       },
+      categoryId: {
+        type: GraphQLInt
+      },
+      category: {
+        type: categoryType,
+        resolve(root) {
+          return root.getCategory();
+        }
+      },
       payload: {
         type: PayloadType,
         resolve(root) {
           return root.getFields({ limit: 9999 });
         }
+      },
+      createdAt: {
+        type: DateType
       }
     }
   });
@@ -782,7 +824,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         }        
       }
     }),
-    
+
     query: new GraphQLObjectType({
       name: 'Queries',
       fields: {
@@ -823,9 +865,21 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             slug: { type: GraphQLString },
             order: { type: GraphQLString },
             offset: { type: GraphQLInt },
-            limit: { type: GraphQLInt }
+            limit: { type: GraphQLInt },
+            categoryId: { type: GraphQLInt }
           },
-          resolve: resolver(Content)
+          //resolve: resolver(Content)
+          resolve(root, { slug, order, offset = 0, limit = 10, categoryId }) {
+            return Content.findAll({
+              limit,
+              offset,
+              order: splitOrder(order),
+              where: compactObject({
+                categoryId,
+                slug
+              })
+            })
+          }
         },
 
         chatIds: {
@@ -854,6 +908,13 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           resolve: resolver(Message)
         },
   
+        categories: {
+          type: new GraphQLList(categoryType),
+          resolve: () => {
+            return Category.findAll({ order: ['name'] })
+          }
+        },
+
         counters: {
           type: countersType,
           resolve: (root, args) => {
