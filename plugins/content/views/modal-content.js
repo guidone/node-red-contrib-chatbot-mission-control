@@ -1,7 +1,20 @@
 import React, { useState } from 'react';
-import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, HelpBlock, SelectPicker } from 'rsuite';
+import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, HelpBlock, SelectPicker, Schema } from 'rsuite';
 
 import JoditEditor from 'jodit-react';
+
+const { StringType, ArrayType, ObjectType } = Schema.Types;
+
+const contentModel = Schema.Model({
+  title: StringType()
+    .isRequired('Title is required'),
+  fields: ArrayType().of(ObjectType().shape({
+    name: StringType().isRequired('Name of field is required')
+  }))  
+
+});
+
+// TODO: validate name of field
 
 import FieldsEditor from '../../../src/components/fields-editor';
 
@@ -38,6 +51,8 @@ const EditorConfig = {
 };
 
 
+let theform; // TODO: fix this
+
 const VisualEditor = props => {
   return (
   <JoditEditor {...props} value={props.value || ''}/>
@@ -57,12 +72,19 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
       </Modal.Header>
       <Modal.Body>
         <Form 
+          model={contentModel}
+          ref={ref => theform = ref}
+          checkTrigger="none"
           formValue={formValue} 
           formError={formError} 
           onChange={formValue => {
             setFormValue(formValue);
             setFormError(null);
           }} 
+          onCheck={errors => {
+            console.log('errors', errors)
+            setFormError(errors);
+          }}
           fluid autoComplete="off"
         >
           <FormGroup>
@@ -95,7 +117,12 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
           appearance="primary"
           disabled={disabled} 
           appearance="primary" 
-          onClick={() => {            
+          onClick={() => {   
+            const errors = theform.check();
+            if (!errors) {
+              console.log('errors', errors);
+              return;
+            }         
             onSubmit(formValue);
           }}
         >

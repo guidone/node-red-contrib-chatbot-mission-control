@@ -382,7 +382,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         description: '',
       },
       value: {
-        type: GraphQLString,
+        type: JSONType,
         description: '',
       }
     }
@@ -406,7 +406,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         description: '',
       },
       value: {
-        type: GraphQLString,
+        type: JSONType,
         description: '',
       }
     }
@@ -651,44 +651,32 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             content: { type: new GraphQLNonNull(newContentType) }
           },
           resolve: async (root, { id, content }) => {
-            // TODO: cleanup
             await Content.update(content, { where: { id } })
-            const updatedContent = await Content.findByPk(id, { include: [Content.Fields]} );
-            
+            const updatedContent = await Content.findByPk(id, { include: [Content.Fields]} );            
             const currentFieldIds = updatedContent.fields.map(field => field.id);
-            console.log('currentFieldIds:', currentFieldIds)
             if (_.isArray(content.fields) && content.fields.length !== 0) {
               let task = when(true); 
               const newFieldIds = _.compact(content.fields.map(field => field.id));
-              console.log('newFieldIds', newFieldIds)
               // now add or update each field present in the payload
               content.fields.forEach(field => {
-                console.log('----tratto', field)
                 if (field.id != null) {
-                  console.log('update field')
                   task = task.then(() => Field.update(field, { where: { id: field.id } }));
                 } else {
-                  console.log('create field')
                   task = task.then(() => updatedContent.createField(field));
                 }
-
               });
               // remove all current id field that are not included in the list of new ids
               currentFieldIds
                 .filter(id => !newFieldIds.includes(id))
                 .forEach(id => {
                   task = task.then(() => Field.destroy({ where: { id }}));
-                })
-
+                });
               await task;
-              console.log('finito task')
               return Content.findByPk(id, { include: [Content.Fields]} );
 
             } else {
               return updatedContent;
-            }
-
-            
+            }            
           }
         },
 

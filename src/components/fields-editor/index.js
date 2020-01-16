@@ -12,7 +12,8 @@ import {
   IconButton, 
   Icon, 
   HelpBlock, 
-  SelectPicker 
+  SelectPicker,
+  Toggle 
 } from 'rsuite';
 
 const FieldTypes = [
@@ -22,9 +23,25 @@ const FieldTypes = [
   { value: 'boolean', label: 'Boolean' }
 ];
 
+const BooleanField = ({ value, onChange = () => {} }) => {
+  return (
+    <div style={{ paddingTop: '6px' }}>
+      <Toggle checked={value} onChange={onChange}/>
+    </div>
+  );
+}
+
+
 const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
 
-  // TODO: validate fields (name only chars)
+
+  let accepter;
+  if (field.type === 'boolean') {
+    accepter = BooleanField;
+  }
+
+
+
 
   return (
     <div className="field-editor">
@@ -50,7 +67,7 @@ const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
             />
           </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={10}>
-            <FormControl name="value" placeholder="value"/>
+            <FormControl name="value" placeholder="value" accepter={accepter}/>
           </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={1}>
             <IconButton 
