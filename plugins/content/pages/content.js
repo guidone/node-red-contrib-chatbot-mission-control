@@ -15,10 +15,6 @@ import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmartDate from '../../../src/components/smart-date';
 import useRouterQuery from '../../../src/hooks/router-query';
 
-// import '../styles/message-logs.scss';
-
-
-
 import useContents from '../hooks/content';
 import ModalContent from '../views/modal-content';
 
@@ -28,10 +24,7 @@ const Contents = ({ messageTypes, platforms }) => {
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10, sortField: 'createdAt', sortType: 'desc' });
   const [ filters, setFilters ] = useState({ chatId: urlChatId, userId: urlUserId, messageId: urlMessageId });
   const [ content, setContent ] = useState(null);
-  
-
   const { limit, page, sortField, sortType } = cursor;
-  // TODO: implement destroy
   const { loading, saving, error, data, deleteContent, editContent, createContent, refetch } = useContents({ limit, page, sortField, sortType });
   
   return (
@@ -41,10 +34,8 @@ const Contents = ({ messageTypes, platforms }) => {
         <ModalContent 
           content={content}
           disabled={saving}
-
           onCancel={() => setContent(null)}
           onSubmit={async content => {
-
             if (content.id != null) {
               await editContent({ variables: { id: content.id, content }})
             } else {
@@ -112,11 +103,10 @@ const Contents = ({ messageTypes, platforms }) => {
                   <Button 
                     disabled={saving} 
                     size="xs"
-                    onClick={() => {
-                      const name = [user.first_name, user.last_name].join(' ');
-                      if (confirm(`Delete user${!_.isEmpty(name.trim()) ? ` "${name}"` : ''} (${user.userId})?`)) {
-                        deleteUser({ variables: { id: user.id }})
-                          .then(refetch);  
+                    onClick={async () => {
+                      if (confirm(`Delete "${content.title}"?`)) {
+                        await deleteContent({ variables: { id: content.id }})
+                        refetch();  
                       }
                     }}
                   >

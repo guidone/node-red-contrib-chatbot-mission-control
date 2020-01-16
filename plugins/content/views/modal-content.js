@@ -1,7 +1,20 @@
-import React, { useState } from 'react';
-import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, HelpBlock, SelectPicker, Schema } from 'rsuite';
-
+import React, { useState, Fragment } from 'react';
+import { 
+  Modal, 
+  Button, 
+  Form, 
+  FormGroup, 
+  ControlLabel, 
+  FormControl, 
+  FlexboxGrid, 
+  HelpBlock, 
+  SelectPicker, 
+  Schema, 
+  Nav
+} from 'rsuite';
 import JoditEditor from 'jodit-react';
+
+
 
 const { StringType, ArrayType, ObjectType } = Schema.Types;
 
@@ -60,6 +73,7 @@ const EditorConfig = {
   ]
 };
 
+import '../styles/modal-content.scss';
 
 let theform; // TODO: fix this
 
@@ -72,6 +86,7 @@ const VisualEditor = props => {
 const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
   const [formValue, setFormValue] = useState(content);
   const [formError, setFormError] = useState(null);
+  const [tab, setTab] = useState('content');
 
   // TODO: flag for edit or new 
 
@@ -81,6 +96,12 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
         <Modal.Title>Edit Content</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        <Nav appearance="tabs" active={tab} onSelect={setTab} activeKey={tab}>
+          <Nav.Item eventKey="content">Content</Nav.Item>
+          <Nav.Item eventKey="custom_fields">Custom Fields</Nav.Item>
+        </Nav>
+      
+      
         <Form 
           model={contentModel}
           ref={ref => theform = ref}
@@ -97,29 +118,35 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
           }}
           fluid autoComplete="off"
         >
-          <FormGroup>
-            <ControlLabel>Title</ControlLabel>
-            <FormControl name="title"/>                      
-          </FormGroup>
-          <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
-            <FlexboxGrid.Item colspan={11}>
+          {tab === 'content' && (
+            <Fragment>
               <FormGroup>
-                <ControlLabel>Slug</ControlLabel>
-                <FormControl autoComplete="off" readOnly={disabled} name="slug" />
+                <ControlLabel>Title</ControlLabel>
+                <FormControl name="title"/>                      
               </FormGroup>
-            </FlexboxGrid.Item>            
-            <FlexboxGrid.Item colspan={11}>
-              empty
-            </FlexboxGrid.Item>
-          </FlexboxGrid>                
-          <FormGroup>
-            <ControlLabel>Body</ControlLabel>
-            <FormControl readOnly={disabled} name="body" accepter={VisualEditor} config={EditorConfig}/>
-          </FormGroup>
-          <FormGroup>
-            <ControlLabel>Fields</ControlLabel>
-            <FormControl readOnly={disabled} name="fields" accepter={FieldsEditor}/>
-          </FormGroup>
+              <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
+                <FlexboxGrid.Item colspan={11}>
+                  <FormGroup>
+                    <ControlLabel>Slug</ControlLabel>
+                    <FormControl autoComplete="off" readOnly={disabled} name="slug" />
+                  </FormGroup>
+                </FlexboxGrid.Item>            
+                <FlexboxGrid.Item colspan={11}>
+                  empty
+                </FlexboxGrid.Item>
+              </FlexboxGrid>                
+              <FormGroup>
+                <ControlLabel>Body</ControlLabel>
+                <FormControl readOnly={disabled} name="body" accepter={VisualEditor} config={EditorConfig}/>
+              </FormGroup>
+            </Fragment>
+          )}
+          {tab === 'custom_fields' && (
+            <FormGroup>
+              <ControlLabel>Fields</ControlLabel>
+              <FormControl readOnly={disabled} name="fields" accepter={FieldsEditor}/>
+            </FormGroup>
+          )}
         </Form>
       </Modal.Body>
       <Modal.Footer>
@@ -131,6 +158,7 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
             const errors = theform.check();
             if (!errors) {
               console.log('errors', errors);
+              setTab(errors.fields != null ? 'custom_fields' : 'content');
               return;
             }         
             onSubmit(formValue);

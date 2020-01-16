@@ -56,6 +56,29 @@ const JSONType = new GraphQLScalarType({
   },
 });
 
+const PayloadType = new GraphQLScalarType({
+  name: 'Payload',
+  description: 'Payload (join custom fields in an hash)',
+  parseValue(value) {
+    // return JSON.stringify(value);
+  },
+  serialize(fields) {
+    let result = {};
+    fields.forEach(field => {
+      try {
+        result[field.name] = JSON.parse(field.value);
+      } catch(e) {
+        // do nothing
+      }  
+    });
+    return result;
+  },
+  parseLiteral(ast) {
+    return null;
+  },
+});
+
+
 module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, sequelize }) => {
 
   const newUserType = new GraphQLInputObjectType({
@@ -463,6 +486,12 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         resolve(root) {
           return root.getFields({ limit: 9999 });
         }
+      },
+      payload: {
+        type: PayloadType,
+        resolve(root) {
+          return root.getFields({ limit: 9999 });
+        }
       }
     }
   });
@@ -677,6 +706,21 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             } else {
               return updatedContent;
             }            
+          }
+        },
+
+        deleteContent: {
+          type: contentType,
+          args: {
+            id: { type: new GraphQLNonNull(GraphQLInt)}
+          },
+          resolve: async function(root, { id }) {
+            const content = await Content.findByPk(id);
+            // destroy user and related chatIds
+            if (content != null) {
+              await content.destroy();
+            }
+            return content;
           }
         },
 

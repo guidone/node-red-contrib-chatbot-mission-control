@@ -27,7 +27,7 @@ query($offset: Int, $limit: Int, $order: String) {
 
 const DELETE_CONTENT = gql`
 mutation($id: Int!) {
-  deleteUser(id: $id) {
+  deleteContent(id: $id) {
     id
   }
 }`;
