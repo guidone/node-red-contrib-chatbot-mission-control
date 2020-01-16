@@ -40,9 +40,6 @@ const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
     accepter = BooleanField;
   }
 
-
-
-
   return (
     <div className="field-editor">
       <Form 
@@ -51,7 +48,7 @@ const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
         onChange={field => onChange(field)} 
           autoComplete="off"
         >
-        <FlexboxGrid justify="space-between" style={{ marginBottom: '10px' }}>
+        <FlexboxGrid justify="space-between" style={{ marginBottom: '10px', marginRight: '0px' }}>
           <FlexboxGrid.Item colspan={7}>
             <FormControl name="name" placeholder="Name"/>
           </FlexboxGrid.Item>
@@ -69,7 +66,7 @@ const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
           <FlexboxGrid.Item colspan={10}>
             <FormControl name="value" placeholder="value" accepter={accepter}/>
           </FlexboxGrid.Item>
-          <FlexboxGrid.Item colspan={1}>
+          <FlexboxGrid.Item colspan={1} align="right">
             <IconButton 
               onClick={() => onRemove()} 
               icon={<Icon icon="trash" />} 
@@ -83,7 +80,7 @@ const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
 };
 
 
-const FieldsEditor = ({ value, onChange = () => {} }) => {
+const FieldsEditor = ({ value, onChange = () => {}, labelAddField = 'Add CustomField' }) => {
   return (
     <div className="ui-fields-editor">
       <div>
@@ -108,7 +105,7 @@ const FieldsEditor = ({ value, onChange = () => {} }) => {
       <div>
         <Button onClick={() => {          
           onChange([...value, { name: '', type: 'string', value: '', cid: _.uniqueId('c') }]); 
-        }}>Add Field</Button>
+        }}>{labelAddField}</Button>
       </div>
     </div>
   );

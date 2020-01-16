@@ -7,12 +7,13 @@ import {
   ControlLabel, 
   FormControl, 
   FlexboxGrid, 
-  HelpBlock, 
   SelectPicker, 
   Schema, 
   Nav
 } from 'rsuite';
 import JoditEditor from 'jodit-react';
+
+import FieldsEditor from '../../../src/components/fields-editor';
 
 const { StringType, ArrayType, ObjectType } = Schema.Types;
 
@@ -20,24 +21,25 @@ const contentModel = Schema.Model({
   title: StringType()
     .isRequired('Title is required'),
   slug: StringType()
-  .addRule(
-    value => {
-      console.log('verific', value)
-      return value.match(/^[A-Za-z0-9-_]*$/) != null
-    }, 
-    'Invalid slug, just letter, numbers or ("-", "_") and no spaces'
-  )
-    .isRequired('Slug is required')
-    ,  
+    .addRule(
+      value => value.match(/^[A-Za-z0-9-_]*$/) != null, 
+      'Invalid slug, just letter, numbers or ("-", "_") and no spaces'
+    )
+    .isRequired('Slug is required'),  
   fields: ArrayType().of(ObjectType().shape({
-    name: StringType().isRequired('Name of field is required')
+    name: StringType()
+      .addRule(
+        value => value.match(/^[A-Za-z0-9-_]*$/) != null, 
+        'Invalid field name, just letter, numbers or ("-", "_") and no spaces'
+      )
+      .isRequired('Name of field is required')
   }))  
 
 });
 
-// TODO: validate name of field
 
-import FieldsEditor from '../../../src/components/fields-editor';
+
+
 
 const EditorConfig = {
   sourceEditor: 'area',
@@ -97,9 +99,7 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
         <Nav appearance="tabs" active={tab} onSelect={setTab} activeKey={tab}>
           <Nav.Item eventKey="content">Content</Nav.Item>
           <Nav.Item eventKey="custom_fields">Custom Fields</Nav.Item>
-        </Nav>
-      
-      
+        </Nav>      
         <Form 
           model={contentModel}
           ref={ref => theform = ref}
@@ -111,8 +111,8 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
             setFormError(null);
           }} 
           onCheck={errors => {
-            console.log('errors', errors)
             setFormError(errors);
+            setTab(errors.fields != null ? 'custom_fields' : 'content');
           }}
           fluid autoComplete="off"
         >
@@ -166,14 +166,14 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
           onClick={() => {   
             const errors = theform.check();
             if (!errors) {
-              console.log('errors', errors);
-              setTab(errors.fields != null ? 'custom_fields' : 'content');
+              
+             
               return;
             }         
             onSubmit(formValue);
           }}
         >
-          Save
+          Save Content
         </Button>
         <Button onClick={onCancel} appearance="subtle">
           Cancel
