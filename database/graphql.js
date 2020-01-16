@@ -777,6 +777,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           type: new GraphQLList(contentType),
           args: {
             slug: { type: GraphQLString },
+            order: { type: GraphQLString },
             offset: { type: GraphQLInt },
             limit: { type: GraphQLInt }
           },

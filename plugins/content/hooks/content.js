@@ -4,13 +4,13 @@ import { useQuery, useMutation } from 'react-apollo';
 import withoutParams from '../../../src/helpers/without-params';
 
 const CONTENTS = gql`
-query($offset: Int, $limit: Int) {
+query($offset: Int, $limit: Int, $order: String) {
   counters {
     contents {
      count
     }
   }
-  contents(offset: $offset, limit: $limit) {
+  contents(offset: $offset, limit: $limit, order: $order) {
     id,
     slug,
     title,
@@ -67,12 +67,13 @@ mutation($content: NewContent!) {
 `;
 
 
+const makeOrder = (sortField, sortType) => `${sortType === 'desc' ? 'reverse:' : ''}${sortField}`;
 
-export default ({ limit, page, onCompleted = () => {} }) => {
+export default ({ limit, page, sortField, sortType, onCompleted = () => {} }) => {
   
   const { loading, error, data, refetch } = useQuery(CONTENTS, {
     fetchPolicy: 'network-only',
-    variables: { limit, offset: (page - 1) * limit, order: 'reverse:createdAt' }
+    variables: { limit, offset: (page - 1) * limit, order: makeOrder(sortField, sortType) }
   });
 
   const [

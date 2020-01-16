@@ -10,11 +10,7 @@ import { useHistory } from 'react-router-dom';
 const { Column, HeaderCell, Cell, Pagination } = Table;
 const { Grid } = Placeholder
 
-import withMessageTypes from '../../../src/wrappers/with-message-types';
-import withPlatforms from '../../../src/wrappers/with-platforms';
 import PageContainer from '../../../src/components/page-container';
-import MessageType from '../../../src/components/message-type';
-import Transport from '../../../src/components/transport';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmartDate from '../../../src/components/smart-date';
 import useRouterQuery from '../../../src/hooks/router-query';
@@ -29,13 +25,14 @@ import ModalContent from '../views/modal-content';
 
 const Contents = ({ messageTypes, platforms }) => {
   const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId }, setQuery } = useRouterQuery();
-  const [ cursor, setCursor ] = useState({ page: 1, limit: 10 });
+  const [ cursor, setCursor ] = useState({ page: 1, limit: 10, sortField: 'createdAt', sortType: 'desc' });
   const [ filters, setFilters ] = useState({ chatId: urlChatId, userId: urlUserId, messageId: urlMessageId });
   const [ content, setContent ] = useState(null);
+  
 
-  const { limit, page } = cursor;
+  const { limit, page, sortField, sortType } = cursor;
   // TODO: implement destroy
-  const { loading, saving, error, data, deleteContent, editContent, createContent, refetch } = useContents({ limit, page });
+  const { loading, saving, error, data, deleteContent, editContent, createContent, refetch } = useContents({ limit, page, sortField, sortType });
   
   return (
     <PageContainer className="page-contents">
@@ -44,6 +41,7 @@ const Contents = ({ messageTypes, platforms }) => {
         <ModalContent 
           content={content}
           disabled={saving}
+
           onCancel={() => setContent(null)}
           onSubmit={async content => {
 
@@ -59,7 +57,11 @@ const Contents = ({ messageTypes, platforms }) => {
         />)}
 
       <div className="filters" style={{ marginBottom: '10px' }}>
-        <Button disabled={loading || saving} onClick={() => setContent({ title: '', body: '', fields: [] })}>Create Content</Button>    
+        <Button 
+          appearance="primary"
+          disabled={loading || saving} 
+          onClick={() => setContent({ title: '', body: '', fields: [] })}>Create Content
+        </Button>    
       </div>
 
       {loading && <Grid columns={9} rows={3} />}
@@ -69,7 +71,10 @@ const Contents = ({ messageTypes, platforms }) => {
           height={600}
           data={data.contents}
           loading={loading}
+          sortColumn={sortField}
+          sortType={sortType}
           renderEmpty={() => <div style={{ textAlign: 'center', padding: 80}}>No Content</div>}
+          onSortColumn={(sortField, sortType) => setCursor({ ...cursor, sortField, sortType })}
           autoHeight
         >
           <Column width={60} align="center">
@@ -77,19 +82,19 @@ const Contents = ({ messageTypes, platforms }) => {
             <Cell dataKey="id" />
           </Column>
 
-          <Column width={140} resizable>
+          <Column width={140} resizable sortable>
             <HeaderCell>Date</HeaderCell>            
-            <Cell>
+            <Cell dataKey="createdAt">
               {({ createdAt }) => <SmartDate date={createdAt} />}
             </Cell>
           </Column>
 
-          <Column width={260} align="left">
+          <Column width={260} align="left" sortable resizable>
             <HeaderCell>Title</HeaderCell>
             <Cell dataKey="title" />
           </Column>
 
-          <Column width={80} align="left">
+          <Column width={80} align="left" sortable resizable>
             <HeaderCell>Slug</HeaderCell>
             <Cell dataKey="slug" />
           </Column>

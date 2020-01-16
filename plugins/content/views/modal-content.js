@@ -8,6 +8,16 @@ const { StringType, ArrayType, ObjectType } = Schema.Types;
 const contentModel = Schema.Model({
   title: StringType()
     .isRequired('Title is required'),
+  slug: StringType()
+  .addRule(
+    value => {
+      console.log('verific', value)
+      return value.match(/^[A-Za-z0-9-_]*$/) != null
+    }, 
+    'Invalid slug, just letter, numbers or ("-", "_") and no spaces'
+  )
+    .isRequired('Slug is required')
+    ,  
   fields: ArrayType().of(ObjectType().shape({
     name: StringType().isRequired('Name of field is required')
   }))  
