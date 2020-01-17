@@ -75,12 +75,7 @@ const Contents = ({ messageTypes, platforms }) => {
               </Button>
 
             </FlexboxGrid.Item>
-          </FlexboxGrid>      
-          
-          
-          
-          
-              
+          </FlexboxGrid>          
         </div>
       )}
 
@@ -122,7 +117,7 @@ const Contents = ({ messageTypes, platforms }) => {
           <Column width={80} align="left" resizable>
             <HeaderCell>Category</HeaderCell>
             <Cell dataKey="category">
-              {({ category }) => <span>{category.name}</span>}
+              {({ category }) => <span>{category != null ? category.name : ''}</span>}
             </Cell>
           </Column>
 

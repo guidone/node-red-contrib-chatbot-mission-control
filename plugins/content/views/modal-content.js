@@ -11,7 +11,6 @@ import {
   Schema, 
   Nav
 } from 'rsuite';
-import JoditEditor from 'jodit-react';
 
 import FieldsEditor from '../../../src/components/fields-editor';
 
@@ -41,46 +40,39 @@ const contentModel = Schema.Model({
 
 
 
-const EditorConfig = {
-  sourceEditor: 'area',
-  buttons: [
-    'bold',
-    'strikethrough',
-    'underline',
-    'italic',
-    '|',
-    'superscript',
-    'subscript',
-    '|',
-    'ul',
-    'ol',
-    '|',
-    'outdent',
-    'indent',
-    '|',
-    'font',
-    'fontsize',
-    'brush',
-    'paragraph',
-    'eraser',
-    '|',
-    'table',
-    'link',
-    '|',
-    'align',
-    'hr',
-    'symbol'
-  ]
-};
-
+import '../../../node_modules/simplemde/dist/simplemde.min.css';
 import '../styles/modal-content.scss';
+
+
+import SimpleMDE from 'simplemde';
 
 let theform; // TODO: fix this
 
-const VisualEditor = props => {
-  return (
-  <JoditEditor {...props} value={props.value || ''}/>
-)};
+class VisualEditor extends React.Component {
+
+  componentDidMount() {
+    const { value, onChange } = this.props;
+
+    this.simplemde = new SimpleMDE({ 
+      element: this.textarea,
+      initialValue: value,
+      spellChecker: false
+    });
+    this.simplemde.codemirror.on('change', () => onChange(this.simplemde.value()));
+
+  }
+
+  componentWillUnmount() {
+    this.simplemde.toTextArea();
+    this.simplemde = null;  
+  }
+
+  render() {
+    return (
+      <textarea ref={ref => this.textarea = ref}/>
+    );
+  }
+}
 
 
 const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabled = false, categories }) => {
@@ -145,8 +137,7 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
                 </FlexboxGrid.Item>
               </FlexboxGrid>                
               <FormGroup>
-                <ControlLabel>Body</ControlLabel>
-                <FormControl readOnly={disabled} name="body" accepter={VisualEditor} config={EditorConfig}/>
+                <FormControl readOnly={disabled} name="body" accepter={VisualEditor}/>
               </FormGroup>
             </Fragment>
           )}
@@ -164,10 +155,7 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
           disabled={disabled} 
           appearance="primary" 
           onClick={() => {   
-            const errors = theform.check();
-            if (!errors) {
-              
-             
+            if (!theform.check()) {
               return;
             }         
             onSubmit(formValue);

@@ -621,7 +621,16 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       count: {
         type: GraphQLInt,
         description: 'Total contents',
-        resolve: () => Content.count()
+        args: {
+          slug: { type: GraphQLString },
+          categoryId: { type: GraphQLInt }
+        },
+        resolve: (root, { slug, categoryId }) => Content.count({
+          where: compactObject({
+            categoryId,
+            slug
+          })
+        })
       }
     }
   });
@@ -878,7 +887,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
                 categoryId,
                 slug
               })
-            })
+            });
           }
         },
 

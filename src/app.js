@@ -4,12 +4,12 @@ import { createHttpLink } from 'apollo-link-http';
 import { ApolloClient } from 'apollo-client';
 import { ApolloLink } from "apollo-link";
 import { ApolloProvider } from 'react-apollo';
-import { Container, Content } from 'rsuite';
+import { Container, Content, Loader } from 'rsuite';
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link
+  Link,
 } from 'react-router-dom';
 
 import { CodePlug } from '../lib/code-plug';
@@ -109,7 +109,11 @@ const AppRouter = ({ codePlug, bootstrap }) => {
   const [state, dispatch] = useReducer(reducers, { ...initialState, ...bootstrap });
 
   if (loading) {
-    return <div>Loading...</div>
+    return (
+      <div style={{ textAlign: 'center', paddingTop: '250px' }}>
+        <Loader size="lg" />
+      </div>
+    );
   }
 
   return (
@@ -131,8 +135,7 @@ const AppRouter = ({ codePlug, bootstrap }) => {
                             
                           </Route>
                         ))}
-                      <Route path="/" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}>
-                        
+                      <Route path="/" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}>                        
                       </Route>
                     </Switch>
                   </Content>
