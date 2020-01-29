@@ -1,14 +1,22 @@
 import _ from 'lodash';
+import { DataStore } from 'apollo-client/data/store';
 
 export default (data, { percentile = false }) => {
+  console.log('data', data)
   const sorted = data.events.sort((a, b) => a.count < b.count ? 1 : -1);
-  return {
+  
+  const nodes = data.events
+    .map(item => [item.name, item.source ]);
+  
+  const funnel =  {
     nodes:  
-      [
-        { id: 'Start' },
-        ...sorted.map(event => ({ id: _.capitalize(event.name) }))
-      ],
-    links: sorted.map((event, idx) => {
+      /*[
+        //{ id: 'Start' },
+        ...sorted.map(event => ({ id: event.name, color: '#336699' }))
+      ],*/
+      _.uniq(_.compact(_.flatten(nodes))).map(name => ({ id: name })),
+
+    links: _.compact(sorted.map((event, idx) => {
       let value = event.count;
       if (percentile) {
         if (idx !== 0) {
@@ -18,11 +26,19 @@ export default (data, { percentile = false }) => {
         }
         
       }
+      if (_.isEmpty(event.source)) {
+        console.log('nullo cazzo')
+        return null;
+      }
+
       return {
-        source: idx > 0 ? _.capitalize(sorted[idx - 1].name) : 'Start',
-        target: _.capitalize(event.name),
+        //source: idx > 0 ? _.capitalize(sorted[idx - 1].name) : 'Start',
+        source: event.source,
+        target: event.name,
         value
       };
-    })
+    }))
   };
+  console.log(funnel)
+  return funnel
 }

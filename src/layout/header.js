@@ -1,8 +1,20 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+var gravatar = require('gravatar');
 import { Button, Container, Header, Navbar, Dropdown, Nav, Footer, Content, Icon, Sidebar, Sidenav, Avatar } from 'rsuite';
 
 import withState from '../wrappers/with-state';
+
+const initials = user => {
+  if (user.firstName != null && user.firstName.length !== 0 && user.lastName != null && user.lastName.length !== 0) {
+    return user.firstName.substr(0, 1) + user.lastName.substr(0, 1);
+  } else if (user.firstName != null && user.firstName.length !== 0 ) {
+    return user.firstName.substr(0, 2);
+  } else if (user.lastName != null && user.lastName.length !== 0) {
+    return user.lastName.substr(0, 2);
+  }
+  return '';
+}
 
 import {
   BrowserRouter as Router,
@@ -34,9 +46,12 @@ const AppHeader = ({ user }) => {
               className="mc-avatar"
               placement="bottomEnd"
               renderTitle={()=> (
-                <Avatar src={user.avatar} circle>{user.username.substr(0,2)}</Avatar>)}
+                <Avatar src={user.avatar || gravatar.url(user.email)} circle>{initials(user)}</Avatar>)}
             >
-              <Dropdown.Item ><Icon icon="user" /> Logout</Dropdown.Item>
+              <Dropdown.Item><b>{`${user.firstName} ${user.lastName}`}</b></Dropdown.Item>
+              <Dropdown.Item onSelect={() => window.location = '/'}>Node-RED</Dropdown.Item>
+              <Dropdown.Item divider />
+              <Dropdown.Item>Logout</Dropdown.Item>
             </Dropdown>
           </Nav>          
         </Navbar.Body>
@@ -49,7 +64,8 @@ AppHeader.propTypes = {
     username: PropTypes.string,
     firstName: PropTypes.string,
     lastName: PropTypes.string,
-    avatar: PropTypes.string
+    avatar: PropTypes.string,
+    email: PropTypes.string
   })
 };
 

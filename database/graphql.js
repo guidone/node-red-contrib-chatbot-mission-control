@@ -5,6 +5,8 @@ const _ = require('lodash');
 
 const { when } = require('../lib/utils');
 
+const getCircularPaths = require('../lib/get-circular-paths');
+
 const compactObject = obj => {
   return Object.entries(obj)
     .reduce((accumulator, current) => {
@@ -297,6 +299,17 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     }
   });
 
+  const newCategoryType = new GraphQLInputObjectType({
+    name: 'NewCategory',
+    description: 'tbd',
+    fields: {
+      name: {
+        type: GraphQLString,
+        description: '',
+      }
+    }
+  });
+
   const messageType = new GraphQLObjectType({
     name: 'Message',
     description: 'tbd',
@@ -370,6 +383,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLString,
         description: '',
       },
+      source: {
+        type: GraphQLString,
+        description: '',
+      },
       count: {
         type: GraphQLInt,
         description: '',
@@ -386,6 +403,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         description: '',
       },
       name: {
+        type: GraphQLString,
+        description: '',
+      },
+      source: {
         type: GraphQLString,
         description: '',
       },
@@ -614,6 +635,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     }
   });
 
+  const categoryCounterType = new GraphQLObjectType({ 
+    name: 'CategoryCounters',
+    description: 'Category Counters',
+    fields: {
+      count: {
+        type: GraphQLInt,
+        description: 'Total categories',
+        resolve: () => Category.count()
+      }
+    }
+  });
+
   const contentCounterType = new GraphQLObjectType({ 
     name: 'ContentCounters',
     description: 'Content Counters',
@@ -662,7 +695,14 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       },
       contents: {
         type: contentCounterType,
-        description: 'Counters for content',
+        description: 'Counters for contents',
+        resolve: () => {
+          return {};
+        }
+      },
+      categories: {
+        type: categoryCounterType,
+        description: 'Counters for categories',
         resolve: () => {
           return {};
         }
@@ -676,7 +716,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     mutation: new GraphQLObjectType({
       name: 'Mutations',
       description: 'These are the things we can change',
-      fields: {
+      fields: {        
         
         createEvent: {
           type: eventType,
@@ -684,14 +724,27 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             event: { type: new GraphQLNonNull(newEventType) }
           },
           resolve: async function(root, { event }) {
-            const existingEvent = await Event.findOne({ where: { flow: event.flow, name: event.name }});
+            // get all nodes
+            const nodes = await Event.findAll({ where: { flow: event.flow }})
             
+            const existingEvent = nodes.find(node => node.name === event.name && node.source === event.source); 
+            
+            
+            // if the node (source + target) already exists, then just increment
             if (existingEvent != null) {
-              await Event.update({ count: existingEvent.count + 1 }, { where: { flow: event.flow, name: event.name }})
+              await Event.update({ count: existingEvent.count + 1 }, { where: { flow: event.flow, name: event.name, source: event.source }})
               existingEvent.count += 1;
               return existingEvent;
+            } else {
+              // if doesn't exist, check for circular referece in the graph of events
+              const routes = getCircularPaths(event.name, event.source, nodes);
+              
+              console.log('--->', routes)
+
+              return {};
+              // return Event.create({ ...event, count: 1 })
             }
-            return Event.create({ ...event, count: 1 });
+            
           }
         },
 
@@ -721,6 +774,43 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             return Content.create(content, {
               include: [Content.Fields]
             });
+          }
+        },
+
+        createCategory: {
+          type: categoryType,
+          args: {
+            category: { type: new GraphQLNonNull(newCategoryType)}
+          },
+          resolve: function(root, { category }) {
+            return Category.create(category);
+          }
+        },
+
+        editCategory: {
+          type: categoryType,
+          args: {
+            id: { type: new GraphQLNonNull(GraphQLInt)},
+            category: { type: new GraphQLNonNull(newCategoryType)}
+          },
+          resolve(root, { id, category }) {
+            return Category.update(category, { where: { id } })
+              .then(() => Category.findByPk(id));
+          }
+        },
+
+        deleteCategory: {
+          type: contentType,
+          args: {
+            id: { type: new GraphQLNonNull(GraphQLInt)}
+          },
+          resolve: async function(root, { id }) {
+            const category = await Category.findByPk(id);
+            // destroy user and related chatIds
+            if (category != null) {
+              await category.destroy();
+            }
+            return category;
           }
         },
 
@@ -860,6 +950,14 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           resolve: resolver(User)
         },
 
+        user: {
+          type: userType,
+          args: {
+            userId: { type: GraphQLString }
+          },
+          resolve: resolver(User)
+        },
+
         events: {
           type: new GraphQLList(eventType),
           args: {
@@ -877,7 +975,6 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             limit: { type: GraphQLInt },
             categoryId: { type: GraphQLInt }
           },
-          //resolve: resolver(Content)
           resolve(root, { slug, order, offset = 0, limit = 10, categoryId }) {
             return Content.findAll({
               limit,
@@ -889,6 +986,15 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
               })
             });
           }
+        },
+
+        content: {
+          type: contentType,
+          args: {
+            slug: { type: GraphQLString },      
+            id: { type: GraphQLInt }
+          },
+          resolve: resolver(Content)
         },
 
         chatIds: {
@@ -919,8 +1025,17 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
   
         categories: {
           type: new GraphQLList(categoryType),
-          resolve: () => {
-            return Category.findAll({ order: ['name'] })
+          args: {
+            order: { type: GraphQLString },
+            offset: { type: GraphQLInt },
+            limit: { type: GraphQLInt }
+          },
+          resolve: (root, { order = 'name', offset, limit }) => {
+            return Category.findAll({
+              limit,
+              offset,
+              order: splitOrder(order)
+            });
           }
         },
 

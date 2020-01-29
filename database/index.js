@@ -92,7 +92,8 @@ module.exports = mcSettings => {
     password: Sequelize.STRING,
     first_name: Sequelize.STRING,
     last_name: Sequelize.STRING,
-    avatar: Sequelize.STRING
+    avatar: Sequelize.STRING,
+    email: Sequelize.STRING
   }, {
     indexes: [
       { name: 'admin_username', using: 'BTREE', fields: ['username'] },
@@ -157,12 +158,14 @@ module.exports = mcSettings => {
 
   const Event = sequelize.define('event', {
     flow: Sequelize.STRING,
+    source: Sequelize.STRING, 
     name: Sequelize.STRING,
     count: Sequelize.INTEGER
   }, {
     indexes: [
       { name: 'event_flow', using: 'BTREE', fields: ['flow'] },
-      { name: 'event_name', using: 'BTREE', fields: ['name'] }
+      { name: 'event_name', using: 'BTREE', fields: ['name'] },
+      { name: 'event_source', using: 'BTREE', fields: ['source'] }
     ]
   });
 

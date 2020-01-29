@@ -5,8 +5,9 @@ const gql = require('graphql-tag');
 
 
 const { isValidMessage, when } = require('../lib/utils/index');
-
+  
 const client = require('../database/client');
+
 
 const CREATE_EVENT = gql`
 mutation ($event: NewEvent!) {
@@ -24,34 +25,40 @@ module.exports = function(RED) {
     const node = this;
     node.flow = config.flow;
     node.name = config.name;
-    
-    
-
+      
     this.on('input', function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
       done = done || function(error) { node.error.call(node, error, msg) };
        
-      // if inbound get userId from chatContext
+      // TODO: check for valid message
 
-      client
-        .mutate({
-          mutation: CREATE_EVENT,
-          variables: {
-            event: {
-              flow: node.flow,
-              name: node.name
+      const chat = msg.chat();
+      when(chat.get('previous_event'))
+        .then(previousEvent => {
+          return client.mutate({
+            mutation: CREATE_EVENT,
+            variables: {
+              event: {
+                flow: node.flow,
+                name: node.name,
+                source: previousEvent
+              }
             }
-          }
+          });
         })
-        .then(data => done())
+        .then(() => chat.set('previous_event', node.name))      
+        .then(() => {
+          send(msg);
+          done()
+        })
         .catch(error => {
           console.log(error)
-          console.log('errorascio', error.networkError.result)
+          console.log('erro saving event', error.networkError.result)
           done(error.networkError.result)
         });
     
-      send(msg);
+      
     });
   }
 

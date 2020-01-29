@@ -112,7 +112,8 @@ function bootstrap(server, app, log, redSettings) {
             username: user.username, 
             firstName: user.first_name, 
             lastName: user.last_name, 
-            avatar: user.avatar 
+            avatar: user.avatar,
+            email: user.email 
           });
         } else {
           done(null, false);

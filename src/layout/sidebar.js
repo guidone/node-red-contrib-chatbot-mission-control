@@ -9,7 +9,6 @@ import { Views } from '../../lib/code-plug';
 const NavLink = props => <Dropdown.Item componentClass={Link} {...props} />;
 
 export default () => {
-
   return (
     <Sidebar
       className="mc-sidebar"
@@ -31,7 +30,7 @@ export default () => {
           <Nav>
             <Views region="sidebar">
               {(View, { label, onClick = () => {}, url, icon, options }) => {
-                if (_.isObject(options)) {
+                if (_.isArray(options)) {
                   return (
                     <Dropdown
                       eventKey="3"
@@ -39,10 +38,13 @@ export default () => {
                       title={label}
                       icon={icon != null ? <Icon icon={icon} /> : null}
                       placement="rightStart"
-                      onSelect={(selected, value) => console.log('selected', selected, value)}
                     >
                       {options.map(option => (
-                        <NavLink eventKey="3-1" to={url} key={option.id}>{option.label}</NavLink>
+                        <NavLink 
+                          eventKey="3-1" 
+                          to={option.url}
+                          key={option.id}                          
+                        >{option.label}</NavLink>
                       ))}
                     </Dropdown>
                   );

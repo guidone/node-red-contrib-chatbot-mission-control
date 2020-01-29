@@ -161,7 +161,7 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
             onSubmit(formValue);
           }}
         >
-          Save Content
+          Save content
         </Button>
         <Button onClick={onCancel} appearance="subtle">
           Cancel
