@@ -19,7 +19,17 @@ const Categories = () => {
   const [ category, setCategory ] = useState(null);
 
   const { limit, page, sortField, sortType } = cursor;
-  const { loading, saving, error, data, deleteCategory, editCategory, createCategory, refetch } = useCategories({ limit, page, sortField, sortType });
+  const { 
+    bootstrapping,
+    loading, 
+    saving, 
+    error, 
+    data, 
+    deleteCategory, 
+    editCategory, 
+    createCategory, 
+    refetch 
+  } = useCategories({ limit, page, sortField, sortType });
   
   return (
     <PageContainer className="page-contents">
@@ -41,7 +51,7 @@ const Categories = () => {
           }}
         />)}
 
-      {!error && !loading && (
+      {!error && !bootstrapping && (
         <div className="filters" style={{ marginBottom: '10px' }}>
           <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
             <FlexboxGrid.Item colspan={18}>
@@ -58,15 +68,16 @@ const Categories = () => {
         </div>
       )}
 
-      {loading && <Grid columns={9} rows={3} />}
+      {bootstrapping && <Grid columns={9} rows={3} />}
       {error && <div>error</div>}
-      {!error && !loading && (
+      {!error && !bootstrapping && (
         <Table
           height={600}
           data={data.categories}
           loading={loading}
           sortColumn={sortField}
           sortType={sortType}
+          disabled={loading}
           renderEmpty={() => <div style={{ textAlign: 'center', padding: 80}}>No Content</div>}
           onSortColumn={(sortField, sortType) => setCursor({ ...cursor, sortField, sortType })}
           autoHeight
@@ -94,7 +105,7 @@ const Categories = () => {
               {category => (
                 <ButtonGroup>
                   <Button 
-                    disabled={saving} 
+                    disabled={saving || loading} 
                     size="xs"
                     onClick={async () => {
                       if (confirm(`Delete "${category.name}"?`)) {
@@ -106,7 +117,7 @@ const Categories = () => {
                     <Icon icon="trash" />
                   </Button>
                   <Button 
-                    disabled={saving} 
+                    disabled={saving || loading} 
                     size="xs"
                     onClick={() => {
                       setCategory(category)  
@@ -121,9 +132,10 @@ const Categories = () => {
 
         </Table>
       )}
-      {!error && !loading && (
+      {!error && !bootstrapping && (
         <Pagination
           activePage={page}
+          disabled={loading}
           displayLength={limit}
           onChangePage={page => setCursor({ ...cursor, page })}
           lengthMenu={[{ label: '10', value: 10 }, { label: '20', value: 20 }, { label: '30', value: 30 } ]}

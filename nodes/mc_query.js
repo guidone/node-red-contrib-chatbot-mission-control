@@ -34,7 +34,7 @@ module.exports = function(RED) {
       const query = gql`${translatedQuery}`;
 
       try {
-        const response = await client.query({ query, variables });
+        const response = await client.query({ query, variables, fetchPolicy: 'network-only' });
         send({ ...msg, payload: response.data });
         done();
       } catch(error) {

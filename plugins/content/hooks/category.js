@@ -1,4 +1,5 @@
 import gql from 'graphql-tag';
+import { useState } from 'react';
 import { useQuery, useMutation } from 'react-apollo';
 
 import withoutParams from '../../../src/helpers/without-params';
@@ -12,7 +13,8 @@ query($offset: Int, $limit: Int, $order: String) {
   }
   categories(offset: $offset, limit: $limit, order: $order) {
     id,
-    name
+    name,
+    createdAt
   }
 }
 `;
@@ -52,10 +54,14 @@ export default ({ limit, page, sortField, sortType, onCompleted = () => {}, slug
       limit, 
       offset: (page - 1) * limit,
       sortField, sortType, 
-      order: makeOrder(sortField, sortType)
+      order: makeOrder(sortField, sortType)      
+    },
+    onCompleted: () => {
+      console.log('finito booststrapping')
+      setBootstrapping(false);
     }
   });
-
+  const [bootstrapping, setBootstrapping] = useState(true);
   const [
     deleteCategory,
     { loading: deleteLoading, error: deleteError },
@@ -70,6 +76,7 @@ export default ({ limit, page, sortField, sortType, onCompleted = () => {}, slug
   ] = useMutation(EDIT_CATEGORY, { onCompleted });
 
   return { 
+    bootstrapping,
     loading: loading, 
     saving: deleteLoading || createLoading || editLoading,
     error: error || deleteError || editError || createError, 

@@ -13,7 +13,7 @@ plug(
     id: 'content', 
     label: 'Content', 
     url: '/content', 
-    icon: 'comment',
+    icon: 'file-text',
     options: [
       { label: 'Posts', url: '/content' },
       { label: 'Categories', url: '/categories' }

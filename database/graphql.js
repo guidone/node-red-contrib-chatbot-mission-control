@@ -295,6 +295,9 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       name: {
         type: GraphQLString,
         description: '',
+      },
+      createdAt: {
+        type: DateType
       }
     }
   });
