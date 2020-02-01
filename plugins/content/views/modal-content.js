@@ -1,4 +1,4 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, Fragment, useRef } from 'react';
 import { 
   Modal, 
   Button, 
@@ -7,85 +7,31 @@ import {
   ControlLabel, 
   FormControl, 
   FlexboxGrid, 
-  SelectPicker, 
-  Schema, 
+  SelectPicker,  
   Nav
 } from 'rsuite';
 
 import FieldsEditor from '../../../src/components/fields-editor';
+import MarkdownEditor from '../../../src/components/markdown-editor';
 
-const { StringType, ArrayType, ObjectType } = Schema.Types;
-
-const contentModel = Schema.Model({
-  title: StringType()
-    .isRequired('Title is required'),
-  slug: StringType()
-    .addRule(
-      value => value.match(/^[A-Za-z0-9-_]*$/) != null, 
-      'Invalid slug, just letter, numbers or ("-", "_") and no spaces'
-    )
-    .isRequired('Slug is required'),  
-  fields: ArrayType().of(ObjectType().shape({
-    name: StringType()
-      .addRule(
-        value => value.match(/^[A-Za-z0-9-_]*$/) != null, 
-        'Invalid field name, just letter, numbers or ("-", "_") and no spaces'
-      )
-      .isRequired('Name of field is required')
-  }))  
-
-});
-
-
-
-
-
-import '../../../node_modules/simplemde/dist/simplemde.min.css';
+import { content as contentModel } from '../models';
 import '../styles/modal-content.scss';
-
-
-import SimpleMDE from 'simplemde';
-
-let theform; // TODO: fix this
-
-class VisualEditor extends React.Component {
-
-  componentDidMount() {
-    const { value, onChange } = this.props;
-
-    this.simplemde = new SimpleMDE({ 
-      element: this.textarea,
-      initialValue: value,
-      spellChecker: false
-    });
-    this.simplemde.codemirror.on('change', () => onChange(this.simplemde.value()));
-
-  }
-
-  componentWillUnmount() {
-    this.simplemde.toTextArea();
-    this.simplemde = null;  
-  }
-
-  render() {
-    return (
-      <textarea ref={ref => this.textarea = ref}/>
-    );
-  }
-}
 
 
 const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabled = false, categories }) => {
   const [formValue, setFormValue] = useState(content);
   const [formError, setFormError] = useState(null);
   const [tab, setTab] = useState('content');
+  const form = useRef(null);
 
+  const isNew = content.id == null;
   // TODO: flag for edit or new 
+  // TODO prevent close if changes
 
   return (
-    <Modal backdrop show onHide={onCancel} className="modal-content" size="lg">
+    <Modal backdrop show onHide={onCancel} className="modal-content" size="md">
       <Modal.Header>
-        <Modal.Title>Edit Content</Modal.Title>
+        <Modal.Title>{isNew ? 'Create content' : `Edit content "${content.title}"`}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <Nav appearance="tabs" active={tab} onSelect={setTab} activeKey={tab}>
@@ -94,7 +40,7 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
         </Nav>      
         <Form 
           model={contentModel}
-          ref={ref => theform = ref}
+          ref={form}
           checkTrigger="none"
           formValue={formValue} 
           formError={formError} 
@@ -137,7 +83,7 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
                 </FlexboxGrid.Item>
               </FlexboxGrid>                
               <FormGroup>
-                <FormControl readOnly={disabled} name="body" accepter={VisualEditor}/>
+                <FormControl readOnly={disabled} name="body" accepter={MarkdownEditor}/>
               </FormGroup>
             </Fragment>
           )}
@@ -155,7 +101,7 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
           disabled={disabled} 
           appearance="primary" 
           onClick={() => {   
-            if (!theform.check()) {
+            if (!form.current.check()) {
               return;
             }         
             onSubmit(formValue);
@@ -168,7 +114,6 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
         </Button>
       </Modal.Footer>
     </Modal>
-
   );
 };
 

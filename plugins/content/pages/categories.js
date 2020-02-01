@@ -68,7 +68,7 @@ const Categories = () => {
         </div>
       )}
 
-      {bootstrapping && <Grid columns={9} rows={3} />}
+      {bootstrapping && <Grid columns={4} rows={3} />}
       {error && <div>error</div>}
       {!error && !bootstrapping && (
         <Table

@@ -1,36 +1,21 @@
-import React, { useState, Fragment } from 'react';
+import React, { useState, useRef } from 'react';
 import { 
   Modal, 
   Button, 
   Form, 
   FormGroup, 
   ControlLabel, 
-  FormControl, 
-  FlexboxGrid, 
-  SelectPicker, 
-  Schema, 
-  Nav
+  FormControl
 } from 'rsuite';
 
-import FieldsEditor from '../../../src/components/fields-editor';
-
-const { StringType, ArrayType, ObjectType } = Schema.Types;
-
-const categoryModel = Schema.Model({
-  name: StringType()
-    .isRequired('Name is required')
-});
-
+import { category as categoryModel } from '../models';
 
 import '../styles/modal-content.scss';
-
-
-let theform; // TODO: fix this
-
 
 const ModalCategory = ({ category, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
   const [formValue, setFormValue] = useState(category);
   const [formError, setFormError] = useState(null);
+  const form = useRef(null);
   
   // TODO: flag for edit or new 
 
@@ -42,7 +27,7 @@ const ModalCategory = ({ category, onCancel = () => {}, onSubmit = () => {}, dis
       <Modal.Body>            
         <Form 
           model={categoryModel}
-          ref={ref => theform = ref}
+          ref={form}
           checkTrigger="none"
           formValue={formValue} 
           formError={formError} 
@@ -67,7 +52,7 @@ const ModalCategory = ({ category, onCancel = () => {}, onSubmit = () => {}, dis
           disabled={disabled} 
           appearance="primary" 
           onClick={() => {   
-            if (!theform.check()) {
+            if (!form.current.check()) {
               return;
             }         
             onSubmit(formValue);
