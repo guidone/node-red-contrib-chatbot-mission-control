@@ -16,6 +16,7 @@ import ModalUser from '../views/modal-user';
 const Users = () => {
   const [ { limit, page }, setPage ] = useState({ page: 1, limit: 10 });
   const [ user, setUser ] = useState(null);
+  const [ error, setError ] = useState(null);
   const { loading, saving, error, data, deleteUser, editUser, refetch } = useUsers({ limit, page });
 
   return (
@@ -27,13 +28,11 @@ const Users = () => {
           disabled={saving}
           onCancel={() => setUser(null)}
           onSubmit={user => {
-            console.log('saving', user.id, user)
             editUser({ variables: { id: user.id, user: _.omit(user, ['id', 'createdAt', '__typename', 'chatIds']) }})
               .then(() => {
                 setUser(null);
                 refetch();
               });
-
           }}
         />)}
       {loading && <Grid columns={9} rows={3} />}
@@ -111,9 +110,7 @@ const Users = () => {
                   <Button 
                     disabled={saving} 
                     size="xs"
-                    onClick={() => {
-                      setUser(user)  
-                    }}
+                    onClick={() => setUser(user)}
                   >
                     <Icon icon="edit2" />
                   </Button>

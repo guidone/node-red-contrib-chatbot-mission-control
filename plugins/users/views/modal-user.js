@@ -1,30 +1,15 @@
 import React, { useState } from 'react';
 import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, HelpBlock, SelectPicker } from 'rsuite';
-import AceEditor from 'react-ace';
 
-import 'ace-builds/src-noconflict/mode-javascript';
-import 'ace-builds/src-noconflict/theme-monokai';
-
+import JSONEditor from '../../../src/components/json-editor';
 import Transport from '../../../src/components/transport';
-
 import Languages from '../helpers/languages';
 
-const JSONEditor = (props) => (
-  <AceEditor            
-    mode="javascript"
-    height="200px"
-    width="100%"
-    theme="monokai"
-    tabSize={2}
-    name="json_editor"
-    editorProps={{ $blockScrolling: true }}
-    {...props}
-    value={props.value || ''}
-  />
-);
-
 const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
-  const [formValue, setFormValue] = useState({ ...user, payload: JSON.stringify(user.payload) });
+  const [formValue, setFormValue] = useState({ 
+    ...user, 
+    payload: !_.isEmpty(user.payload) ? JSON.stringify(user.payload) : '' 
+  });
   const [formError, setFormError] = useState(null);
 
   return (
@@ -93,7 +78,6 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
                   </div>
                 </div>
               ))}
-
             </div>
           </FormGroup>
           <FormGroup>
@@ -108,17 +92,19 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
           disabled={disabled} 
           appearance="primary" 
           onClick={() => {
-            let payload;
-            try {
-              payload = JSON.parse(formValue.payload);
-            } catch(e) {
-              setFormError({ payload: 'Invalid JSON '});
-              return;
+            let payload = null;
+            if (!_.isEmpty(formValue.payload)) {
+              try {
+                payload = JSON.parse(formValue.payload);
+              } catch(e) {
+                setFormError({ payload: 'Invalid JSON '});
+                return;
+              }
             }
             onSubmit({ ...formValue, payload });
           }}
         >
-          Save
+          Save user
         </Button>
         <Button onClick={onCancel} appearance="subtle">
           Cancel
