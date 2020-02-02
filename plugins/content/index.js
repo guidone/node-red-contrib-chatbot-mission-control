@@ -15,8 +15,8 @@ plug(
     url: '/content', 
     icon: 'file-text',
     options: [
-      { label: 'Posts', url: '/content' },
-      { label: 'Categories', url: '/categories' }
+      { label: 'Posts', url: '/content', id: 'posts' },
+      { label: 'Categories', url: '/categories', id: 'categories' }
     ] 
   }
 );

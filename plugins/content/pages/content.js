@@ -28,9 +28,17 @@ const Contents = ({ messageTypes, platforms }) => {
 
   const { limit, page, sortField, sortType } = cursor;
   const { categoryId } = filters;
-  const { loading, saving, error, data, deleteContent, editContent, createContent, refetch } = useContents({ limit, page, sortField, sortType, categoryId });
-  
-
+  const { 
+    bootstrapping,
+    loading, 
+    saving, 
+    error, 
+    data, 
+    deleteContent, 
+    editContent, 
+    createContent, 
+    refetch 
+  } = useContents({ limit, page, sortField, sortType, categoryId });
   
 
   return (
@@ -52,9 +60,9 @@ const Contents = ({ messageTypes, platforms }) => {
             setContent(null);
             refetch();        
           }}
-        />)}
-
-      {!error && !loading && (
+        />
+      )}
+      {!bootstrapping && (
         <div className="filters" style={{ marginBottom: '10px' }}>
           <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
             <FlexboxGrid.Item colspan={18}>
@@ -73,15 +81,13 @@ const Contents = ({ messageTypes, platforms }) => {
                 disabled={loading || saving} 
                 onClick={() => setContent({ title: '', body: '', fields: [] })}>Create Content
               </Button>
-
             </FlexboxGrid.Item>
           </FlexboxGrid>          
         </div>
       )}
-
-      {loading && <Grid columns={9} rows={3} />}
+      {bootstrapping && <Grid columns={9} rows={3} />}
       {error && <div>error</div>}
-      {!error && !loading && (
+      {!error && !bootstrapping && (
         <Table
           height={600}
           data={data.contents}
@@ -159,10 +165,11 @@ const Contents = ({ messageTypes, platforms }) => {
 
         </Table>
       )}
-      {!error && !loading && (
+      {!error && !bootstrapping && (
         <Pagination
           activePage={page}
           displayLength={limit}
+          disabled={loading}
           onChangePage={page => setCursor({ ...cursor, page })}
           lengthMenu={[{ label: '10', value: 10 }, { label: '20', value: 20 }, { label: '30', value: 30 } ]}
           onChangeLength={limit => setCursor({ limit, page: 1 })}
@@ -171,8 +178,6 @@ const Contents = ({ messageTypes, platforms }) => {
       )}
     </PageContainer>
   );
-
-
 };
 
 export default Contents;

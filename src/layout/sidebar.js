@@ -29,13 +29,14 @@ export default () => {
         <Sidenav.Body className="mc-sidebar-body">
           <Nav>
             <Views region="sidebar">
-              {(View, { label, onClick = () => {}, url, icon, options }) => {
+              {(View, { label, onClick = () => {}, url, icon, options, id }) => {
                 if (_.isArray(options)) {
                   return (
                     <Dropdown
                       eventKey="3"
                       trigger="hover"
                       title={label}
+                      key={id}
                       icon={icon != null ? <Icon icon={icon} /> : null}
                       placement="rightStart"
                     >
@@ -52,7 +53,8 @@ export default () => {
                   return (
                     <Nav.Item 
                       key={label}
-                      eventKey="1" 
+                      eventKey="1"
+                      key={id} 
                       onSelect={onClick} 
                       href={url} 
                       renderItem={children => (

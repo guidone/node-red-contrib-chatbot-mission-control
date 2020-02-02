@@ -1,3 +1,4 @@
+import { useState } from 'react'; 
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from 'react-apollo';
 
@@ -89,9 +90,10 @@ export default ({ limit, page, sortField, sortType, categoryId, onCompleted = ()
       order: makeOrder(sortField, sortType), 
       categoryId,
       slug
-    }
+    },
+    onCompleted: () => setBootstrapping(false)
   });
-
+  const [bootstrapping, setBootstrapping] = useState(true);
   const [
     deleteContent,
     { loading: deleteLoading, error: deleteError },
@@ -106,6 +108,7 @@ export default ({ limit, page, sortField, sortType, categoryId, onCompleted = ()
   ] = useMutation(EDIT_CONTENT, { onCompleted });
 
   return { 
+    bootstrapping,
     loading: loading, 
     saving: deleteLoading || createLoading || editLoading,
     error: error || deleteError || editError || createError, 

@@ -56,10 +56,7 @@ export default ({ limit, page, sortField, sortType, onCompleted = () => {}, slug
       sortField, sortType, 
       order: makeOrder(sortField, sortType)      
     },
-    onCompleted: () => {
-      console.log('finito booststrapping')
-      setBootstrapping(false);
-    }
+    onCompleted: () => setBootstrapping(false)
   });
   const [bootstrapping, setBootstrapping] = useState(true);
   const [

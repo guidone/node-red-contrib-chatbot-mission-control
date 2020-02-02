@@ -1,6 +1,8 @@
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from 'react-apollo';
 
+import withoutParams from '../../../src/helpers/without-params';
+
 const USERS = gql`
 query ($limit: Int, $offset: Int, $order: String) {
   counters {
@@ -71,8 +73,8 @@ export default ({ limit, page, onCompleted = () => {} }) => {
     saving: mutationLoading || mutationLoading,
     error: error || mutationError || editError, 
     data,
-    deleteUser,
-    editUser,
+    deleteUser,    
+    editUser: withoutParams(editUser, ['id', 'updatedAt', 'createdAt', '__typename', 'chatIds']),
     refetch
   };
 };

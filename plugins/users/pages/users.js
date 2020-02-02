@@ -16,7 +16,6 @@ import ModalUser from '../views/modal-user';
 const Users = () => {
   const [ { limit, page }, setPage ] = useState({ page: 1, limit: 10 });
   const [ user, setUser ] = useState(null);
-  const [ error, setError ] = useState(null);
   const { loading, saving, error, data, deleteUser, editUser, refetch } = useUsers({ limit, page });
 
   return (
@@ -25,14 +24,13 @@ const Users = () => {
       {user != null && (
         <ModalUser 
           user={user}
+          error={error}
           disabled={saving}
           onCancel={() => setUser(null)}
-          onSubmit={user => {
-            editUser({ variables: { id: user.id, user: _.omit(user, ['id', 'createdAt', '__typename', 'chatIds']) }})
-              .then(() => {
-                setUser(null);
-                refetch();
-              });
+          onSubmit={async user => {            
+            await editUser({ variables: { id: user.id, user }})              
+            setUser(null);
+            refetch();
           }}
         />)}
       {loading && <Grid columns={9} rows={3} />}
