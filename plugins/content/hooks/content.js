@@ -83,6 +83,7 @@ const makeOrder = (sortField, sortType) => `${sortType === 'desc' ? 'reverse:' :
 export default ({ limit, page, sortField, sortType, categoryId, onCompleted = () => {}, slug }) => {
   const { loading, error, data, refetch } = useQuery(CONTENTS, {
     fetchPolicy: 'network-only',
+    errorPolicy: 'all',
     variables: { 
       limit, 
       offset: (page - 1) * limit,

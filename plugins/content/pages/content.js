@@ -47,6 +47,7 @@ const Contents = ({ messageTypes, platforms }) => {
       {content != null && (
         <ModalContent 
           content={content}
+          error={error}
           disabled={saving}
           categories={data.categories}
           onCancel={() => setContent(null)}
@@ -85,12 +86,11 @@ const Contents = ({ messageTypes, platforms }) => {
           </FlexboxGrid>          
         </div>
       )}
-      {bootstrapping && <Grid columns={9} rows={3} />}
-      {error && <div>error</div>}
-      {!error && !bootstrapping && (
+      {bootstrapping && <Grid columns={9} rows={3} />}      
+      {!bootstrapping && (
         <Table
           height={600}
-          data={data.contents}
+          data={data.contents || []}
           loading={loading}
           sortColumn={sortField}
           sortType={sortType}

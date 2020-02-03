@@ -13,19 +13,20 @@ import {
 
 import FieldsEditor from '../../../src/components/fields-editor';
 import MarkdownEditor from '../../../src/components/markdown-editor';
+import ShowError from '../../../src/components/show-error';
 
 import { content as contentModel } from '../models';
 import '../styles/modal-content.scss';
 
 
-const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabled = false, categories }) => {
+const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabled = false, categories, error }) => {
   const [formValue, setFormValue] = useState(content);
   const [formError, setFormError] = useState(null);
   const [tab, setTab] = useState('content');
   const form = useRef(null);
 
   const isNew = content.id == null;
-  // TODO: flag for edit or new 
+
   // TODO prevent close if changes
 
   return (
@@ -34,6 +35,7 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
         <Modal.Title>{isNew ? 'Create content' : `Edit content "${content.title}"`}</Modal.Title>
       </Modal.Header>
       <Modal.Body>
+        {error != null && <ShowError error={error}/>}
         <Nav appearance="tabs" active={tab} onSelect={setTab} activeKey={tab}>
           <Nav.Item eventKey="content">Content</Nav.Item>
           <Nav.Item eventKey="custom_fields">Custom Fields</Nav.Item>
