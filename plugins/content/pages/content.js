@@ -13,6 +13,8 @@ const { Grid } = Placeholder
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmartDate from '../../../src/components/smart-date';
+import Language from '../../../src/components/language';
+import LanguagePicker from '../../../src/components/language-picker';
 import useRouterQuery from '../../../src/hooks/router-query';
 
 import useContents from '../hooks/content';
@@ -21,13 +23,13 @@ import ModalContent from '../views/modal-content';
 
 
 const Contents = ({ messageTypes, platforms }) => {
-  const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId }, setQuery } = useRouterQuery();
+  //const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId }, setQuery } = useRouterQuery();
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10, sortField: 'createdAt', sortType: 'desc' });
-  const [ filters, setFilters ] = useState({ categoryId: null });
+  const [ filters, setFilters ] = useState({ categoryId: null, language: null });
   const [ content, setContent ] = useState(null);
 
   const { limit, page, sortField, sortType } = cursor;
-  const { categoryId } = filters;
+  const { categoryId, language } = filters;
   const { 
     bootstrapping,
     loading, 
@@ -38,7 +40,7 @@ const Contents = ({ messageTypes, platforms }) => {
     editContent, 
     createContent, 
     refetch 
-  } = useContents({ limit, page, sortField, sortType, categoryId });
+  } = useContents({ limit, page, sortField, sortType, categoryId, language });
   
 
   return (
@@ -52,6 +54,7 @@ const Contents = ({ messageTypes, platforms }) => {
           categories={data.categories}
           onCancel={() => setContent(null)}
           onSubmit={async content => {
+            console.log('cont', content )
             if (content.id != null) {
               await editContent({ variables: { id: content.id, content }})
             } else {
@@ -74,6 +77,14 @@ const Contents = ({ messageTypes, platforms }) => {
                 placeholder="Filter by category"
                 onChange={categoryId => setFilters({ ...filters, categoryId })}
                 data={data.categories.map(category => ({ value: category.id, label: category.name }))}
+              />
+              &nbsp;
+              <LanguagePicker
+                readOnly={loading || saving} 
+                value={language}
+                cleanable
+                placeholder="Filter by language"
+                onChange={language => setFilters({ ...filters, language })}
               />  
             </FlexboxGrid.Item>            
             <FlexboxGrid.Item colspan={6} align="right">
@@ -118,6 +129,13 @@ const Contents = ({ messageTypes, platforms }) => {
           <Column width={80} align="left" sortable resizable>
             <HeaderCell>Slug</HeaderCell>
             <Cell dataKey="slug" />
+          </Column>
+
+          <Column width={50} resizable>
+            <HeaderCell>Language</HeaderCell>
+            <Cell>
+              {({ language }) => <Language>{language}</Language>}
+            </Cell>
           </Column>
 
           <Column width={80} align="left" resizable>

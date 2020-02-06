@@ -5,6 +5,7 @@ import { Message } from 'rsuite';
 import './index.scss';
 
 const ShowError = ({ error }) => {
+  // TODO try to extract error message
   const message = 'Something went wrong on the server, please try again.';
   return (
     <div className="ui-show-error">

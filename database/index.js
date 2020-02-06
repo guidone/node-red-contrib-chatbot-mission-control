@@ -33,21 +33,25 @@ module.exports = mcSettings => {
 
   const Content = sequelize.define('content', {
     title: Sequelize.STRING,
-    slug: Sequelize.STRING,  
+    slug: Sequelize.STRING,
+    language: Sequelize.STRING,  
     body: Sequelize.TEXT
   }, {
     indexes: [
       { name: 'content_title', using: 'BTREE', fields: ['title'] },
       { name: 'content_slug', using: 'BTREE', fields: ['slug'] },
-      { name: 'content_content', using: 'BTREE', fields: ['body'] }
+      { name: 'content_content', using: 'BTREE', fields: ['body'] },
+      { name: 'content_language', using: 'BTREE', fields: ['language'] }
     ]
   });
 
   const Category = sequelize.define('category', {
-    name: Sequelize.STRING
+    name: Sequelize.STRING,
+    language: Sequelize.STRING
   }, {
     indexes: [
-      { name: 'category_name', using: 'BTREE', fields: ['name'] }
+      { name: 'category_name', using: 'BTREE', fields: ['name'] },
+      { name: 'category_language', using: 'BTREE', fields: ['language'] }
     ]
   });
 

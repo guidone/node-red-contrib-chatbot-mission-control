@@ -71,6 +71,12 @@ function bootstrap(server, app, log, redSettings) {
   // get mission control configurations
   console.log(lcd.timestamp() + 'Red Bot Mission Control configuration:')
   const mcSettings = redSettings.missionControl || {};
+  if (process.env.DEV != null) {
+    mcSettings.environment = 'development';
+  } else {
+    mcSettings.environment = 'production';
+  }
+  console.log(lcd.timestamp() + '  ' + lcd.green('environment: ') + lcd.grey(mcSettings.environment));
   if (mcSettings.dbPath == null) {
     mcSettings.dbPath = __dirname + '/mission-control.sqlite';
   } else {
@@ -154,6 +160,8 @@ function bootstrap(server, app, log, redSettings) {
       });
   });
 
+  // assets
+  app.use(`${mcSettings.root}/main.js`, serveStatic(path.join(__dirname, 'dist/main.js')));
   // serve mission control page and assets
   app.use(
     '^' + mcSettings.root, 
@@ -163,13 +171,16 @@ function bootstrap(server, app, log, redSettings) {
       fs.readFile(`${__dirname}/src/index.html`, (err, data) => {
         const template = data.toString();
         const bootstrap = { user: req.user, settings: mcSettings };
-        const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};</script>`;        
-        res.send(template.replace('{{data}}', json));
+        const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};</script>`;  
+        const assets = mcSettings.environment === 'development' ?
+          'http://localhost:8080/main.js' : `${mcSettings.root}/main.js`;      
+        res.send(template.replace('{{data}}', json).replace('{{assets}}', assets));
      });
     }
   );
-  // assets
-  app.use(`${mcSettings.root}/main.js`, serveStatic(path.join(__dirname, 'dist/main.js')));
+
+  console.log('assets', `${mcSettings.root}/main.js`)
+  
 
   // Setup web socket
   const wss = new WebSocket.Server({ port: Settings.wsPort });

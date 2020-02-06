@@ -3,7 +3,7 @@ import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid,
 
 import JSONEditor from '../../../src/components/json-editor';
 import Transport from '../../../src/components/transport';
-import Languages from '../helpers/languages';
+import LanguagePicker from '../../../src/components/language-picker';
 
 const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
   const [formValue, setFormValue] = useState({ 
@@ -57,8 +57,7 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
               name="language" 
               cleanable={false}
               block
-              accepter={SelectPicker}
-              data={Languages.map(item => ({ value: item.code, label: item.name }))} 
+              accepter={LanguagePicker}
             />
           </FormGroup>
           <FormGroup>

@@ -14,6 +14,7 @@ import {
 import FieldsEditor from '../../../src/components/fields-editor';
 import MarkdownEditor from '../../../src/components/markdown-editor';
 import ShowError from '../../../src/components/show-error';
+import LanguagePicker from '../../../src/components/language-picker';
 
 import { content as contentModel } from '../models';
 import '../styles/modal-content.scss';
@@ -63,13 +64,13 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
                 <FormControl name="title"/>                      
               </FormGroup>
               <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
-                <FlexboxGrid.Item colspan={11}>
+                <FlexboxGrid.Item colspan={7}>
                   <FormGroup>
                     <ControlLabel>Slug</ControlLabel>
                     <FormControl autoComplete="off" readOnly={disabled} name="slug" />
                   </FormGroup>
                 </FlexboxGrid.Item>            
-                <FlexboxGrid.Item colspan={11}>
+                <FlexboxGrid.Item colspan={7}>
                   <FormGroup>
                     <ControlLabel>Category</ControlLabel>
                     <FormControl 
@@ -80,6 +81,18 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
                       cleanable={false}
                       data={categories.map(category => ({ value: category.id, label: category.name }))}
                       accepter={SelectPicker} 
+                    />
+                  </FormGroup>
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item colspan={7}>
+                  <FormGroup>
+                    <ControlLabel>Language</ControlLabel>
+                    <FormControl 
+                      readOnly={disabled} 
+                      name="language" 
+                      cleanable={false}
+                      block
+                      accepter={LanguagePicker}
                     />
                   </FormGroup>
                 </FlexboxGrid.Item>

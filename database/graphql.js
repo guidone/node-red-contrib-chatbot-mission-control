@@ -296,6 +296,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLString,
         description: '',
       },
+      language: {
+        type: GraphQLString,
+        description: '',
+      },
       createdAt: {
         type: DateType
       }
@@ -307,6 +311,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     description: 'tbd',
     fields: {
       name: {
+        type: GraphQLString,
+        description: '',
+      },
+      language: {
         type: GraphQLString,
         description: '',
       }
@@ -501,6 +509,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLString,
         description: '',
       },
+      language: {
+        type: GraphQLString,
+        description: '',
+      },
       body: {
         type: GraphQLString,
         description: '',
@@ -528,6 +540,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         description: '',
       },
       slug: {
+        type: GraphQLString,
+        description: '',
+      },
+      language: {
         type: GraphQLString,
         description: '',
       },
@@ -659,12 +675,14 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         description: 'Total contents',
         args: {
           slug: { type: GraphQLString },
+          language: { type: GraphQLString },
           categoryId: { type: GraphQLInt }
         },
-        resolve: (root, { slug, categoryId }) => Content.count({
+        resolve: (root, { slug, categoryId, language }) => Content.count({
           where: compactObject({
             categoryId,
-            slug
+            slug,
+            language
           })
         })
       }
@@ -976,16 +994,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             order: { type: GraphQLString },
             offset: { type: GraphQLInt },
             limit: { type: GraphQLInt },
-            categoryId: { type: GraphQLInt }
+            categoryId: { type: GraphQLInt },
+            language: { type: GraphQLString }
           },
-          resolve(root, { slug, order, offset = 0, limit = 10, categoryId }) {
+          resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language }) {
             return Content.findAll({
               limit,
               offset,
               order: splitOrder(order),
               where: compactObject({
                 categoryId,
-                slug
+                slug,
+                language
               })
             });
           }
