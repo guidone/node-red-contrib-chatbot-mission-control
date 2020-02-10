@@ -2,6 +2,9 @@ const { ApolloServer } = require('apollo-server-express');
 const { resolver } = require('graphql-sequelize');
 const { Kind } = require('graphql/language');
 const _ = require('lodash');
+const Sequelize = require('sequelize');
+
+const Op = Sequelize.Op;
 
 const { when } = require('../lib/utils');
 
@@ -649,7 +652,16 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       count: {
         type: GraphQLInt,
         description: 'Total users',
-        resolve: () => User.count()
+        args: {          
+          userId: { type: GraphQLString },
+          username: { type: GraphQLString }
+        },
+        resolve: (root, { userId, username }) => User.count({
+          where: compactObject({  
+            userId,
+            username: username != null ? { [Op.like]: `%${username}%` } : null
+          })
+        })
       }
     }
   });
@@ -967,8 +979,19 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             limit: { type: GraphQLInt },
             order: { type: GraphQLString },
             userId: { type: GraphQLString },
+            username: { type: GraphQLString }
           },
-          resolve: resolver(User)
+          resolve(root, { order, offset = 0, limit = 10, userId, username }) {
+            return User.findAll({
+              limit,
+              offset,
+              order: splitOrder(order),
+              where: compactObject({  
+                userId,
+                username: username != null ? { [Op.like]: `%${username}%` } : null
+              })
+            });
+          }
         },
 
         user: {

@@ -80,7 +80,7 @@ const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
 };
 
 
-const FieldsEditor = ({ value, onChange = () => {}, labelAddField = 'Add CustomField' }) => {
+const FieldsEditor = ({ value, onChange = () => {}, labelAddField = 'Add custom field' }) => {
   return (
     <div className="ui-fields-editor">
       <div>

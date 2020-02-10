@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, FormGroup, ControlLabel, FormControl, HelpBlock } from 'rsuite';
+import { Form, FormGroup, ControlLabel, Tag, HelpBlock, Toggle } from 'rsuite';
 
 const SuspendForm = ({ formValue, formError = null, onChange }) => {
 
@@ -14,8 +14,13 @@ const SuspendForm = ({ formValue, formError = null, onChange }) => {
     >
       <FormGroup>
         <ControlLabel>Suspend</ControlLabel>
-        <FormControl name="middle_name"/>
-        <HelpBlock >tbd</HelpBlock>            
+        <Toggle
+          onChange={checked => onChange({ ...formValue, suspended: checked })}
+          checked={formValue.suspended}
+        />
+        <HelpBlock>
+          Suspend the user, use the node <Tag color="violet">User suspended</Tag> in <b>Node-RED</b> flow
+        </HelpBlock>            
       </FormGroup>
     </Form>
   );

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Table, Placeholder, Icon, ButtonGroup, Button } from 'rsuite';
+import { Table, Placeholder, Icon, ButtonGroup, Button, Input } from 'rsuite';
 
 const { Column, HeaderCell, Cell, Pagination } = Table;
 const { Grid } = Placeholder;
@@ -8,15 +8,20 @@ import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import Language from '../../../src/components/language';
 import SmartDate from '../../../src/components/smart-date';
+import useRouterQuery from '../../../src/hooks/router-query'; 
 
 import '../styles/users.scss';
 import useUsers from '../hooks/users';
 import ModalUser from '../views/modal-user';
 
 const Users = () => {
+  const { query: { userId: urlUserId, username: urlUsername }, setQuery } = useRouterQuery();
   const [ { limit, page }, setPage ] = useState({ page: 1, limit: 10 });
   const [ user, setUser ] = useState(null);
-  const { loading, saving, error, data, deleteUser, editUser, refetch } = useUsers({ limit, page });
+  const [ filters, setFilters ] = useState({ userId: urlUserId, username: urlUsername });
+  const { loading, saving, error, data, deleteUser, editUser, refetch, bootstrapping } = useUsers({ limit, page, filters });
+
+  const { username, userId } = filters;
 
   return (
     <PageContainer className="page-users">
@@ -33,9 +38,40 @@ const Users = () => {
             refetch();
           }}
         />)}
-      {loading && <Grid columns={9} rows={3} />}
+      {bootstrapping && <Grid columns={9} rows={3} />}
       {error && <div>error</div>}
-      {!error && !loading && (
+      {!bootstrapping && (<div className="filters" style={{ marginBottom: '10px' }}>
+        <Input
+          defaultValue={userId}
+          style={{ width: '150px', display: 'inline-block' }}
+          placeholder="userId"
+          onKeyUp={e => {
+            if (e.keyCode === 13) {
+              setFilters({ ...filters, userId: e.target.value });
+              setPage({ limit, page: 1 });
+              setQuery({ userId: e.target.value});
+              refetch({ userId: e.target.value });  
+            }
+          }}
+        />
+        &nbsp;
+        <Input
+          defaultValue={username}
+          style={{ width: '150px', display: 'inline-block' }}
+          placeholder="Username"
+          onKeyUp={e => {
+            if (e.keyCode === 13) {
+              setFilters({ ...filters, username: e.target.value });
+              setPage({ limit, page: 1 });
+              setQuery({ username: e.target.value});
+              refetch({ username: e.target.value });  
+            }
+          }}
+        />
+
+      </div>
+      )}
+      {!error && !bootstrapping && (
         <Table
           height={600}
           data={data.users}
@@ -93,7 +129,7 @@ const Users = () => {
               {user => (
                 <ButtonGroup>
                   <Button 
-                    disabled={saving} 
+                    disabled={saving || loading} 
                     size="xs"
                     onClick={() => {
                       const name = [user.first_name, user.last_name].join(' ');
@@ -106,7 +142,7 @@ const Users = () => {
                     <Icon icon="trash" />
                   </Button>
                   <Button 
-                    disabled={saving} 
+                    disabled={saving || loading} 
                     size="xs"
                     onClick={() => setUser(user)}
                   >
@@ -119,7 +155,7 @@ const Users = () => {
 
         </Table>
       )}
-      {!error && !loading && (
+      {!error && !bootstrapping && (
         <Pagination
           activePage={page}
           displayLength={limit}
