@@ -2,42 +2,29 @@ import React from 'react';
 import _ from 'lodash';
 
 import { 
-  Modal, 
   Button, 
   Form, 
-  FormGroup, 
-  ControlLabel, 
   FormControl, 
   FlexboxGrid, 
   IconButton, 
   Icon, 
-  HelpBlock, 
-  SelectPicker,
-  Toggle 
+  SelectPicker
 } from 'rsuite';
 
-const FieldTypes = [
-  { value: 'string', label: 'String' },
-  { value: 'number', label: 'Number' },
-  { value: 'date', label: 'Date' },
-  { value: 'boolean', label: 'Boolean' }
-];
-
-const BooleanField = ({ value, onChange = () => {} }) => {
-  return (
-    <div style={{ paddingTop: '6px' }}>
-      <Toggle checked={value} onChange={onChange}/>
-    </div>
-  );
-}
-
+import FieldTypes from './field-types';
+import BooleanField from './fields/boolean';
+import DateField from './fields/date';
+import NumberField from './fields/number';
 
 const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
-
 
   let accepter;
   if (field.type === 'boolean') {
     accepter = BooleanField;
+  } else if (field.type === 'date') {
+    accepter = DateField;
+  } else if (field.type === 'number') {
+    accepter = NumberField;
   }
 
   return (
@@ -89,6 +76,7 @@ const FieldsEditor = ({ value, onChange = () => {}, labelAddField = 'Add custom 
           field={field}
           key={field.id || field.cid}
           onChange={field => {
+            console.log('changed', field)
             const newFields = [...value];
             newFields[idx] = field;
             onChange(newFields);
