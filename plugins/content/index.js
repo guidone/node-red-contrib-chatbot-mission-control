@@ -6,6 +6,7 @@ import { plug } from '../../lib/code-plug';
 import Contents from './pages/content'
 import Categories from './pages/categories';
 
+
 plug(
   'sidebar', 
   null, 

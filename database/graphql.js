@@ -1018,17 +1018,21 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             offset: { type: GraphQLInt },
             limit: { type: GraphQLInt },
             categoryId: { type: GraphQLInt },
-            language: { type: GraphQLString }
+            id: { type: GraphQLInt },
+            language: { type: GraphQLString },
+            title: { type: GraphQLString }
           },
-          resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language }) {
+          resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language, title, id }) {
             return Content.findAll({
               limit,
               offset,
               order: splitOrder(order),
               where: compactObject({
+                id,
                 categoryId,
                 slug,
-                language
+                language,
+                title: title != null ? { [Op.like]: `%${title}%` } : undefined
               })
             });
           }
