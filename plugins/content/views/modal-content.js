@@ -1,4 +1,5 @@
 import React, { useState, Fragment, useRef } from 'react';
+import PropTypes from 'prop-types';
 import { 
   Modal, 
   Button, 
@@ -130,6 +131,25 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
       </Modal.Footer>
     </Modal>
   );
+};
+ModalContent.propTypes = {
+  error: PropTypes.object,
+  category: PropTypes.array,
+  onCancel: PropTypes.func,
+  onSubmit: PropTypes.func,
+  disabled: PropTypes.bool,
+  content: PropTypes.shape({
+    title: PropTypes.string,
+    language: PropTypes.string,
+    slug: PropTypes.string,
+    categoryId: PropTypes.number,
+    fields: PropTypes.arrayOf(PropTypes.shape({
+      id: PropTypes.number,
+      name: PropTypes.string,
+      type: PropTypes.string,
+      value: PropTypes.any
+    }))
+  })
 };
 
 export default ModalContent;
