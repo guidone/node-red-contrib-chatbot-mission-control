@@ -8,6 +8,7 @@ plug('sidebar', null, {
   icon: 'cog',
   options: [
     {
+      id: 'configuration-hours',
       label: 'Opening hours', 
       url: '/mc/configuration-openings',
     }

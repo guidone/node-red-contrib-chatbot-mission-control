@@ -8,6 +8,7 @@ plug('sidebar', null, {
   icon: 'cog',
   options: [
     {
+      id: 'configuration-test',
       label: 'Test', 
       url: '/mc/configuration-test',
     }
