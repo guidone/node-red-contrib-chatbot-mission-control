@@ -1,7 +1,18 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { IconButton, FlexboxGrid, Icon } from 'rsuite';
+import classNames from 'classnames';
 
-const Item = ({ value, onChange = () => {}, onRemove = () => {}, onMoveUp = () => {}, onMoveDown = () =>{}, form, readOnly = false }) => {
+const Item = ({ 
+  value, 
+  onChange = () => {}, 
+  onRemove = () => {}, 
+  onMoveUp = () => {}, 
+  onMoveDown = () =>{}, 
+  form, 
+  disabled = false,
+  hideArrows = false 
+}) => {
 
   const Form = form;
 
@@ -9,42 +20,49 @@ const Item = ({ value, onChange = () => {}, onRemove = () => {}, onMoveUp = () =
     <div className="item">
       <FlexboxGrid>
         <FlexboxGrid.Item colspan={21}>
-          <Form value={value} onChange={onChange}/>
+          <Form value={value} onChange={onChange} disabled={disabled} />
         </FlexboxGrid.Item>
-        <FlexboxGrid.Item colspan={3} style={{ textAlign: 'right' }}>
+        <FlexboxGrid.Item colspan={3} style={{ textAlign: 'right' }} className="button">
           <IconButton 
+            disabled={disabled}
             icon={<Icon icon="trash2" />} 
             size="sm"
-            style={{ marginTop: '-23px' }}
+            style={!hideArrows ? { marginTop: '-23px' } : null}
             onClick={onRemove} 
           />
-
-          <div className="ui-spin-button">
-            <div className="top">
-              <IconButton 
-                disabled={onMoveUp == null}
-                size="xs" 
-                icon={<Icon icon="caret-up" />} 
-                onClick={onMoveUp}
-              />
+          {!hideArrows && (
+            <div className="ui-spin-button">
+              <div className="top">
+                <IconButton 
+                  disabled={onMoveUp == null || disabled}
+                  size="xs" 
+                  icon={<Icon icon="caret-up" />} 
+                  onClick={onMoveUp}
+                />
+              </div>
+              <div className="bottom">
+                <IconButton 
+                  disabled={onMoveDown == null || disabled}
+                  size="xs" 
+                  icon={<Icon icon="caret-down" />}
+                  onClick={onMoveDown}
+                />
+              </div>          
             </div>
-            <div className="bottom">
-              <IconButton 
-                disabled={onMoveDown == null}
-                size="xs" 
-                icon={<Icon icon="caret-down" />}
-                onClick={onMoveDown}
-              />
-            </div>          
-          </div>
-
-
+          )}
         </FlexboxGrid.Item>
       </FlexboxGrid>
     </div>
   );
-
-
-}
+};
+Item.propTypes = {
+  value: PropTypes.object,
+  onChange: PropTypes.func, 
+  onRemove: PropTypes.func, 
+  onMoveUp: PropTypes.func, 
+  onMoveDown: PropTypes.func,  
+  disabled: PropTypes.bool,
+  hideArrows: PropTypes.bool
+};
 
 export default Item;

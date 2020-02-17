@@ -9,6 +9,9 @@
       query: {
         value: ''
       },
+      preserve: {
+        value: false
+      },
       noerr: {
         value: 0,
         required: true,
@@ -72,6 +75,13 @@
   <div class="form-row">
     <input type="hidden" id="node-input-query" autofocus="autofocus">
     <div style="height: 250px; min-height:150px;margin-top: 25px;" class="node-text-editor" id="node-input-func-editor" ></div>
+  </div>
+  <div class="form-row">
+    <label for="node-input-preserve" style="width:auto;">Keep incoming message</label>
+    <input type="checkbox" value="true" id="node-input-preserve">
+    <span class="redbot-form-hint">
+      This will preserve incoming message, the result of the query will be stored in the message object
+    </span>
   </div>
 </script>
 

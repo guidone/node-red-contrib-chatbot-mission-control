@@ -1,11 +1,16 @@
 import React from 'react';
 import { SelectPicker } from 'rsuite';
+import PropTypes from 'prop-types';
 
 import Language from '../language';
 
 import Languages from './languages';
 
-const LanguagePicker = ({ onChange = () => {}, ...props }) => {
+const LanguagePicker = ({ 
+  onChange = () => {},
+  hideLanguageLabel = false, 
+  ...props 
+}) => {
   return (
     <SelectPicker 
       name="language" 
@@ -24,13 +29,18 @@ const LanguagePicker = ({ onChange = () => {}, ...props }) => {
         return (
         <div>
           <Language>{value}</Language>
-          <span style={{ display: 'inline-block', marginLeft: '5px' }}>{item.label}</span>
+          {!hideLanguageLabel && <span style={{ display: 'inline-block', marginLeft: '5px' }}>{item.label}</span>}
         </div>
         );
       }}
       {...props} 
     />
   );
+};
+LanguagePicker.propTypes = {
+  onChange: PropTypes.func,
+  value: PropTypes.string,
+  hideLanguageLabel: PropTypes.bool
 };
 
 export default LanguagePicker;

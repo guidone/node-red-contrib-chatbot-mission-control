@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-
+import classNames from 'classnames';
 import { Button } from 'rsuite';
 
 import Item from './views/item';
@@ -10,27 +10,31 @@ import './style.scss';
 const CollectionEditor = ({ 
   value = [], 
   onChange = () => {}, 
-  readOnly = false, 
+   
   form,
   labelAdd = 'Add item',
   labelEmpty = 'No elements',
-  style 
+  hideArrows = false,
+  style,
+  disabled = false 
 }) => {
 
   const addButton = (
     <Button
       size="sm"
-      disabled={readOnly} 
+      readOnly={disabled} 
       onClick={() => {
-        console.log(_.uniqueId())
+        console.log(_.uniqueId()) // TODO fix clashing id
         onChange([...value, { id: _.uniqueId() }]);
       }}>
         {labelAdd}
     </Button>
   );
 
+  // TODO fix add button when empty
+
   return (
-    <div className="ui-collection-editor" style={style}>
+    <div className={classNames('ui-collection-editor', { disabled })} style={style}>
       {_.isEmpty(value) && (
         <div className="empty">
           {labelEmpty}
@@ -44,9 +48,9 @@ const CollectionEditor = ({
             key={item.id}
             value={item}
             form={form}
-            disabled={readOnly} 
+            disabled={disabled}
+            hideArrows={hideArrows} 
             onRemove={() => {
-              console.log('idx', idx)
               const cloned = [...value];
               cloned[idx] = null;
               onChange(_.compact(cloned));
@@ -84,7 +88,10 @@ const CollectionEditor = ({
 CollectionEditor.propTypes = {
   value: PropTypes.arrayOf(PropTypes.object),
   onChange: PropTypes.func,
-  readOnly: PropTypes.bool
+  readOnly: PropTypes.bool,
+  hideArrows: PropTypes.bool,
+  labelAdd: PropTypes.string,
+  labelEmpty: PropTypes.string
 };
 
 export default CollectionEditor;

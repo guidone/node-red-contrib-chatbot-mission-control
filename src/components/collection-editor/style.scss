@@ -74,4 +74,12 @@
     }
 
   }
+
+  &.disabled {
+    .item {
+      .button {
+        opacity: .5;
+      }
+    }
+  }
 }

@@ -4,6 +4,7 @@ import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, Date
 
 import ContentAutocomplete from '../../../src/components/content-autocomplete';
 import CollectionEditor from '../../../src/components/collection-editor';
+import InputLanguage from '../../../src/components/input-language';
 
 const SELECT_DAYS = [
   { value: 'mo', label: 'Monday' },
@@ -19,12 +20,13 @@ const SELECT_DAYS = [
   { value: 'sa-su', label: 'Saturday - Sunday' }
 ];
 
-const FormOpening = ({ value, onChange }) => (
+const FormOpening = ({ value, onChange, disabled = false }) => (
   <Form formValue={value} onChange={onChange} fluid>
     <FlexboxGrid justify="space-between">
       <FlexboxGrid.Item colspan={7}>
         <FormControl 
           name="start"
+          readOnly={disabled}
           accepter={DatePicker}
           format="HH:mm" 
           style={{ width: '100%' }}
@@ -33,6 +35,7 @@ const FormOpening = ({ value, onChange }) => (
       <FlexboxGrid.Item colspan={7}>
         <FormControl 
           name="end"
+          readOnly={disabled}
           accepter={DatePicker}
           format="HH:mm" 
           style={{ width: '100%' }}
@@ -42,6 +45,7 @@ const FormOpening = ({ value, onChange }) => (
         <FormControl 
           name="range"
           accepter={SelectPicker}
+          readOnly={disabled}
           format="HH:mm" 
           block
           data={SELECT_DAYS}
@@ -55,18 +59,17 @@ const FormOpening = ({ value, onChange }) => (
   </Form>
 );
 
-const withForm = (Component, form) => {
-  return ({ children, ...props }) => <Component {...props} form={form}>{children}</Component>
-};
 
-
-export default ({ value, onSubmit = () => { }, disabled = false }) => {
+export default ({ 
+  value, 
+  onSubmit = () => { }, 
+  disabled = false 
+}) => {
   
   const [formValue, setFormValue] = useState(value);
 
   return (
-    <Form formValue={formValue} onChange={formValue => {
-      console.log('form onchange', formValue)
+    <Form disabled={true} formValue={formValue} onChange={formValue => {
       setFormValue(formValue);
     }}>
       <FormGroup>
@@ -81,13 +84,28 @@ export default ({ value, onSubmit = () => { }, disabled = false }) => {
       </FormGroup>
 
       <FormGroup>
-        <ControlLabel>Openings</ControlLabel>
+        <ControlLabel>Opening hours label</ControlLabel>
         <FormControl 
-          readOnly={disabled} 
+          disabled={disabled}
+          name="labelOpenings" 
+          accepter={InputLanguage}
+          style={{ width: '550px' }}           
+        />        
+      </FormGroup>
+
+
+
+
+
+      <FormGroup>
+        <ControlLabel>Openings hours</ControlLabel>
+        <FormControl 
           name="openings" 
           accepter={CollectionEditor}
           style={{ width: '550px' }} 
           form={FormOpening}
+          labelAdd="Add opening hour"
+          disabled={disabled}
         />        
       </FormGroup>
 
@@ -96,6 +114,7 @@ export default ({ value, onSubmit = () => { }, disabled = false }) => {
         <FormControl 
           useSlug={true} 
           readOnly={disabled} 
+          disabled="fottit stronzo"
           name="content" 
           style={{ width: '350px' }}         
           accepter={ContentAutocomplete}           
@@ -114,7 +133,6 @@ export default ({ value, onSubmit = () => { }, disabled = false }) => {
             </Button>
         </ButtonToolbar>
       </FormGroup>
-
     </Form>
   );
 };
