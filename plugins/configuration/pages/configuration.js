@@ -13,7 +13,7 @@ import useConfiguration from '../../../src/hooks/configuration';
 const ConfigurationPage = ({ sendMessage }) => {
 
   const { loading, saving, error, data, update } = useConfiguration({ 
-    namespace: 'postcardbot',
+    namespace: 'openings',
     onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' }) 
   });
 
