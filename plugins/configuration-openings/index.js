@@ -15,7 +15,7 @@ plug('sidebar', null, {
 });
 plug('pages', ConfigurationPage, { 
   url: '/mc/configuration-openings', 
-  title: 'Configuration', 
+  title: 'Opening Hours', 
   id: 'configuration' 
 });
 
