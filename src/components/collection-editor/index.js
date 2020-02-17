@@ -9,8 +9,7 @@ import './style.scss';
 
 const CollectionEditor = ({ 
   value = [], 
-  onChange = () => {}, 
-   
+  onChange = () => {},    
   form,
   labelAdd = 'Add item',
   labelEmpty = 'No elements',

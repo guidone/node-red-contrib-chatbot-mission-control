@@ -1,12 +1,11 @@
 import React, { useState }  from 'react';
+import { Form, FlexboxGrid, FormControl } from 'rsuite';
+import PropTypes from 'prop-types';
 
 import CollectionEditor from '../collection-editor';
-import { Form, FlexboxGrid, FormControl } from 'rsuite';
-
-
 import LanguagePicker from '../language-picker';
 
-const FormOpening = ({ value, onChange, disabled = false }) => (
+const FormLabel = ({ value, onChange, disabled = false }) => (
   <Form 
     formValue={value} 
     onChange={onChange} 
@@ -34,8 +33,14 @@ const FormOpening = ({ value, onChange, disabled = false }) => (
     </FlexboxGrid>    
   </Form>
 );
-
-
+FormLabel.propTypes = {
+  value: PropTypes.shape({
+    text: PropTypes.string,
+    language: PropTypes.string
+  }),
+  onChange: PropTypes.func,
+  disabled: PropTypes.bool
+};
 
 
 const InputLanguage = ({
@@ -44,20 +49,18 @@ const InputLanguage = ({
   onChange = () => {},
   style
 }) => {
-
   const initialState = Object.keys(value)
-    .map(key => ({ language: key, text: value[key] }));
-
+    .map(key => ({ language: key, text: value[key] }))
   const [current, setCurrent] = useState(initialState);
   
-
   return (
     <div className="ui-input-language" style={style}>
       <CollectionEditor 
         value={current} 
         disabled={disabled}
-        form={FormOpening}
+        form={FormLabel}
         hideArrows={true}
+        labelAdd="Add label"
         onChange={value => {
           setCurrent(value);
           const newValue = {};
@@ -67,6 +70,12 @@ const InputLanguage = ({
       />
     </div>
   );
+};
+InputLanguage.propTypes = {
+  value: PropTypes.object,
+  style: PropTypes.object,
+  disabled: PropTypes.bool,
+  onChange: PropTypes.func
 };
 
 export default InputLanguage;

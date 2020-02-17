@@ -8,20 +8,19 @@ import withSocket from '../../../src/wrappers/with-socket';
 import ConfigurationForm from '../views/form';
 import useConfiguration from '../../../src/hooks/configuration';
 
-
-
 const ConfigurationPage = ({ sendMessage }) => {
-
   const { loading, saving, error, data, update } = useConfiguration({ 
     namespace: 'openings',
     onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' }) 
   });
+  // TODO fix loading
+  // TODO error component
 
   return (
     <PageContainer className="page-configuration">
       <Breadcrumbs pages={['Configuration']}/>
       <FlexboxGrid justify="space-between">
-        <FlexboxGrid.Item colspan={17}>
+        <FlexboxGrid.Item colspan={17} style={{ paddingTop: '20px' }}>
           {loading && <div>loading</div>}
           {error && <div>{error.message}</div>}
           {!loading && !error && (
@@ -44,7 +43,6 @@ const ConfigurationPage = ({ sendMessage }) => {
       </FlexboxGrid>
     </PageContainer>
   );
-
 };
 
 export default withSocket(ConfigurationPage);
