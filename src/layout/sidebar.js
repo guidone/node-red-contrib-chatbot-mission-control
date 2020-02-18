@@ -23,8 +23,7 @@ const AppSidebar = ({ codePlug }) => {
               return current;
             } else {
               let options = current.options || [];
-              options = options.concat(item.options)
-              console.log('accordo', item.options)
+              options = options.concat(item.options)              
               return {
                 ...current,
                 options

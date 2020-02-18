@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useState } from 'react'
 import _ from 'lodash';
-import { FlexboxGrid, SelectPicker, Toggle, Icon, IconButton, Modal, Button, FormGroup, ControlLabel, Form, FormControl, Portal } from 'rsuite';
+import PropTypes from 'prop-types';
+import { FlexboxGrid, SelectPicker, Modal, Button, FormGroup, ControlLabel, Form, FormControl } from 'rsuite';
 
 import Transport from '../../../src/components/transport';
-
 import LanguagePicker from '../../../src/components/language-picker';
 import UserAutocomplete from '../../../src/components/user-autocomplete';
 
@@ -71,7 +70,6 @@ const SimulatorParamsModal = ({
             }}
           />              
         </FormGroup>
-
         <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
           <FlexboxGrid.Item colspan={11}>
             <FormGroup>
@@ -120,6 +118,26 @@ const SimulatorParamsModal = ({
       </Modal.Footer>
     </Modal>
   );
+};
+SimulatorParamsModal.propTypes = {
+  params: PropTypes.shape({
+    language: PropTypes.string,
+    user: PropTypes.shape({
+      id: PropTypes.number,
+      userId: PropTypes.string,
+      username: PropTypes.string,
+      language: PropTypes.string
+    }),
+    nodeId: PropTypes.string  
+  }),
+  disabled: PropTypes.bool,
+  onCancel: PropTypes.func,
+  onSubmit: PropTypes.func,
+  activeChatbots: PropTypes.arrayOf(PropTypes.shape({
+    transport: PropTypes.string,
+    nodeId: PropTypes.string,
+    name: PropTypes.string
+  }))
 };
 
 export default SimulatorParamsModal;
