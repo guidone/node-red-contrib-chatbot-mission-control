@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import classNames from 'classnames';
 import { Button } from 'rsuite';
+import uniqueId from '../../helpers/unique-id';
 
 import Item from './views/item';
 import './style.scss';
@@ -23,21 +24,18 @@ const CollectionEditor = ({
       size="sm"
       readOnly={disabled} 
       onClick={() => {
-        console.log(_.uniqueId()) // TODO fix clashing id
-        onChange([...value, { id: _.uniqueId() }]);
+        console.log(_.uniqueId())
+        onChange([...value, { id: uniqueId('c') }]);
       }}>
         {labelAdd}
     </Button>
   );
 
-  // TODO fix add button when empty
-
   return (
     <div className={classNames('ui-collection-editor', { disabled })} style={style}>
       {_.isEmpty(value) && (
         <div className="empty">
-          {labelEmpty}
-          <br/>
+          <div>{labelEmpty}</div>          
           {addButton}
         </div>
       )}

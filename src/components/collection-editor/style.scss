@@ -4,8 +4,17 @@
   .empty {
     height: 80px;
     color: #888888;
-    line-height: 80px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+
+    .rs-btn {
+      margin-top: 10px;
+    }
   }
 
 

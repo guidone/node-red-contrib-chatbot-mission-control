@@ -1,6 +1,7 @@
 import React, { useState }  from 'react';
 import { Form, FlexboxGrid, FormControl } from 'rsuite';
 import PropTypes from 'prop-types';
+import uniqueId from '../../helpers/unique-id';
 
 import CollectionEditor from '../collection-editor';
 import LanguagePicker from '../language-picker';
@@ -50,7 +51,7 @@ const InputLanguage = ({
   style
 }) => {
   const initialState = Object.keys(value)
-    .map(key => ({ language: key, text: value[key] }))
+    .map(key => ({ language: key, text: value[key], id: uniqueId('lang') }))
   const [current, setCurrent] = useState(initialState);
   
   return (

@@ -15,12 +15,13 @@ const ConfigurationPage = ({ sendMessage }) => {
   });
   // TODO fix loading
   // TODO error component
+  // TODO move to basic configuration layout the flexigird
 
   return (
     <PageContainer className="page-configuration">
       <Breadcrumbs pages={['Configuration', 'Opening Hours']}/>
       <FlexboxGrid justify="space-between">
-        <FlexboxGrid.Item colspan={17} style={{ paddingTop: '20px' }}>
+        <FlexboxGrid.Item colspan={17} style={{ paddingTop: '20px', paddingLeft: '20px' }}>
           {loading && <div>loading</div>}
           {error && <div>{error.message}</div>}
           {!loading && !error && (
