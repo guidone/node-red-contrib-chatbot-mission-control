@@ -63,7 +63,7 @@ const HomePage = ({ codePlug, count, dispatch, user }) => {
         className="layout"
         compactType="horizontal"
         cols={{ lg: 4, md: 4, sm: 3, xs: 2, xxs: 1 }}
-        draggableCancel=".ui-grid-panel *:not(.ui-panel-title)"
+        draggableCancel=".ui-grid-panel *:not(.ui-panel-title),.rs-modal *"
         rowHeight={50}
         margin={[20, 20]}
         layouts={data}

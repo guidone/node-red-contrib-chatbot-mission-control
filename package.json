@@ -54,7 +54,7 @@
     "react-grid-layout": "^0.17.1",
     "react-moment-proptypes": "^1.7.0",
     "react-router-dom": "^5.1.2",
-    "rsuite": "^4.1.5",
+    "rsuite": "^4.2.1",
     "sequelize": "^5.21.3",
     "serve-static": "^1.14.1",
     "simplemde": "^1.11.2",

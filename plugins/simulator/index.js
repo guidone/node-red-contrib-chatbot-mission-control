@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import ReactDOM from 'react-dom';
 import _ from 'lodash';
-import { Placeholder, SelectPicker, Toggle } from 'rsuite';
+import { Placeholder, SelectPicker, Toggle, Icon, IconButton, Modal, Button, FormGroup, ControlLabel, Form, FormControl, Portal } from 'rsuite';
 
 
 import { plug } from '../../lib/code-plug';
@@ -10,6 +11,13 @@ import withActiveChatbots from '../../src/wrappers/with-active-chatbots';
 import withState from '../../src/wrappers/with-state';
 import useSocket from '../../src/hooks/socket';
 import Transport from '../../src/components/transport';
+import LanguagePicker from '../../src/components/language-picker';
+import UserAutocomplete from '../../src/components/user-autocomplete';
+
+
+import Language from '../../src/components/language';
+
+import SimulatorParamsModal from './views/simulator-modal';
 
 import { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, MessageDate, MessageUser, UserStatus, 
   MessageText,
@@ -21,31 +29,50 @@ import { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, Mess
 import './simulator.scss';
 
 
-const TransportValue = (value, item) => <Transport transport={item.transport}/>;
 
-const MenuItem = (label, item) => (
-  <div className="picker-item-transport">
-    <b>{item.name}</b><br/>
-    <Transport transport={item.transport}/>
-    &nbsp;<em>(id: {item.nodeId})</em>
-  </div>
-); 
 
-const PanelMenu = ({ nodeId, onChange, data }) => (
-  <div className="simulator-transport-menu">
-    <SelectPicker 
-      renderValue={TransportValue}
-      renderMenuItem={MenuItem}
-      searchable={false}
-      size="sm"
-      cleanable={false}
-      appearance="subtle"
-      value={nodeId}
-      onChange={nodeId => onChange(data.find(item => item.nodeId === nodeId))}
-      data={data}
-    />      
-  </div>
-);
+
+// TODO move panelmenu to different file
+
+const PanelMenu = ({ user, language, nodeId, activeChatbots, onChange, data, dispatch }) => {
+  console.log('refresh panel menu')
+  
+  const [params, setParams] = useState(null);
+
+
+  return (
+    <div className="simulator-transport-menu cancel-drag">
+      {params != null && (
+        
+        <SimulatorParamsModal 
+          activeChatbots={activeChatbots}
+          params={params}
+          onCancel={() => setParams(null)}
+          onSubmit={params => {
+            dispatch({ type: 'params', params });
+            setParams(null);
+          }}
+        />
+              
+      )}
+      <div className="meta">
+        {user != null && (
+          <div className="user">{user.username} <em>({user.userId})</em></div>
+        )}
+        {user == null && <div className="user">Test User</div>}
+        <Language>{language}</Language>
+      </div>
+      
+      <IconButton 
+        appearance="subtle" 
+        icon={<Icon icon="cog" />}
+        onClick={() => setParams({ user: user, language, nodeId })} 
+        style={{ marginTop: '-3px', marginRight: '1px' }}
+      />
+    </div>
+  );
+  
+}
 
 
 const handleMessages = (state, action) => {
@@ -67,10 +94,17 @@ const handleMessages = (state, action) => {
     case 'globals':
       // set globals
       return { ...state, globals: action.globals };
-      
-    case 'chatBot':
-      // switch transport
-      return { ...state, transport: action.chatBot.transport, nodeId: action.chatBot.nodeId };
+    
+  
+    case 'params':
+      const { params } = action;
+      return { 
+        ...state, 
+        transport: params.chatBot.transport, 
+        nodeId: params.chatBot.nodeId,
+        language: params.language,
+        user: params.user
+      };
 
     default:
       return state; 
@@ -84,23 +118,28 @@ const SimulatorWidget = ({ sendMessage, activeChatbots, user }) => {
     messages: {},
     transport: !_.isEmpty(activeChatbots) ? activeChatbots[0].transport : null,
     nodeId: !_.isEmpty(activeChatbots) ? activeChatbots[0].nodeId : null,
-    globals: null 
+    globals: null,
+    language: 'en',
+    user: null 
   });
-
-  const { messages, transport, nodeId } = state; 
+  console.log('STATOP', state)
+  const { messages, transport, nodeId, language, user: impersonatedUser } = state; 
   const loading = activeChatbots == null;
 
   return (
     <Panel 
       title="Chat Simulator" 
       className="chat-simulator"
-      menu={!loading && <PanelMenu 
+      menu={!loading && <PanelMenu
+        user={impersonatedUser}
+        language={language} 
         nodeId={nodeId}
-        transport={transport} 
-        data={activeChatbots.map(chatbot => ({ value: chatbot.nodeId, label: chatbot.transport, ...chatbot }))}
+        transport={transport}
+        dispatch={dispatch} 
+        activeChatbots={activeChatbots}        
         onChange={chatBot => dispatch({ type: 'chatBot', chatBot })}
       />}
-    >      
+    > 
       {!loading && (
         <ChatWindow>
           <Messages>
@@ -116,8 +155,11 @@ const SimulatorWidget = ({ sendMessage, activeChatbots, user }) => {
               sendMessage('simulator', { 
                 transport, 
                 nodeId,
-                userId: user.id,
-                username: user.username,
+                language,
+                userId: impersonatedUser != null ? impersonatedUser.id : 42,
+                username: impersonatedUser != null ? impersonatedUser.username : 'testUser',
+                firstName: impersonatedUser != null ? impersonatedUser.first_name : null,
+                lastName: impersonatedUser != null ? impersonatedUser.last_name : null,
                 payload: {
                   content: message, 
                   type: 'message'

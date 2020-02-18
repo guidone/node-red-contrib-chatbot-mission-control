@@ -25,6 +25,9 @@ module.exports = function(RED) {
         const chatId = 'sim42'; // TODO: fix chat id with something meaningful
         const userId = String(message.userId); // TODO: select right userid
         const username = message.username;
+        const language = message.language;
+        const firstName = message.firstName;
+        const lastName = message.lastName;
         const messageId = _.uniqueId('msg_');;
         const msg = await chatServer.createMessage(chatId, userId, messageId, {})
         msg.payload = {
@@ -41,7 +44,7 @@ module.exports = function(RED) {
           userId: userId,
           username: username
         }
-        await msg.chat().set({ username, userId});
+        await msg.chat().set({ username, userId, language, firstName, lastName });
         // send back the evaluated message so also originated messages are visible in the simulator
         sendMessage('simulator', {
           ...msg.payload, 

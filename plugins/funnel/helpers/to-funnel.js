@@ -2,7 +2,7 @@ import _ from 'lodash';
 import { DataStore } from 'apollo-client/data/store';
 
 export default (data, { percentile = false }) => {
-  console.log('data', data)
+
   const sorted = data.events.sort((a, b) => a.count < b.count ? 1 : -1);
   
   const nodes = data.events
@@ -27,7 +27,6 @@ export default (data, { percentile = false }) => {
         
       }
       if (_.isEmpty(event.source)) {
-        console.log('nullo cazzo')
         return null;
       }
 

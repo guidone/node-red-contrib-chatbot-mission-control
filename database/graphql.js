@@ -977,16 +977,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           args: {
             offset: { type: GraphQLInt },
             limit: { type: GraphQLInt },
+            id: { type: GraphQLInt },
             order: { type: GraphQLString },
             userId: { type: GraphQLString },
             username: { type: GraphQLString }
           },
-          resolve(root, { order, offset = 0, limit = 10, userId, username }) {
-            return User.findAll({
+          resolve(root, { order, offset = 0, limit = 10, userId, username, id }) {
+            return User.findAll({              
               limit,
               offset,
               order: splitOrder(order),
-              where: compactObject({  
+              where: compactObject({
+                id,  
                 userId,
                 username: username != null ? { [Op.like]: `%${username}%` } : null
               })

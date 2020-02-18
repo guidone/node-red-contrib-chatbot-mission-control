@@ -8,6 +8,8 @@ import InputLanguage from '../../../src/components/input-language';
 import { opening as openingModel } from '../models';
 import FormOpening from './form-opening';
 
+// TODO check models and schema, start < end, no repetitions in range
+
 export default ({ 
   value, 
   onSubmit = () => { }, 

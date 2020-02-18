@@ -16,6 +16,18 @@
   }
 }
 
+.meta {
+  display: inline-block;
+  margin-right: 5px;
+
+  .user {
+    display: inline-block;
+    margin-right: 5px;
+    font-size: 14px;
+    font-weight: normal;
+  }
+}
+
 .chat-simulator {
   .ui-grid-panel-content {
     margin: -5px -10px -10px -10px;
