@@ -62,6 +62,7 @@ const SimulatorParamsModal = ({
           <FormControl 
             accepter={UserAutocomplete}
             name="user"
+            placeholder="Test User"
             style={{ width: '100%' }}
             onChange2={user => {              
               if (user != null && user.language != null) {

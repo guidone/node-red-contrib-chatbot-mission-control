@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { AutoComplete, InputGroup } from 'rsuite';
 import PropTypes from 'prop-types';
-
 import { useQuery } from 'react-apollo';
 
 import { SEARCH } from './queries';
@@ -10,12 +9,10 @@ const UserAutocomplete = ({
   value, 
   onChange = () => {}, 
   style,
-  defaultUser
+  placeholder = null
 }) => {
   const [search, setSearch] = useState(null);
   const [items, setItems] = useState(null);
-
-
 
   const variables = {
     username: search != null ? search : undefined,
@@ -43,9 +40,8 @@ const UserAutocomplete = ({
       <InputGroup inside style={style}>
         <AutoComplete 
           value={current}
-          renderItem={({ username, userId }) => {            
-            return <div>{username} <em>({userId})</em></div>;
-          }}
+          placeholder={placeholder} 
+          renderItem={({ username, userId }) => <div>{username} <em>({userId})</em></div>}
           onChange={(current, event) => {
             const isBackspace = event.nativeEvent != null && event.nativeEvent.inputType === 'deleteContentBackward';
             if (event.keyCode === 13) {              
@@ -82,10 +78,13 @@ const UserAutocomplete = ({
   );
 };
 UserAutocomplete.propTypes = {
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),  // TODO fix this
+  value: PropTypes.shape({
+    id: PropTypes.number,
+    userId: PropTypes.string,
+    username: PropTypes.string
+  }),
   onChange: PropTypes.func,
   style: PropTypes.object
 };
-
 
 export default UserAutocomplete;
