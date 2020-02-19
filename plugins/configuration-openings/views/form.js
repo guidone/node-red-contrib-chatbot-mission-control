@@ -34,13 +34,7 @@ export default ({
       onCheck={errors => {
         setFormError(errors);        
       }}
-    >
-      <FormGroup>
-        <ControlLabel>Username</ControlLabel>
-        <FormControl readOnly={disabled} name="username" />
-        <HelpBlock>Required</HelpBlock>
-      </FormGroup>
-
+    >    
       <FormGroup>
         <ControlLabel>Opening hours label</ControlLabel>
         <FormControl 
@@ -50,7 +44,6 @@ export default ({
           style={{ width: '550px' }}           
         />        
       </FormGroup>
-
       <FormGroup>
         <ControlLabel>Openings hours</ControlLabel>
         <FormControl 
@@ -62,7 +55,6 @@ export default ({
           disabled={disabled}
         />        
       </FormGroup>
-
       <FormGroup>
         <ControlLabel>Content</ControlLabel>
         <FormControl 
@@ -74,7 +66,6 @@ export default ({
           accepter={ContentAutocomplete}           
         />        
       </FormGroup>
-
       <FormGroup>
         <ButtonToolbar>
           <Button 
@@ -86,14 +77,18 @@ export default ({
               }
               onSubmit(formValue);
             }}>
-            Save
+            Save configuration
             </Button>
           <Button 
             disabled={disabled} 
             appearance="default" 
-            onClick={() => setFormValue({ })}
+            onClick={() => {
+              if (confirm('Reset configuration?')) {
+                setFormValue(value);
+              }
+            }}
           >
-            Cancel
+            Reset
           </Button>
         </ButtonToolbar>
       </FormGroup>

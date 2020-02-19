@@ -1,48 +1,12 @@
-import React, { useState }  from 'react';
-import { Form, FlexboxGrid, FormControl } from 'rsuite';
+import React from 'react';
 import PropTypes from 'prop-types';
-import uniqueId from '../../helpers/unique-id';
 
 import CollectionEditor from '../collection-editor';
-import LanguagePicker from '../language-picker';
 
-const FormLabel = ({ value, onChange, disabled = false }) => (
-  <Form 
-    formValue={value} 
-    onChange={onChange} 
-    autoComplete="off"
-    fluid
-  >
-    <FlexboxGrid justify="space-between">
-      <FlexboxGrid.Item colspan={19}>
-        <FormControl 
-          name="text"
-          readOnly={disabled}           
-          style={{ width: '100%' }}
-        />
-      </FlexboxGrid.Item>      
-      <FlexboxGrid.Item colspan={4}>
-        <FormControl 
-          readOnly={disabled} 
-          name="language" 
-          hideLanguageLabel={true}
-          cleanable={false}
-          block
-          accepter={LanguagePicker}
-        />
-      </FlexboxGrid.Item>
-    </FlexboxGrid>    
-  </Form>
-);
-FormLabel.propTypes = {
-  value: PropTypes.shape({
-    text: PropTypes.string,
-    language: PropTypes.string
-  }),
-  onChange: PropTypes.func,
-  disabled: PropTypes.bool
-};
+import FormLabel from './views/form-label';
 
+// TODO check if language is not defined
+// TODO disable used languages in form label
 
 const InputLanguage = ({
   value = {},
@@ -50,10 +14,7 @@ const InputLanguage = ({
   onChange = () => {},
   style
 }) => {
-  const initialState = Object.keys(value)
-    .map(key => ({ language: key, text: value[key], id: uniqueId('lang') }))
-  const [current, setCurrent] = useState(initialState);
-  
+  const current = Object.keys(value).map(key => ({ language: key, text: value[key], id: key }))
   return (
     <div className="ui-input-language" style={style}>
       <CollectionEditor 
@@ -63,7 +24,6 @@ const InputLanguage = ({
         hideArrows={true}
         labelAdd="Add label"
         onChange={value => {
-          setCurrent(value);
           const newValue = {};
           value.forEach(item => newValue[item.language] = item.text);          
           onChange(newValue);

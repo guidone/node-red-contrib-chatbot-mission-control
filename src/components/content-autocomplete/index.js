@@ -33,7 +33,7 @@ const ContentAutocomplete = ({ value, onChange = () => {}, style, useSlug = fals
     current = search;
   } else {
     if (!_.isEmpty(items)) {
-      current = useSlug ? items[0].slug : items[0].title;
+      current = useSlug ? `slug: ${items[0].slug}` : items[0].title;
     } else {
       current = '';
     }
@@ -64,6 +64,8 @@ const ContentAutocomplete = ({ value, onChange = () => {}, style, useSlug = fals
               } 
               setItems(null);
               onChange(null);
+            } else if (useSlug && event.nativeEvent != null && event.nativeEvent.inputType === 'insertText' && current.startsWith('slug: ')) {              
+              setSearch(event.nativeEvent.data);
             } else if (event.nativeEvent != null && event.nativeEvent.inputType === 'insertText') {
               setSearch(String(current));
             }            
