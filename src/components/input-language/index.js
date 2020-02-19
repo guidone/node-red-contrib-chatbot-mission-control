@@ -14,7 +14,8 @@ const InputLanguage = ({
   onChange = () => {},
   style
 }) => {
-  const current = Object.keys(value).map(key => ({ language: key, text: value[key], id: key }))
+  const languages = Object.keys(value);
+  const current = languages.map(key => ({ language: key, text: value[key], id: key }))
   return (
     <div className="ui-input-language" style={style}>
       <CollectionEditor 
@@ -23,9 +24,12 @@ const InputLanguage = ({
         form={FormLabel}
         hideArrows={true}
         labelAdd="Add label"
+        disabledLanguages={languages}
+        disableAdd={languages.includes('new')} 
         onChange={value => {
           const newValue = {};
-          value.forEach(item => newValue[item.language] = item.text);          
+          value.forEach(item => newValue[item.language || 'new'] = item.text);   
+          console.log('lang', newValue)       
           onChange(newValue);
         }}
       />

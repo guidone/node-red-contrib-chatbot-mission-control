@@ -11,7 +11,8 @@ const Item = ({
   onMoveDown = () =>{}, 
   form, 
   disabled = false,
-  hideArrows = false 
+  hideArrows = false,
+  ...rest 
 }) => {
 
   const Form = form;
@@ -20,7 +21,12 @@ const Item = ({
     <div className="item">
       <FlexboxGrid>
         <FlexboxGrid.Item colspan={21}>
-          <Form value={value} onChange={onChange} disabled={disabled} />
+          <Form 
+            value={value} 
+            onChange={onChange} 
+            disabled={disabled}
+            {...rest}  
+          />
         </FlexboxGrid.Item>
         <FlexboxGrid.Item colspan={3} style={{ textAlign: 'right' }} className="button">
           <IconButton 

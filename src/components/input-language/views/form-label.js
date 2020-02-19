@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 
 import LanguagePicker from '../../language-picker';
 
-const FormLabel = ({ value, onChange, disabled = false }) => (
+const FormLabel = ({ value, onChange, disabled = false, disabledLanguages }) => (
   <Form 
     formValue={value} 
     onChange={onChange} 
@@ -26,6 +26,7 @@ const FormLabel = ({ value, onChange, disabled = false }) => (
           hideLanguageLabel={true}
           cleanable={false}
           block
+          disabledItemValues={disabledLanguages.filter(language => language !== value.language)}
           accepter={LanguagePicker}
         />
       </FlexboxGrid.Item>

@@ -16,13 +16,15 @@ const CollectionEditor = ({
   labelEmpty = 'No elements',
   hideArrows = false,
   style,
-  disabled = false 
+  disabled = false,
+  disableAdd = false,
+  ...rest 
 }) => {
 
   const addButton = (
     <Button
       size="sm"
-      readOnly={disabled} 
+      disabled={disabled || disableAdd} 
       onClick={() => {
         console.log(_.uniqueId())
         onChange([...value, { id: uniqueId('c') }]);
@@ -75,6 +77,7 @@ const CollectionEditor = ({
                 onChange(cloned);
               }
             } : null}
+            {...rest}
           />
         ))}
       </div>
@@ -86,6 +89,7 @@ CollectionEditor.propTypes = {
   value: PropTypes.arrayOf(PropTypes.object),
   onChange: PropTypes.func,
   readOnly: PropTypes.bool,
+  disableAdd: PropTypes.bool,
   hideArrows: PropTypes.bool,
   labelAdd: PropTypes.string,
   labelEmpty: PropTypes.string

@@ -7,6 +7,7 @@ import InputLanguage from '../../../src/components/input-language';
 
 import { opening as openingModel } from '../models';
 import FormOpening from './form-opening';
+import UserAutocomplete from '../../../src/components/user-autocomplete';
 
 // TODO check models and schema, start < end, no repetitions in range
 
@@ -60,11 +61,14 @@ export default ({
         <FormControl 
           useSlug={true} 
           readOnly={disabled} 
-          disabled="fottit stronzo"
           name="content" 
-          style={{ width: '350px' }}         
+          style={{ width: '550px' }}         
           accepter={ContentAutocomplete}           
-        />        
+        />
+        <HelpBlock>
+          Select a <em>slug</em> for a multi-language content to show additional information when a user requests
+          information about opening hours
+        </HelpBlock>        
       </FormGroup>
       <FormGroup>
         <ButtonToolbar>
