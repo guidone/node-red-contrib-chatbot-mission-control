@@ -58,8 +58,8 @@ module.exports = function(RED) {
           lcd.dump('Unknown GraphQL error', `GraphQL Error (id: ${node.id})`);
           console.log(error);
         }
+        done(error);
       }
-
     });
   }
 
