@@ -10,9 +10,21 @@ const handleMessages = (state, action) => {
         return state;
       }
       const current = _.isArray(state.messages[payload.transport]) ? state.messages[payload.transport] : [];
+      
+      let toAdd;
+      if (!_.isArray(payload.payload)) {
+        toAdd = [payload]
+      } else {
+        toAdd = payload.payload.map(current => ({ ...payload, ...current, payload: undefined }))
+      }
+      
       const messages = { 
         ...state.messages, 
-        [payload.transport]: [...current, payload]
+        // multiple messages can be enqueued
+        [payload.transport]: [
+          ...current, 
+          ...toAdd
+        ]
       }
       return { ...state, messages };
     
