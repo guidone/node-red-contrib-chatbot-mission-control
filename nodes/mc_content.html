@@ -11,6 +11,9 @@
       },
       failbackLanguage: {
         value: 'en'
+      },
+      chain: {
+        value: false
       }
     },
     inputs: 1,
@@ -104,6 +107,14 @@
       <option value="uk">Ukrainian</option>
       <option value="zh">Chinese</option>
     </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-chain" style="width:auto;">Chain messages</label>
+    <input type="checkbox" value="true" id="node-input-chain">
+    <span class="redbot-form-hint">
+      This will preserve incoming message in order to chain multiple message and using
+      at the same time the result of the query (available in <code>msg.data</code>)
+    </span>
   </div>
 </script>
 

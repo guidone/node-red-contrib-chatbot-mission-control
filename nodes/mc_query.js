@@ -11,7 +11,7 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     const node = this;
     this.query = config.query;
-    this.preserve = config.preserve;
+    this.chain = config.chain;
     
     this.on('input', async function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
@@ -36,8 +36,8 @@ module.exports = function(RED) {
 
       try {
         const response = await client.query({ query, variables, fetchPolicy: 'network-only' });
-        if (node.preserve) {
-          send({ ...msg, ...response.data });
+        if (node.chain) {
+          send({ ...msg, data: response.data });
         } else {
           send({ ...msg, payload: response.data });
         }        

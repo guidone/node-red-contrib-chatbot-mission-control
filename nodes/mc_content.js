@@ -37,6 +37,7 @@ module.exports = function(RED) {
     this.slug = config.slug;
     this.language = config.language;
     this.failbackLanguage = config.failbackLanguage;
+    this.chain = config.chain;
     
     this.on('input', async function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
@@ -76,7 +77,12 @@ module.exports = function(RED) {
           content = contents.find(content => content.language === failbackLanguage);
         }
         const payload = await template(content);
-        send({ ...msg, payload });
+        if (node.chain) {
+          send({ ...msg, data: payload });
+        } else {
+          send({ ...msg, payload });
+        }
+        
         done();
       } catch(error) {
         done(error);
