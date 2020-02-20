@@ -229,9 +229,26 @@ $gray: #92959E;
     margin-left: -10px;
   }
   
-  &.first-of-group {
+  &.first-of-group, &.first {
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
+    margin-bottom: 3px;
+  }
+
+  &.middle {
+    border-radius: 0px;
+    margin-bottom: 3px;
+    &:after {
+      display: none;
+    }
+  }
+
+  &.last {
+    border-top-left-radius: 0px;
+    border-top-right-radius: 0px;
+    &:after {
+      display: none;
+    } 
   }
 }
 

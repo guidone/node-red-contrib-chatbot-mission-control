@@ -41,6 +41,7 @@ const SimulatorWidget = ({ sendMessage, activeChatbots, user }) => {
   const { messages, transport, nodeId, language, user: impersonatedUser } = state; 
   const loading = activeChatbots == null;
 
+  console.log('messages', messages)
   return (
     <Panel 
       title="Chat Simulator" 
@@ -58,12 +59,24 @@ const SimulatorWidget = ({ sendMessage, activeChatbots, user }) => {
       {!loading && (
         <ChatWindow>
           <Messages>
-            {messages[transport] != null && messages[transport].map(message => (
-              <GenericMessage 
-                key={message.messageId} 
-                message={!message.inbound ? { ...message, username: 'chatbot'} : message } 
-              />
-            ))}
+            {messages[transport] != null && messages[transport].map(message => {
+              if (_.isArray(message)) {
+                // multiple messages are always inbound
+                return (
+                  <GenericMessage 
+                    key={message.messageId} 
+                    message={message.map(message => ({ ...message, username: 'chatbot' }))} 
+                  />
+                );
+              } else {
+                return (
+                  <GenericMessage 
+                    key={message.messageId} 
+                    message={!message.inbound ? { ...message, username: 'chatbot' } : message } 
+                  />
+                );
+              }
+            })}
           </Messages>
           <MessageComposer
             onSend={message => {

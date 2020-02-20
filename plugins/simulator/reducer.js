@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import moment from 'moment';
 
 const handleMessages = (state, action) => {
   switch(action.type) {    
@@ -13,9 +14,9 @@ const handleMessages = (state, action) => {
       
       let toAdd;
       if (!_.isArray(payload.payload)) {
-        toAdd = [payload]
+        toAdd = { ...payload, ts: moment() }
       } else {
-        toAdd = payload.payload.map(current => ({ ...payload, ...current, payload: undefined }))
+        toAdd = payload.payload.map(current => ({ ...payload, ...current, payload: undefined, ts: moment() }))
       }
       
       const messages = { 
@@ -23,7 +24,7 @@ const handleMessages = (state, action) => {
         // multiple messages can be enqueued
         [payload.transport]: [
           ...current, 
-          ...toAdd
+          toAdd
         ]
       }
       return { ...state, messages };
