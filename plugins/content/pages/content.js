@@ -25,11 +25,11 @@ import ModalContent from '../views/modal-content';
 const Contents = ({ messageTypes, platforms }) => {
   //const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId }, setQuery } = useRouterQuery();
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10, sortField: 'createdAt', sortType: 'desc' });
-  const [ filters, setFilters ] = useState({ categoryId: null, language: null });
+  const [ filters, setFilters ] = useState({ categoryId: null, language: null, slug: null });
   const [ content, setContent ] = useState(null);
 
   const { limit, page, sortField, sortType } = cursor;
-  const { categoryId, language } = filters;
+  const { categoryId, language, slug } = filters;
   const { 
     bootstrapping,
     loading, 
@@ -40,7 +40,7 @@ const Contents = ({ messageTypes, platforms }) => {
     editContent, 
     createContent, 
     refetch 
-  } = useContents({ limit, page, sortField, sortType, categoryId, language });
+  } = useContents({ limit, page, sortField, sortType, categoryId, language, slug });
   
 
   return (
@@ -75,7 +75,10 @@ const Contents = ({ messageTypes, platforms }) => {
                 value={categoryId}
                 cleanable
                 placeholder="Filter by category"
-                onChange={categoryId => setFilters({ ...filters, categoryId })}
+                onChange={categoryId => {
+                  setFilters({ ...filters, categoryId });
+                  setCursor({ ...cursor, page: 1 });
+                }}
                 data={data.categories.map(category => ({ value: category.id, label: category.name }))}
               />
               &nbsp;
@@ -84,7 +87,22 @@ const Contents = ({ messageTypes, platforms }) => {
                 value={language}
                 cleanable
                 placeholder="Filter by language"
-                onChange={language => setFilters({ ...filters, language })}
+                onChange={language => {
+                  setFilters({ ...filters, language });
+                  setCursor({ ...cursor, page: 1 });
+                }}
+              />
+              &nbsp;
+              <Input
+                defaultValue={slug}
+                style={{ width: '150px', display: 'inline-block' }}
+                placeholder="slug"
+                onKeyUp={e => {
+                  if (e.keyCode === 13) {
+                    setFilters({ ...filters, slug: !_.isEmpty(e.target.value) ? e.target.value : undefined });
+                    setCursor({ ...cursor, page: 1 });                                          
+                  }
+                }}
               />  
             </FlexboxGrid.Item>            
             <FlexboxGrid.Item colspan={6} align="right">

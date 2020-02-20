@@ -13,13 +13,6 @@ const {
   when 
 } = require('../lib/helpers/utils');
 
-var decodeHtmlEntity = function(str) {
-  return str.replace(/&#(\d+);/g, function(match, dec) {
-    return String.fromCharCode(dec);
-  });
-};
-
-
 
 const CONTENT = gql`
 query($id: Int,$slug: String) {
@@ -49,14 +42,15 @@ module.exports = function(RED) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
       done = done || function(error) { node.error.call(node, error, msg) };
-
+      // check if valid message
+      if (!isValidMessage(msg, node)) {
+        return;
+      }
       const chat = msg.chat();
       const template = MessageTemplate(msg, node);
       const slug = extractValue('string', 'slug', node, msg, false);
       const language = extractValue('string', 'language', node, msg, false);
       const failbackLanguage = extractValue('string', 'failbackLanguage', node, msg, false);
-
-      // TODO check if valid message
       
       // build query variables
       let variables;

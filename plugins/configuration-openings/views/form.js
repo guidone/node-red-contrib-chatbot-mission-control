@@ -27,7 +27,9 @@ export default ({
       formValue={formValue}
       formError={formError}
       ref={form}
-      checkTrigger="none" 
+      checkTrigger="none"
+      layout="vertical"
+      fluid 
       onChange={formValue => {
         setFormValue(formValue);
         setFormError(null);
@@ -35,22 +37,12 @@ export default ({
       onCheck={errors => {
         setFormError(errors);        
       }}
-    >    
-      <FormGroup>
-        <ControlLabel>Opening hours label</ControlLabel>
-        <FormControl 
-          disabled={disabled}
-          name="labelOpenings" 
-          accepter={InputLanguage}
-          style={{ width: '550px' }}           
-        />        
-      </FormGroup>
+    >          
       <FormGroup>
         <ControlLabel>Openings hours</ControlLabel>
         <FormControl 
           name="openings" 
-          accepter={CollectionEditor}
-          style={{ width: '550px' }} 
+          accepter={CollectionEditor}           
           form={FormOpening}
           labelAdd="Add opening hour"
           disabled={disabled}
@@ -61,14 +53,21 @@ export default ({
         <FormControl 
           useSlug={true} 
           readOnly={disabled} 
-          name="content" 
-          style={{ width: '550px' }}         
+          name="content"                    
           accepter={ContentAutocomplete}           
         />
         <HelpBlock>
           Select a <em>slug</em> for a multi-language content to show additional information when a user requests
           information about opening hours
         </HelpBlock>        
+      </FormGroup>
+      <FormGroup>
+        <ControlLabel>Opening hours label</ControlLabel>
+        <FormControl 
+          disabled={disabled}
+          name="labelOpenings" 
+          accepter={InputLanguage}
+        />        
       </FormGroup>
       <FormGroup>
         <ButtonToolbar>

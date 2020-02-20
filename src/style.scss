@@ -1,6 +1,8 @@
 $sidebar-background: #05386b;
 $sidebar-color: #eeeeee;
 $sidebag-hover-background: #087CA7;
+$sidebar-icon-hover: #ff9966;
+$sidebar-icon: #aaaaaa;
 
 .rs-control-label {
   font-weight: bold;
@@ -29,6 +31,22 @@ $sidebag-hover-background: #087CA7;
 
 .rs-help-block {
   font-size: 13px;
+}
+
+.rs-control-label {
+  .rs-help-block {
+    margin-top: 0px;
+    margin-left: 5px;    
+    height: 10px;
+    line-height: 12px;
+    display: inline-block;
+    min-height: unset;
+    margin-top: 5px;
+    .rs-icon {
+      font-size: 12px;
+      line-height: 12px;
+    }
+  }
 }
 
 .mc-sidebar-header {
@@ -70,6 +88,9 @@ $sidebag-hover-background: #087CA7;
   .rs-nav .rs-nav-item-active > .rs-nav-item-content:active {
     background-color: $sidebag-hover-background;
     color: $sidebar-color;
+    .rs-icon {
+      color: $sidebar-icon-hover !important;
+    }    
   }
 
   .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content, 
@@ -84,6 +105,9 @@ $sidebag-hover-background: #087CA7;
   .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-item-content > .rs-dropdown-menu-toggle:hover, 
   .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-item-content > .rs-dropdown-menu-toggle:hover {
     background-color: $sidebag-hover-background;
+    .rs-icon {
+      color: $sidebar-icon-hover !important;
+    }
   }
 
   .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content:focus, 
@@ -92,20 +116,40 @@ $sidebag-hover-background: #087CA7;
   .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-item-content > .rs-dropdown-menu-toggle:focus {
     background-color: $sidebag-hover-background;
     border-right: 3px solid #eeeeee;
+    .rs-icon {
+      color: $sidebar-icon-hover !important;
+    }
   }
   
   .rs-nav-default .rs-nav-item:not(.rs-nav-item-active):not(.rs-nav-item-disabled) > .rs-nav-item-content:hover, 
   .rs-nav-default .rs-nav-item:not(.rs-nav-item-active):not(.rs-nav-item-disabled) > .rs-nav-item-content:focus {
     background-color: $sidebag-hover-background;
     color: $sidebar-color;
+    .rs-icon {
+      color: $sidebar-icon-hover !important;
+    }
   }
 
   .rs-btn-subtle:focus, .rs-btn-subtle.rs-btn-focus, .rs-btn-subtle:hover {
     background-color: $sidebag-hover-background;
+    .rs-icon {
+      color: $sidebar-icon-hover !important;
+    }
   }
 
   .rs-nav-item > .rs-nav-item-content {
-    color: $sidebar-color ;
+    color: $sidebar-color;
+    .rs-icon {
+      color: $sidebar-icon;
+    }
+  }
+
+  .rs-dropdown {
+    .rs-btn {    
+      .rs-icon {
+        color: $sidebar-icon;
+      }
+    }
   }
 
   .rs-btn-subtle {

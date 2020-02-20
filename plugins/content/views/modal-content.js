@@ -8,7 +8,8 @@ import {
   ControlLabel, 
   FormControl, 
   FlexboxGrid, 
-  SelectPicker,  
+  SelectPicker,
+  HelpBlock,  
   Nav
 } from 'rsuite';
 
@@ -67,7 +68,13 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
               <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
                 <FlexboxGrid.Item colspan={7}>
                   <FormGroup>
-                    <ControlLabel>Slug</ControlLabel>
+                    <ControlLabel>
+                      Slug
+                      <HelpBlock tooltip>
+                        The <em>slug</em> is a shortcut for a content or a group of contents 
+                        (for example the same article translated in different languages)
+                      </HelpBlock>
+                    </ControlLabel>
                     <FormControl autoComplete="off" readOnly={disabled} name="slug" />
                   </FormGroup>
                 </FlexboxGrid.Item>            

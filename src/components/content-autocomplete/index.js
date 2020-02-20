@@ -9,6 +9,7 @@ import Language from '../../components/language';
 import ContentPreview from './views/content-preview';
 import ContentIcon from './views/content-icon';
 import { SEARCH } from './queries';
+import './style.scss';
 
 const ContentAutocomplete = ({ value, onChange = () => {}, style, useSlug = false }) => {
 

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import CollectionEditor from '../collection-editor';
 
 import FormLabel from './views/form-label';
+import './style.scss';
 
 // TODO check if language is not defined
 // TODO disable used languages in form label
