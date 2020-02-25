@@ -7,11 +7,12 @@ import FormLabel from './views/form-label';
 import './style.scss';
 
 // TODO check if language is not defined
-// TODO disable used languages in form label
 
 const InputLanguage = ({
   value = {},
   disabled = false,
+  labelAdd = 'Add label',
+  labelEmpty,
   onChange = () => {},
   style
 }) => {
@@ -24,13 +25,13 @@ const InputLanguage = ({
         disabled={disabled}
         form={FormLabel}
         hideArrows={true}
-        labelAdd="Add label"
+        labelAdd={labelAdd}
         disabledLanguages={languages}
+        labelEmpty={labelEmpty}
         disableAdd={languages.includes('new')} 
         onChange={value => {
           const newValue = {};
           value.forEach(item => newValue[item.language || 'new'] = item.text);   
-          console.log('lang', newValue)       
           onChange(newValue);
         }}
       />
@@ -41,7 +42,9 @@ InputLanguage.propTypes = {
   value: PropTypes.object,
   style: PropTypes.object,
   disabled: PropTypes.bool,
-  onChange: PropTypes.func
+  onChange: PropTypes.func,
+  labelAdd: PropTypes.string,
+  labelEmpty: PropTypes.string
 };
 
 export default InputLanguage;

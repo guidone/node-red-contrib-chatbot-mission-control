@@ -4,13 +4,40 @@ const lcd = require('../lib/lcd/index');
 
 const saveConfiguration = (configuration, context, namespace) => {
   Object.keys(configuration)
+    .filter(key => key !== 'translations')
     .forEach(key => context.set(`${namespace}_${key}`, configuration[key]));
+
+
+  // save dictionary if present
+  if (configuration != null && configuration.translations != null) {
+    console.log('installing translator')
+    const currentDictionary = context.get('dictionary') || {};
+    //Object.assign(currentDictionary, configuration.translations, { tx: tx.bind(context) });
+    context.set('dictionary', { ...currentDictionary, ...configuration.translations }); 
+    context.set('tx', tx.bind(context)); 
+  }
+
+
 };
+
+const tx = function(key, language, predefined) {
+  //console.log('--', this, key, predefined)
+  
+  const dictionary = this.get('dictionary') || {};
+  
+  if (dictionary[key] != null && dictionary[key][language] != null) {
+    return dictionary[key][language];
+  } else if (dictionary[key] != null && dictionary[key][predefined] != null) {
+    return dictionary[key][predefined];
+  } 
+  return key;
+};
+
 
 const RequestConfiguration = function({ url, poll = 2000, callback = () => {} }) {
   this.timerId = setInterval(() => {
     console.log(lcd.orange('Asking configuration...'));
-    // todo put dinamic
+    
     request({ url }, (error, response, body) => {
       if (!error) {
         let json;
@@ -56,7 +83,11 @@ module.exports = function(RED) {
         if (this.timerId != null) {
           clearInterval(this.timerId);
         }
+        
+
+
         saveConfiguration(payload, this.context().global, node.namespace);
+        // pass through
         node.send({ payload });
       }
     };
