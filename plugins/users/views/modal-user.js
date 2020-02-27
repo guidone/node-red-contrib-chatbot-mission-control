@@ -11,7 +11,7 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
   const [formValue, setFormValue] = useState({ ...user });
   const [jsonValue, setJsonValue] = useState({
     json: !_.isEmpty(user.payload) ? JSON.stringify(user.payload) : ''
-  })
+  });
   const [formError, setFormError] = useState(null);
   const [tab, setTab] = useState('user-details');
 

@@ -23,6 +23,7 @@ query($offset: Int, $limit: Int, $order: String, $categoryId: Int, $slug: String
     categoryId,
     language,
     createdAt,
+    payload,
     category {
       id,
       name
@@ -52,6 +53,7 @@ mutation($id: Int!, $content: NewContent!) {
     title,
     body,
     language,
+    payload,
     fields {
       id,
       name,
@@ -70,6 +72,7 @@ mutation($content: NewContent!) {
     title,
     body,
     language,
+    payload,
     fields {
       id,
       name,

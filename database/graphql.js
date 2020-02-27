@@ -520,6 +520,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLString,
         description: '',
       },
+      payload: {
+        type: JSONType,
+        description: '',
+      },
       fields: {
         type: new GraphQLList(newFieldType),
         description: ''        
@@ -570,6 +574,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         }
       },
       payload: {
+        type: JSONType,
+        description: '',
+      },
+      json: {
         type: PayloadType,
         resolve(root) {
           return root.getFields({ limit: 9999 });

@@ -17,14 +17,18 @@ import FieldsEditor from '../../../src/components/fields-editor';
 import MarkdownEditor from '../../../src/components/markdown-editor';
 import ShowError from '../../../src/components/show-error';
 import LanguagePicker from '../../../src/components/language-picker';
+import JSONEditor from '../../../src/components/json-editor';
+import { Views } from '../../../lib/code-plug';
 
 import { content as contentModel } from '../models';
 import '../styles/modal-content.scss';
 
-
 const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabled = false, categories, error }) => {
   const [formValue, setFormValue] = useState(content);
   const [formError, setFormError] = useState(null);
+  const [jsonValue, setJsonValue] = useState({
+    json: !_.isEmpty(content.payload) ? JSON.stringify(content.payload) : ''
+  });
   const [tab, setTab] = useState('content');
   const form = useRef(null);
 
@@ -39,9 +43,27 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
       </Modal.Header>
       <Modal.Body>
         {error != null && <ShowError error={error}/>}
-        <Nav appearance="tabs" active={tab} onSelect={setTab} activeKey={tab}>
+        <Nav 
+          appearance="tabs" 
+          active={tab} 
+          onSelect={tab => {
+            // tab is switched to manual edit of payload, make sure the current payload field is serialized
+            // in serialized payload in order to show the updated one
+            if (tab === 'content-payload') {
+              setJsonValue({                  
+                json: !_.isEmpty(formValue.payload) ? JSON.stringify(formValue.payload) : ''
+              });
+            }
+            setTab(tab);
+          }}  
+          activeKey={tab}
+        >
           <Nav.Item eventKey="content">Content</Nav.Item>
           <Nav.Item eventKey="custom_fields">Custom Fields</Nav.Item>
+          <Views region="content-tabs">
+            {(View, { label, id}) => <Nav.Item active={id === tab} eventKey={id} onSelect={() => setTab(id)}>{label}</Nav.Item>}
+          </Views>
+          <Nav.Item eventKey="content-payload">Content payload</Nav.Item>
         </Nav>      
         <Form 
           model={contentModel}
@@ -116,6 +138,49 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
               <FormControl readOnly={disabled} name="fields" accepter={FieldsEditor}/>
             </FormGroup>
           )}
+          <Views region="content-tabs">
+            {(View, { id }) => {        
+              if (id === tab) {
+                return (
+                  <View 
+                    key={id} 
+                    formValue={formValue.payload}
+                    onChange={payload => setFormValue({ ...formValue, payload })}
+                  />
+                );
+              }
+              return <div/>;
+            }}
+          </Views>
+          {tab === 'content-payload' && (
+          <Form 
+            formValue={jsonValue} 
+            formError={formError}              
+            fluid autoComplete="off"
+          >
+            <FormGroup>
+              <ControlLabel>Payload</ControlLabel>
+              <FormControl 
+                readOnly={disabled} 
+                name="json" 
+                accepter={JSONEditor}
+                onChange={json => {
+                  if (!_.isEmpty(json)) {
+                    let payload;
+                    setJsonValue({ json });
+                    try {
+                      payload = JSON.parse(json);
+                    } catch(e) {    
+                      // error do nothing                
+                      return;
+                    }                    
+                    setFormValue({ ...formValue, payload });
+                  }
+                }}
+              />
+            </FormGroup>
+          </Form>
+        )}
         </Form>
       </Modal.Body>
       <Modal.Footer>

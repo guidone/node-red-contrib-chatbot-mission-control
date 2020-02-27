@@ -10,3 +10,4 @@ import './plugins/chat-demo';
 import './plugins/funnel';
 import './plugins/simulator';
 import './plugins/content';
+import './plugins/content-image';

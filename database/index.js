@@ -35,7 +35,8 @@ module.exports = mcSettings => {
     title: Sequelize.STRING,
     slug: Sequelize.STRING,
     language: Sequelize.STRING,  
-    body: Sequelize.TEXT
+    body: Sequelize.TEXT,
+    payload: Sequelize.TEXT
   }, {
     indexes: [
       { name: 'content_title', using: 'BTREE', fields: ['title'] },
