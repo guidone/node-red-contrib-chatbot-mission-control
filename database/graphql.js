@@ -8,7 +8,7 @@ const Op = Sequelize.Op;
 
 const { when } = require('../lib/utils');
 
-const getCircularPaths = require('../lib/get-circular-paths');
+const isCircularPaths = require('../lib/get-circular-paths');
 
 const compactObject = obj => {
   return Object.entries(obj)
@@ -404,6 +404,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       count: {
         type: GraphQLInt,
         description: '',
+      },
+      sources: {
+        type: new GraphQLList(GraphQLString),
+        description: 'Only in adding'
       }
     }
   });
@@ -420,13 +424,9 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLString,
         description: '',
       },
-      source: {
-        type: GraphQLString,
-        description: '',
-      },
-      count: {
-        type: GraphQLInt,
-        description: '',
+      sources: {
+        type: GraphQLList(GraphQLString),
+        description: 'List of current events'
       }
     }
   });
@@ -762,30 +762,47 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         createEvent: {
           type: eventType,
           args: {
-            event: { type: new GraphQLNonNull(newEventType) }
+            event: { type: new GraphQLNonNull(newEventType) },
+            // TODO define sources
           },
           resolve: async function(root, { event }) {
-            // get all nodes
+                        
+            // get all connections for this flow
             const nodes = await Event.findAll({ where: { flow: event.flow }})
             
-            const existingEvent = nodes.find(node => node.name === event.name && node.source === event.source); 
+             
             
             
             // if the node (source + target) already exists, then just increment
-            if (existingEvent != null) {
-              await Event.update({ count: existingEvent.count + 1 }, { where: { flow: event.flow, name: event.name, source: event.source }})
-              existingEvent.count += 1;
-              return existingEvent;
-            } else {
-              // if doesn't exist, check for circular referece in the graph of events
-              const routes = getCircularPaths(event.name, event.source, nodes);
-              
-              console.log('--->', routes)
+            //if (existingEvent != null) {
+            //  await Event.update({ count: existingEvent.count + 1 }, { where: { flow: event.flow, name: event.name, source: event.source }})
+            //  existingEvent.count += 1;
+            //  return existingEvent;
+            //} else {
 
-              return {};
-              // return Event.create({ ...event, count: 1 })
+            let sources = [...event.sources];
+
+            // while the last event of history is circular, chop the array remove the last event, 
+            // then try again
+            while (!_.isEmpty(sources) && isCircularPaths(event.name, _.last(sources), nodes, false)) {
+              console.log('* IS circular ', _.last(sources),  ' -> ', event.name)  
+              sources = _.initial(sources);
             }
-            
+            // there's still something
+            if (!_.isEmpty(sources)) {
+              console.log('* NOT circular ', _.last(sources),  ' -> ', event.name)
+              // check if exists
+              const existingEvent = nodes.find(node => node.name === event.name && node.source === _.last(sources));
+              // check if the event already exists or create a new one
+              if (existingEvent != null) {
+                await Event.update({ count: existingEvent.count + 1 }, { where: { flow: event.flow, name: event.name, source: _.last(sources) }})
+                existingEvent.count += 1;
+                return { ...existingEvent.toJSON(), sources: [...sources, event.name] };
+              } else {
+                let newEvent = await Event.create({ name: event.name, flow: event.flow, source: _.last(sources), count: 1 });                 
+                return { ...newEvent.toJSON(), sources: [...sources, event.name] };
+              }            
+            }
           }
         },
 

@@ -3,10 +3,16 @@ const _ = require('lodash');
 const moment = require('moment');
 const gql = require('graphql-tag');
 
-
-const { isValidMessage, when } = require('../lib/utils/index');
-  
 const client = require('../database/client');
+
+const { 
+  isValidMessage, 
+  getChatId, 
+  getTransport, 
+  extractValue,
+  append,
+  when 
+} = require('../lib/helpers/utils');
 
 
 const CREATE_EVENT = gql`
@@ -26,39 +32,44 @@ module.exports = function(RED) {
     node.flow = config.flow;
     node.name = config.name;
       
-    this.on('input', function(msg, send, done) {
+    this.on('input', async function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
       done = done || function(error) { node.error.call(node, error, msg) };
        
-      // TODO: check for valid message
+      const flow = extractValue('string', 'flow', node, msg, false);
+      const name = extractValue('string', 'name', node, msg, false);
 
       const chat = msg.chat();
-      when(chat.get('previous_event'))
-        .then(previousEvent => {
-          return client.mutate({
-            mutation: CREATE_EVENT,
-            variables: {
-              event: {
-                flow: node.flow,
-                name: node.name,
-                source: previousEvent
-              }
+      try {
+        let previousEvents = await when(chat.get('previous_events'));
+        // default stack message          
+        if (_.isEmpty(previousEvents) || _.isArray(previousEvents)) {
+          previousEvents = [];
+        }
+          
+        await client.mutate({
+          mutation: CREATE_EVENT,
+          variables: {
+            event: {
+              flow,
+              name,
+              sources: previousEvents
             }
-          });
-        })
-        .then(() => chat.set('previous_event', node.name))      
-        .then(() => {
-          send(msg);
-          done()
-        })
-        .catch(error => {
-          console.log(error)
-          console.log('erro saving event', error.networkError.result)
-          done(error.networkError.result)
+          }
         });
-    
-      
+        await when(chat.set('previous_events', [...previousEvents, name]));
+
+
+        send(msg);
+        done();
+      } catch(error) {
+        // TODO cleanup
+        console.log(error)
+        console.log('erro saving event', error)
+        done(error)
+      }
+            
     });
   }
 
