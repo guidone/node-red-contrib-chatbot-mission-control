@@ -25,4 +25,10 @@ query {
 }
 `;
 
-export { EVENTS, GROUPED_EVENTS };
+const DELETE_FLOW = gql`
+mutation($flow: String!) {
+  deleteEvent(flow: $flow) 
+}
+`;
+
+export { EVENTS, GROUPED_EVENTS, DELETE_FLOW };

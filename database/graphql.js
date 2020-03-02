@@ -759,50 +759,52 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       description: 'These are the things we can change',
       fields: {        
         
+        deleteEvent: {
+          type: GraphQLString,
+          args: {
+            flow: { type: new GraphQLNonNull(GraphQLString) }
+          },
+          resolve: async function(root, { flow }) {
+            await Event.destroy({ where: { flow }});
+            return true;
+          }
+        },
+
         createEvent: {
           type: eventType,
           args: {
-            event: { type: new GraphQLNonNull(newEventType) },
-            // TODO define sources
+            event: { type: new GraphQLNonNull(newEventType) }
           },
           resolve: async function(root, { event }) {
                         
             // get all connections for this flow
             const nodes = await Event.findAll({ where: { flow: event.flow }})
-            
-             
-            
-            
-            // if the node (source + target) already exists, then just increment
-            //if (existingEvent != null) {
-            //  await Event.update({ count: existingEvent.count + 1 }, { where: { flow: event.flow, name: event.name, source: event.source }})
-            //  existingEvent.count += 1;
-            //  return existingEvent;
-            //} else {
-
+                  
             let sources = [...event.sources];
-
             // while the last event of history is circular, chop the array remove the last event, 
             // then try again
             while (!_.isEmpty(sources) && isCircularPaths(event.name, _.last(sources), nodes, false)) {
               console.log('* IS circular ', _.last(sources),  ' -> ', event.name)  
               sources = _.initial(sources);
             }
+
+            let source = !_.isEmpty(sources) ? _.last(sources) : undefined;
+
             // there's still something
-            if (!_.isEmpty(sources)) {
-              console.log('* NOT circular ', _.last(sources),  ' -> ', event.name)
+            //if (!_.isEmpty(sources)) {
+              console.log('* NOT circular ', source,  ' -> ', event.name)
               // check if exists
-              const existingEvent = nodes.find(node => node.name === event.name && node.source === _.last(sources));
+              const existingEvent = nodes.find(node => node.name === event.name && node.source === source);
               // check if the event already exists or create a new one
               if (existingEvent != null) {
-                await Event.update({ count: existingEvent.count + 1 }, { where: { flow: event.flow, name: event.name, source: _.last(sources) }})
+                await Event.update({ count: existingEvent.count + 1 }, { where: { flow: event.flow, name: event.name, source }})
                 existingEvent.count += 1;
                 return { ...existingEvent.toJSON(), sources: [...sources, event.name] };
               } else {
-                let newEvent = await Event.create({ name: event.name, flow: event.flow, source: _.last(sources), count: 1 });                 
+                let newEvent = await Event.create({ name: event.name, flow: event.flow, source, count: 1 });                 
                 return { ...newEvent.toJSON(), sources: [...sources, event.name] };
               }            
-            }
+            //}
           }
         },
 

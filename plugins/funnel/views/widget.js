@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { Placeholder, SelectPicker, Toggle, Button } from 'rsuite';
-import { useQuery } from 'react-apollo';
+import { useQuery, useMutation } from 'react-apollo';
 
 import Panel from '../../../src/components/grid-panel';
 
 import FunnelGraph from './funnel-graph';
 import '../funnel.scss';
-import { GROUPED_EVENTS } from '../queries';
+import { GROUPED_EVENTS, DELETE_FLOW } from '../queries';
 
 const { Paragraph } = Placeholder;
 
@@ -20,7 +20,13 @@ const FunnelWidget = () => {
       setFlow(events.length !== 0 ? events[0].flow : null)    
     }
   });
-  console.log('data', data)
+  const [
+    deleteFlow,
+    { loading: deleting },
+  ] = useMutation(DELETE_FLOW, { });
+
+
+
   return (
     <Panel 
       title="Funnel" 
@@ -46,15 +52,25 @@ const FunnelWidget = () => {
               size="md"
             />
             &nbsp;
-            <Button 
+            <Button               
               onClick ={async () => {
-                const flows = await refetch();
+                await refetch();
                 setVersion(version + 1);
               }}>
               Reload
             </Button>
             &nbsp;
-            <Button>Clear</Button>
+            <Button
+              disabled={_.isEmpty(flow)}
+              onClick={async () => {
+                if (confirm('Clear events for this flow?')) {
+                  await deleteFlow({ variables: { flow } });
+                  setFlow(null);  
+                  refetch();
+                }
+              }}>
+              Clear
+            </Button>
             <div className="perc-toggle">
               <b>%</b>&nbsp;
               <Toggle size="sm" checked={percentile} onChange={() => setPercentile(!percentile)}/>

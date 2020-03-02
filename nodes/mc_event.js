@@ -19,7 +19,8 @@ const CREATE_EVENT = gql`
 mutation ($event: NewEvent!) {
 	createEvent(event: $event) {
     id,
-    count 
+    count,
+    sources 
   }
 }
 `;
@@ -44,11 +45,14 @@ module.exports = function(RED) {
       try {
         let previousEvents = await when(chat.get('previous_events'));
         // default stack message          
-        if (_.isEmpty(previousEvents) || _.isArray(previousEvents)) {
+        if (_.isEmpty(previousEvents) || !_.isArray(previousEvents)) {
           previousEvents = [];
         }
-          
-        await client.mutate({
+
+
+        // TODO skip on simulator
+
+        const newEvent = await client.mutate({
           mutation: CREATE_EVENT,
           variables: {
             event: {
@@ -58,9 +62,11 @@ module.exports = function(RED) {
             }
           }
         });
-        await when(chat.set('previous_events', [...previousEvents, name]));
-
-
+        if (newEvent != null) {
+          console.log('risetto', newEvent, newEvent.data.createEvent.sources)
+          await when(chat.set('previous_events', newEvent.data.createEvent.sources ));
+        }
+        
         send(msg);
         done();
       } catch(error) {
