@@ -782,13 +782,6 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
                   
             let sources = [...event.sources];
 
-            console.log('-------')
-            console.log('name', event.name, 'sources', sources)
-            console.log('')
-    
-
-
-
             // while the last event of history is circular, chop the array remove the last event, 
             // then try again
             while (!_.isEmpty(sources) && isCircularPaths(event.name, _.last(sources), nodes, false)) {
@@ -796,7 +789,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
               sources = _.initial(sources);
             }
 
-            let source = !_.isEmpty(sources) ? _.last(sources) : undefined;
+            let source = !_.isEmpty(sources) ? _.last(sources) : 'home';
 
             // there's still something
             //if (!_.isEmpty(sources)) {

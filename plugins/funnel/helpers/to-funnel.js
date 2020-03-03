@@ -26,9 +26,9 @@ export default (data, { percentile = false }) => {
         }
         
       }
-      if (_.isEmpty(event.source)) {
+      /*if (_.isEmpty(event.source)) {
         return null;
-      }
+      }*/
 
       return {
         //source: idx > 0 ? _.capitalize(sorted[idx - 1].name) : 'Start',

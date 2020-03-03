@@ -84,6 +84,11 @@ const FunnelWidget = ({ sendMessage }) => {
               flow={flow} 
               percentile={percentile}/>
           )}
+          {flow == null && (
+            <div className="empty">
+              <div>No events</div>
+            </div>
+          )}
         </div>
       )}
     </Panel>
