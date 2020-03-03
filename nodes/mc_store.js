@@ -29,6 +29,11 @@ module.exports = function(RED) {
         done();
         return;  
       }
+      const flag = msg.payload != null && msg.payload.params != null && msg.payload.params.messageFlag != null ?
+        msg.payload.params.messageFlag : null
+
+      console.log('+++++++++ flag', flag);
+
       // get chat context
       const chat = msg.chat();
       when(chat.get('firstName', 'lastName', 'username', 'language', 'userId'))
@@ -51,6 +56,7 @@ module.exports = function(RED) {
                   type: msg.payload.type,
                   ts: moment(),
                   transport: msg.originalMessage.transport,
+                  flag,
                   content: _.isString(msg.payload.content) ? msg.payload.content : '<buffer>'
                 }
               }

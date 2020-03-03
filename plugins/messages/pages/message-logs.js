@@ -22,10 +22,18 @@ import useRouterQuery from '../../../src/hooks/router-query';
 import '../styles/message-logs.scss';
 
 const MESSAGES = gql`
-query ($limit: Int, $offset: Int, $order: String, $inbound: Boolean, $type: String, $transport: String, $messageId: String, $chatId: String, $userId: String) {
+query ($limit: Int, $offset: Int, $order: String, $inbound: Boolean, $type: String, $transport: String, $messageId: String, $chatId: String, $userId: String, $flag: String) {
   counters {
     messages {
-     count
+      count(
+        inbound: $inbound,          
+        type: $type, 
+        transport: $transport,
+        chatId: $chatId,
+        messageId: $messageId,
+        userId: $userId,
+        flag: $flag
+      )
     }
   }
   messages(
@@ -37,7 +45,8 @@ query ($limit: Int, $offset: Int, $order: String, $inbound: Boolean, $type: Stri
     transport: $transport,
     chatId: $chatId,
     messageId: $messageId,
-    userId: $userId
+    userId: $userId,
+    flag: $flag
   ) {
     id
     chatId
@@ -49,7 +58,8 @@ query ($limit: Int, $offset: Int, $order: String, $inbound: Boolean, $type: Stri
     userId,
     from,
     transport,
-    createdAt
+    createdAt,
+    flag
   }
 }
 `;
@@ -62,10 +72,10 @@ const SelectInbound = [
 
 
 const MessageLogs = ({ messageTypes, platforms }) => {
-  const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId }, setQuery } = useRouterQuery();
+  const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId, flag: urlFlag }, setQuery } = useRouterQuery();
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10 });
-  const [ filters, setFilters ] = useState({ chatId: urlChatId, userId: urlUserId, messageId: urlMessageId });
-  const { messageType, transport, inbound, chatId, userId, messageId } = filters;
+  const [ filters, setFilters ] = useState({ chatId: urlChatId, userId: urlUserId, messageId: urlMessageId, flag: urlFlag });
+  const { messageType, transport, inbound, chatId, userId, messageId, flag } = filters;
   const { limit, page } = cursor;
   
   const { loading, error, data, refetch } = useQuery(MESSAGES, {
@@ -77,6 +87,7 @@ const MessageLogs = ({ messageTypes, platforms }) => {
       order: 'reverse:createdAt',
       inbound, 
       transport,
+      flag: !_.isEmpty(flag) ? flag : undefined,
       chatId: !_.isEmpty(chatId) ? chatId : undefined,
       userId: !_.isEmpty(userId) ? userId : undefined,
       messageId: !_.isEmpty(messageId) ? messageId : undefined
@@ -172,6 +183,20 @@ const MessageLogs = ({ messageTypes, platforms }) => {
               refetch({ userId: e.target.value });  
             }
           }}
+        />
+        &nbsp;
+        <Input
+          defaultValue={flag}
+          style={{ width: '150px', display: 'inline-block' }}
+          placeholder="flag"
+          onKeyUp={e => {
+            if (e.keyCode === 13) {
+              setFilters({ ...filters, flag: e.target.value });
+              setCursor({ ...cursor, page: 1 });
+              setQuery({ flag: e.target.value});
+              refetch({ flag: e.target.value });  
+            }
+          }}
         />        
       </div>
 
@@ -235,6 +260,11 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           <Column width={100} resizable>
             <HeaderCell>userId</HeaderCell>
             <Cell>{({ userId }) => <span className="cell-type-id">{userId}</span>}</Cell>
+          </Column>
+
+          <Column width={100} resizable>
+            <HeaderCell>Flag</HeaderCell>
+            <Cell>{({ flag }) => <span>{flag}</span>}</Cell>
           </Column>
 
           <Column width={300} flexGrow={1}>

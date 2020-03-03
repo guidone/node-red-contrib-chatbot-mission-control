@@ -619,8 +619,21 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     fields: {
       count: {
         type: GraphQLInt,
+        args: {                    
+          type: { type: GraphQLString },
+          transport: { type: GraphQLString },
+          messageId: { type: GraphQLString },
+          chatId: { type: GraphQLString },
+          userId: { type: GraphQLString },
+          flag: { type: GraphQLString },
+          inbound: { type: GraphQLBoolean }
+        },
         description: 'Total messages',
-        resolve: () => Message.count()
+        resolve: (root, { type, transport, messageId, chatId, userId, flag, inbound }) => Message.count({
+          where: compactObject({  
+            type, transport, messageId, chatId, userId, flag, inbound
+          })
+        })
       }
     }
   });
@@ -723,7 +736,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     fields: {
       messages: {
         type: messageCounterType,
-        description: 'Counters for messages',
+        description: 'Counters for messages',        
         resolve: (root, args) => {
           return {};
         } 
@@ -1106,6 +1119,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             messageId: { type: GraphQLString },
             chatId: { type: GraphQLString },
             userId: { type: GraphQLString },
+            flag: { type: GraphQLString },
             inbound: { type: GraphQLBoolean }
           },
           resolve: resolver(Message)
