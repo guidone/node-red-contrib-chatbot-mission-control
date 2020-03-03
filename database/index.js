@@ -77,6 +77,7 @@ module.exports = mcSettings => {
     from: Sequelize.STRING,
     messageId: Sequelize.STRING,
     transport: Sequelize.STRING,
+    flag: Sequelize.STRING,
     type: Sequelize.TEXT,
     content: Sequelize.TEXT,
     inbound: Sequelize.BOOLEAN,
@@ -88,6 +89,7 @@ module.exports = mcSettings => {
       { name: 'message_from', using: 'BTREE', fields: ['from'] },
       { name: 'message_messageid', using: 'BTREE', fields: ['messageId'] },
       { name: 'message_transport', using: 'BTREE', fields: ['transport'] },
+      { name: 'message_flag', using: 'BTREE', fields: ['flag'] },
       { name: 'message_type', using: 'BTREE', fields: ['type'] },
       { name: 'message_inbound', using: 'BTREE', fields: ['inbound'] },
       { name: 'message_ts', using: 'BTREE', fields: ['ts'] }
