@@ -58,7 +58,7 @@ const AppSidebar = ({ codePlug }) => {
               if (_.isArray(options)) {
                 return (
                   <Dropdown
-                    eventKey="3"
+                    eventKey={id}
                     trigger="hover"
                     title={label}
                     key={id}

@@ -12,7 +12,7 @@ const extractValues = location => {
   return values;
 }
 
-export default ({ onChangeQuery = () => {} }) => {
+export default ({ onChangeQuery = () => {} } = {}) => {
   const location = useLocation();
   const history = useHistory();
   useEffect(() => onChangeQuery(extractValues(location), location.key), [location]);
