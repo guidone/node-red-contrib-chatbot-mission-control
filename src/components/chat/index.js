@@ -192,7 +192,7 @@ const MessageGroup = ({ messages, ...props }) => {
   );
 };
 MessageGroup.propTypes = {
-  messages: PropTypes.oneOfType(
+  messages: PropTypes.arrayOf(
     PropTypes.shape({
       content: PropTypes.string,
       userId: PropTypes.string,

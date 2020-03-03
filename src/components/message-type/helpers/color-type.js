@@ -9,6 +9,6 @@ export default type => {
     case 'buttons':
     case 'inline-buttons':
       return 'violet';
-    default: return 'grey';
+    default: return 'yellow';
   }
 };

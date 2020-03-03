@@ -72,9 +72,19 @@ const SelectInbound = [
 
 
 const MessageLogs = ({ messageTypes, platforms }) => {
-  const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId, flag: urlFlag }, setQuery } = useRouterQuery();
+  const { 
+    query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId, flag: urlFlag }, 
+    setQuery,
+
+  } = useRouterQuery({
+    onChangeQuery: values => {
+      console.log('changed values', values)
+      setFilters(Object.assign({ chatId: null, messageId: null, userId: null, flag: null }, values))
+    }
+  });
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10 });
   const [ filters, setFilters ] = useState({ chatId: urlChatId, userId: urlUserId, messageId: urlMessageId, flag: urlFlag });
+  
   const { messageType, transport, inbound, chatId, userId, messageId, flag } = filters;
   const { limit, page } = cursor;
   
