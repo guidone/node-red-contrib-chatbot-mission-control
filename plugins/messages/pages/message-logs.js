@@ -5,8 +5,6 @@ import classNames from 'classnames';
 import _ from 'lodash';
 import { Table, Icon, SelectPicker, Placeholder, Input } from 'rsuite';
 
-import { useHistory } from 'react-router-dom';
-
 const { Column, HeaderCell, Cell, Pagination } = Table;
 const { Grid } = Placeholder
 
@@ -69,25 +67,23 @@ const SelectInbound = [
   { value: false, label: 'Outbound' },
 ]
 
-
-
 const MessageLogs = ({ messageTypes, platforms }) => {
   const { 
-    query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId, flag: urlFlag }, 
+    query,
     setQuery,
-
+    key: initialKey
   } = useRouterQuery({
-    onChangeQuery: values => {
-      console.log('changed values', values)
-      setFilters(Object.assign({ chatId: null, messageId: null, userId: null, flag: null }, values))
+    onChangeQuery: (values, key) => {
+      setFilters({ chatId: null, messageId: null, userId: null, flag: null, ...values })
+      setKey(key);
     }
   });
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10 });
-  const [ filters, setFilters ] = useState({ chatId: urlChatId, userId: urlUserId, messageId: urlMessageId, flag: urlFlag });
-  
+  const [ key, setKey] = useState(initialKey);
+  const [ filters, setFilters ] = useState(_.pick(query, ['chatId', 'userId', 'messageId', 'flag']));
   const { messageType, transport, inbound, chatId, userId, messageId, flag } = filters;
   const { limit, page } = cursor;
-  
+
   const { loading, error, data, refetch } = useQuery(MESSAGES, {
     fetchPolicy: 'network-only',
     variables: { 
@@ -148,7 +144,8 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           }} 
           onClean={() => setFilters({ ...filters, messageType: undefined })} 
           cleanable
-          searchable={false}          
+          searchable={false}
+          key={`type_${key}`}          
           placeholder="Message type" 
           size="md"
         />
@@ -157,6 +154,7 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           defaultValue={messageId}
           style={{ width: '150px', display: 'inline-block' }}
           placeholder="messageId"
+          key={`messageId_${key}`}
           onKeyUp={e => {
             if (e.keyCode === 13) {
               setFilters({ ...filters, messageId: e.target.value });
@@ -171,6 +169,7 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           defaultValue={chatId}
           style={{ width: '150px', display: 'inline-block' }}
           placeholder="chatId"
+          key={`chatId_${key}`}
           onKeyUp={e => {
             if (e.keyCode === 13) {
               setFilters({ ...filters, chatId: e.target.value });
@@ -185,6 +184,7 @@ const MessageLogs = ({ messageTypes, platforms }) => {
           defaultValue={userId}
           style={{ width: '150px', display: 'inline-block' }}
           placeholder="userId"
+          key={`userId_${key}`}
           onKeyUp={e => {
             if (e.keyCode === 13) {
               setFilters({ ...filters, userId: e.target.value });
@@ -197,6 +197,7 @@ const MessageLogs = ({ messageTypes, platforms }) => {
         &nbsp;
         <Input
           defaultValue={flag}
+          key={`flag_${key}`}
           style={{ width: '150px', display: 'inline-block' }}
           placeholder="flag"
           onKeyUp={e => {
@@ -299,8 +300,6 @@ const MessageLogs = ({ messageTypes, platforms }) => {
       )}
     </PageContainer>
   );
-
-
 };
 
 export default withPlatforms(withMessageTypes(MessageLogs));

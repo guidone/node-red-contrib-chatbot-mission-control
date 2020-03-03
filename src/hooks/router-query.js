@@ -14,28 +14,15 @@ const extractValues = location => {
 
 export default ({ onChangeQuery = () => {} }) => {
   const location = useLocation();
-
   const history = useHistory();
+  useEffect(() => onChangeQuery(extractValues(location), location.key), [location]);
 
-  useEffect(() => {
-    console.log('cambiato', location)
-
-    onChangeQuery(extractValues(location));
-
-  }, [location]);
-
-  /*
-  const { search } = location;
-  const query = new URLSearchParams(search);
-  const values = {};
-  for (const [key, value] of query.entries()) {
-    values[key] = !_.isEmpty(value) ? value : undefined;
-  }*/
-
-  
   return { 
     query: extractValues(location),
+    key: location.key,
     setQuery(obj) {
+      const { search } = location;
+      const query = new URLSearchParams(search);
       Object.keys(obj).forEach(key => {
         if (!_.isEmpty(obj[key])) {
           query.set(key, obj[key]);
@@ -47,4 +34,4 @@ export default ({ onChangeQuery = () => {} }) => {
       history.push(history.location.pathname + (!_.isEmpty(queryString) ? `?${queryString}`: ''));  
     }
   };
-}
+};
