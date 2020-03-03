@@ -8,6 +8,8 @@ const GraphQLServer = require('./graphql');
 
 let exportCache;
 
+const logging = process.env.DEBUG != null;
+
 module.exports = mcSettings => {
   if (exportCache != null) {
     return exportCache;;
@@ -18,7 +20,7 @@ module.exports = mcSettings => {
     host: 'localhost',
     dialect: 'sqlite',
     storage: dbPath,
-    logging: true
+    logging
   });
     
   const Configuration = sequelize.define('configuration', {

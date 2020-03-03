@@ -9,8 +9,6 @@ import toFunnel from '../helpers/to-funnel';
 
 const { Paragraph } = Placeholder;
 
-
-
 const FunnelGraph = ({ flow, percentile = false }) => {
   const { loading, error, data } = useQuery(EVENTS, {
     fetchPolicy: 'network-only',

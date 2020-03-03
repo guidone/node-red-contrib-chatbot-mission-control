@@ -38,6 +38,6 @@ export default (data, { percentile = false }) => {
       };
     }))
   };
-  console.log(funnel)
+
   return funnel
 }

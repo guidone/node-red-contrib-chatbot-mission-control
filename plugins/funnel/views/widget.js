@@ -3,6 +3,7 @@ import { Placeholder, SelectPicker, Toggle, Button } from 'rsuite';
 import { useQuery, useMutation } from 'react-apollo';
 
 import Panel from '../../../src/components/grid-panel';
+import withSocket from '../../../src/wrappers/with-socket';
 
 import FunnelGraph from './funnel-graph';
 import '../funnel.scss';
@@ -10,7 +11,7 @@ import { GROUPED_EVENTS, DELETE_FLOW } from '../queries';
 
 const { Paragraph } = Placeholder;
 
-const FunnelWidget = () => {
+const FunnelWidget = ({ sendMessage }) => {
   const [flow, setFlow] = useState(undefined);
   const [version, setVersion] = useState(1);
   const [percentile, setPercentile] = useState(false);
@@ -65,7 +66,8 @@ const FunnelWidget = () => {
               onClick={async () => {
                 if (confirm('Clear events for this flow?')) {
                   await deleteFlow({ variables: { flow } });
-                  setFlow(null);  
+                  setFlow(null);
+                  sendMessage('mc.events.timestamp', { eventsTimestamp: (new Date()).toString() });  
                   refetch();
                 }
               }}>
@@ -88,4 +90,4 @@ const FunnelWidget = () => {
   );
 };
 
-export default FunnelWidget;
+export default withSocket(FunnelWidget);

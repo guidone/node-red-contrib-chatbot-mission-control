@@ -781,6 +781,14 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             const nodes = await Event.findAll({ where: { flow: event.flow }})
                   
             let sources = [...event.sources];
+
+            console.log('-------')
+            console.log('name', event.name, 'sources', sources)
+            console.log('')
+    
+
+
+
             // while the last event of history is circular, chop the array remove the last event, 
             // then try again
             while (!_.isEmpty(sources) && isCircularPaths(event.name, _.last(sources), nodes, false)) {

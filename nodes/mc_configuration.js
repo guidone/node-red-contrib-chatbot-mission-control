@@ -6,18 +6,12 @@ const saveConfiguration = (configuration, context, namespace) => {
   Object.keys(configuration)
     .filter(key => key !== 'translations')
     .forEach(key => context.set(`${namespace}_${key}`, configuration[key]));
-
-
   // save dictionary if present
-  if (configuration != null && configuration.translations != null) {
-    console.log('installing translator')
+  if (configuration != null && configuration.translations != null) {    
     const currentDictionary = context.get('dictionary') || {};
-    //Object.assign(currentDictionary, configuration.translations, { tx: tx.bind(context) });
     context.set('dictionary', { ...currentDictionary, ...configuration.translations }); 
     context.set('tx', tx.bind(context)); 
   }
-
-
 };
 
 const tx = function(key, language, predefined) {
@@ -36,7 +30,7 @@ const tx = function(key, language, predefined) {
 
 const RequestConfiguration = function({ url, poll = 2000, callback = () => {} }) {
   this.timerId = setInterval(() => {
-    console.log(lcd.orange('Asking configuration...'));
+    console.log(lcd.orange('Fetching configuration...'));
     
     request({ url }, (error, response, body) => {
       if (!error) {
