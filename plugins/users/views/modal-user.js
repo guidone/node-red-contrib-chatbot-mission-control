@@ -16,7 +16,7 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
   const [tab, setTab] = useState('user-details');
 
   return (
-    <Modal backdrop show onHide={onCancel} className="modal-user">
+    <Modal backdrop show onHide={onCancel} size="md" className="modal-user">
       <Modal.Header>
         <Modal.Title>Edit User <em>(id: {user.id})</em></Modal.Title>
       </Modal.Header>
@@ -39,7 +39,15 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
         >
           <Nav.Item eventKey="user-details">User details</Nav.Item>
           <Views region="user-tabs">
-            {(View, { label, id}) => <Nav.Item active={id === tab} eventKey={id} onSelect={() => setTab(id)}>{label}</Nav.Item>}
+            {(View, { label, id}) => (
+              <Nav.Item 
+                key={id} 
+                active={id === tab} 
+                eventKey={id} 
+                onSelect={() => setTab(id)}>
+                {label}
+              </Nav.Item>
+            )}
           </Views>
           <Nav.Item eventKey="user-payload">User payload</Nav.Item>          
         </Nav>
@@ -142,7 +150,7 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
             </FormGroup>
           </Form>
         )}
-        <Views region="user-tabs">
+        <Views region="user-tabs" key="user-tabs">
           {(View, { id }) => {        
             if (id === tab) {
               return (
@@ -153,11 +161,14 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
                 />
               );
             }
-            return <div/>;
+            return <div key={id}/>;
           }}
         </Views>
       </Modal.Body>
-      <Modal.Footer>
+      <Modal.Footer>        
+        <Button onClick={onCancel} appearance="subtle">
+          Cancel
+        </Button>
         <Button 
           appearance="primary"
           disabled={disabled} 
@@ -165,9 +176,6 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
           onClick={() => onSubmit(formValue)}
         >
           Save user
-        </Button>
-        <Button onClick={onCancel} appearance="subtle">
-          Cancel
         </Button>
       </Modal.Footer>
     </Modal>

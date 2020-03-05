@@ -1,9 +1,9 @@
 import React from 'react';
 import { Form, FormGroup, ControlLabel, Tag, HelpBlock, Toggle } from 'rsuite';
 
-const SuspendForm = ({ formValue, formError = null, onChange }) => {
+const SuspendForm = ({ formValue = {}, formError = null, onChange }) => {
+  formValue = formValue || {};
 
-  // TODO implement suspended
   return (
     <Form 
       formValue={formValue} 
