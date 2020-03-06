@@ -32,8 +32,6 @@ module.exports = function(RED) {
       const flag = msg.payload != null && msg.payload.params != null && msg.payload.params.messageFlag != null ?
         msg.payload.params.messageFlag : null
 
-      console.log('+++++++++ flag', flag);
-
       // get chat context
       const chat = msg.chat();
       when(chat.get('firstName', 'lastName', 'username', 'language', 'userId'))
