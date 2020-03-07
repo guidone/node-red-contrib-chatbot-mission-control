@@ -6,7 +6,9 @@ const lcd = require('../lib/lcd/index');
 
 const { 
   getTransport,
-  getChatId
+  getChatId,
+  when,
+  isValidMessage
 } = require('../lib/helpers/utils');
 
 const GET_USER = gql`
@@ -45,41 +47,50 @@ module.exports = function(RED) {
       send = send || function() { node.send.apply(node, arguments) };
       done = done || function(error) { node.error.call(node, error, msg) };
 
+      // check if valid redbot message or simulator, pass thru
+      if (!isValidMessage(msg, node)) {        
+        return;  
+      }
+
       const chatId = getChatId(msg);
       const transport = getTransport(msg);
+      const chat = msg.chat();
 
       try {
+        // get data from context
+        const { firstName, lastName, language } = await when(chat.get('firstName', 'lastName', 'language'));
+
+        // get user data from DB
         const response = await client.query({ 
           query: GET_USER, 
           variables: { chatId: String(chatId), transport }, 
           fetchPolicy: 'network-only' 
         });
-        
-        if (response.data != null && !_.isEmpty(response.data.chatIds)) {        
-          send({ ...msg, payload: response.data.chatIds[0].user });
-        } else {
-          send(msg);
+
+        const user = response.data != null && !_.isEmpty(response.data.chatIds) ? response.data.chatIds[0].user : null;
+        // reflect back changes to context
+        if (user != null) {
+          // the DB is the single source of truth
+          const update = {};
+          if (firstName !== user.first_name) {
+            update.firstName = user.first_name;
+          }
+          if (lastName !== user.last_name) {
+            update.lastName = user.last_name;
+          }
+          if (language !== user.language) {
+            update.language = user.language;
+          }
+          // update chat context only if there are changes
+          if (!_.isEmpty(update)) {          
+            await when(chat.set(update));
+          }
         }
-        
+
+        send({ ...msg, user });              
         done();
-      } catch(error) {
-        console.log('errr', error )
-        // format error
-        // TODO: generalize query error
-        if (error != null && error.networkError != null && error.networkError.result != null && error.networkError.result.errors != null) {
-          let errors = error.networkError.result.errors.map(error => {
-            let errorMsg = error.message;
-            if (error.locations != null) {
-              errorMsg += ` (line: ${error.locations[0].line})`;
-            }
-            return errorMsg;
-          });            
-          lcd.dump(errors, `GraphQL Error (id: ${node.id})`);
-        } else {
-          lcd.dump('Unknown GraphQL error', `GraphQL Error (id: ${node.id})`);
-          console.log(error);
-        }
-        done(error);
+      } catch(error) {      
+        done(error);  
       }
     });
   }

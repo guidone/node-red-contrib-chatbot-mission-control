@@ -34,7 +34,7 @@ module.exports = function(RED) {
       done = done || function(error) { node.error.call(node, error, msg) };
       
       // check if valid redbot message or simulator, pass thru
-      if (!isValidMessage(msg, node) || isSimulator(msg)) {
+      if (!isValidMessage(msg, node, { silent: true }) || isSimulator(msg)) {
         send(msg);
         done();
         return;  
