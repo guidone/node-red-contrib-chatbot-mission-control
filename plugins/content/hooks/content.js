@@ -5,17 +5,17 @@ import { useQuery, useMutation } from 'react-apollo';
 import withoutParams from '../../../src/helpers/without-params';
 
 const CONTENTS = gql`
-query($offset: Int, $limit: Int, $order: String, $categoryId: Int, $slug: String, $language: String) {
+query($offset: Int, $limit: Int, $order: String, $categoryId: Int, $slug: String, $language: String, $namespace: String) {
   counters {
     contents {
-     count(categoryId: $categoryId, slug: $slug, language: $language)
+     count(categoryId: $categoryId, slug: $slug, language: $language, namespace: $namespace)
     }
   }
-  categories {
+  categories(namespace: $namespace) {
     id,
     name
   }
-  contents(offset: $offset, limit: $limit, order: $order, categoryId: $categoryId, slug: $slug, language: $language) {
+  contents(offset: $offset, limit: $limit, order: $order, categoryId: $categoryId, slug: $slug, language: $language, namespace: $namespace) {
     id,
     slug,
     title,
@@ -86,7 +86,7 @@ mutation($content: NewContent!) {
 
 const makeOrder = (sortField, sortType) => `${sortType === 'desc' ? 'reverse:' : ''}${sortField}`;
 
-export default ({ limit, page, sortField, sortType, categoryId, language, onCompleted = () => {}, slug }) => {
+export default ({ limit, page, sortField, sortType, categoryId, language, onCompleted = () => {}, slug, namespace }) => {
   const { loading, error, data, refetch } = useQuery(CONTENTS, {
     fetchPolicy: 'network-only',
     errorPolicy: 'all',
@@ -97,7 +97,8 @@ export default ({ limit, page, sortField, sortType, categoryId, language, onComp
       order: makeOrder(sortField, sortType), 
       categoryId,
       slug,
-      language
+      language,
+      namespace
     },
     onCompleted: () => setBootstrapping(false)
   });

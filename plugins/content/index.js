@@ -21,5 +21,15 @@ plug(
     ] 
   }
 );
-plug('pages', Contents, { url: '/content', title: 'Content', id: 'contents' });
-plug('pages', Categories, { url: '/categories', title: 'Categories', id: 'categories' });
+plug('pages', Contents, { 
+  url: '/content', 
+  title: 'Contents', 
+  id: 'contents',
+  namespace: 'content' 
+});
+plug('pages', Categories, { 
+  url: '/categories', 
+  title: 'Categories', 
+  id: 'categories',
+  namespace: 'content' 
+});

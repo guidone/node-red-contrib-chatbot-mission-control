@@ -22,7 +22,7 @@ import ModalContent from '../views/modal-content';
 
 
 
-const Contents = ({ messageTypes, platforms }) => {
+const Contents = ({ namespace, title }) => {
   //const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId }, setQuery } = useRouterQuery();
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10, sortField: 'createdAt', sortType: 'desc' });
   const [ filters, setFilters ] = useState({ categoryId: null, language: null, slug: null });
@@ -40,12 +40,11 @@ const Contents = ({ messageTypes, platforms }) => {
     editContent, 
     createContent, 
     refetch 
-  } = useContents({ limit, page, sortField, sortType, categoryId, language, slug });
+  } = useContents({ limit, page, sortField, sortType, categoryId, language, slug, namespace });
   
-
   return (
     <PageContainer className="page-contents">
-      <Breadcrumbs pages={['Contents']}/>
+      <Breadcrumbs pages={[title]}/>
       {content != null && (
         <ModalContent 
           content={content}
@@ -54,11 +53,11 @@ const Contents = ({ messageTypes, platforms }) => {
           categories={data.categories}
           onCancel={() => setContent(null)}
           onSubmit={async content => {
-            console.log('cont', content )
+
             if (content.id != null) {
               await editContent({ variables: { id: content.id, content }})
             } else {
-              await createContent({ variables: { content } });
+              await createContent({ variables: { content: { ...content, namespace } } });
             }
             // TODO: catch errorrs                          
             setContent(null);

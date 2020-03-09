@@ -14,7 +14,7 @@ import ModalCategory from '../views/modal-category';
 
 
 
-const Categories = () => {
+const Categories = ({ namespace, title }) => {
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10, sortField: 'createdAt', sortType: 'desc' });  
   const [ category, setCategory ] = useState(null);
 
@@ -29,11 +29,11 @@ const Categories = () => {
     editCategory, 
     createCategory, 
     refetch 
-  } = useCategories({ limit, page, sortField, sortType });
+  } = useCategories({ limit, page, sortField, sortType, namespace });
   
   return (
     <PageContainer className="page-contents">
-      <Breadcrumbs pages={['Categories']}/>
+      <Breadcrumbs pages={[title]}/>
       {category != null && (
         <ModalCategory 
           category={category}
@@ -43,7 +43,7 @@ const Categories = () => {
             if (category.id != null) {
               await editCategory({ variables: { id: category.id, category }})
             } else {
-              await createCategory({ variables: { category } });
+              await createCategory({ variables: { category: { ...category, namespace} } });
             }
             // TODO: catch errorrs                          
             setCategory(null);
@@ -78,7 +78,7 @@ const Categories = () => {
           sortColumn={sortField}
           sortType={sortType}
           disabled={loading}
-          renderEmpty={() => <div style={{ textAlign: 'center', padding: 80}}>No Content</div>}
+          renderEmpty={() => <div style={{ textAlign: 'center', padding: 80}}>No categories</div>}
           onSortColumn={(sortField, sortType) => setCursor({ ...cursor, sortField, sortType })}
           autoHeight
         >

@@ -5,13 +5,13 @@ import { useQuery, useMutation } from 'react-apollo';
 import withoutParams from '../../../src/helpers/without-params';
 
 const CATEGORIES = gql`
-query($offset: Int, $limit: Int, $order: String) {  
+query($offset: Int, $limit: Int, $order: String, $namespace: String) {  
   counters {
     categories {
-      count
+      count(namespace: $namespace)
     }
   }
-  categories(offset: $offset, limit: $limit, order: $order) {
+  categories(offset: $offset, limit: $limit, order: $order, namespace: $namespace) {
     id,
     name,
     createdAt
@@ -47,14 +47,15 @@ mutation($category: NewCategory!) {
 
 const makeOrder = (sortField, sortType) => `${sortType === 'desc' ? 'reverse:' : ''}${sortField}`;
 
-export default ({ limit, page, sortField, sortType, onCompleted = () => {}, slug }) => {
+export default ({ limit, page, sortField, sortType, onCompleted = () => {}, namespace }) => {
   const { loading, error, data, refetch } = useQuery(CATEGORIES, {
     fetchPolicy: 'network-only',
     variables: { 
       limit, 
       offset: (page - 1) * limit,
       sortField, sortType, 
-      order: makeOrder(sortField, sortType)      
+      order: makeOrder(sortField, sortType),
+      namespace      
     },
     onCompleted: () => setBootstrapping(false)
   });

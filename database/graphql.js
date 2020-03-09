@@ -324,6 +324,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       language: {
         type: GraphQLString,
         description: '',
+      },
+      namespace: {
+        type: GraphQLString,
+        description: '',
       }
     }
   });
@@ -528,6 +532,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLString,
         description: '',
       },
+      namespace: {
+        type: GraphQLString,
+        description: '',
+      },
       payload: {
         type: JSONType,
         description: '',
@@ -559,6 +567,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         description: '',
       },
       language: {
+        type: GraphQLString,
+        description: '',
+      },
+      namespace: {
         type: GraphQLString,
         description: '',
       },
@@ -701,8 +713,15 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     fields: {
       count: {
         type: GraphQLInt,
-        description: 'Total categories',
-        resolve: () => Category.count()
+        args: {        
+          namespace: { type: GraphQLString }
+        },
+        description: 'Total categories', // TODO put also namespace
+        resolve: (root, { namespace }) => Category.count({
+          where: compactObject({
+            namespace
+          })
+        })
       }
     }
   });
@@ -717,13 +736,15 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         args: {
           slug: { type: GraphQLString },
           language: { type: GraphQLString },
+          namespace: { type: GraphQLString },
           categoryId: { type: GraphQLInt }
         },
-        resolve: (root, { slug, categoryId, language }) => Content.count({
+        resolve: (root, { slug, categoryId, language, namespace }) => Content.count({
           where: compactObject({
             categoryId,
             slug,
-            language
+            language,
+            namespace
           })
         })
       }
@@ -1071,9 +1092,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             categoryId: { type: GraphQLInt },
             id: { type: GraphQLInt },
             language: { type: GraphQLString },
+            namespace: { type: GraphQLString },
             title: { type: GraphQLString }
           },
-          resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language, title, id }) {
+          resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language, title, id, namespace }) {
             return Content.findAll({
               limit,
               offset,
@@ -1083,6 +1105,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
                 categoryId,
                 slug,
                 language,
+                namespace,
                 title: title != null ? { [Op.like]: `%${title}%` } : undefined
               })
             });
@@ -1129,14 +1152,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           type: new GraphQLList(categoryType),
           args: {
             order: { type: GraphQLString },
+            namespace: { type: GraphQLString },
             offset: { type: GraphQLInt },
             limit: { type: GraphQLInt }
           },
-          resolve: (root, { order = 'name', offset, limit }) => {
+          resolve: (root, { order = 'name', offset, limit, namespace }) => {
             return Category.findAll({
               limit,
               offset,
-              order: splitOrder(order)
+              order: splitOrder(order),
+              where: compactObject({                
+                namespace                
+              })
             });
           }
         },

@@ -12,3 +12,4 @@ import './plugins/funnel';
 import './plugins/simulator';
 import './plugins/content';
 import './plugins/content-image';
+import './plugins/knowledge-base';
