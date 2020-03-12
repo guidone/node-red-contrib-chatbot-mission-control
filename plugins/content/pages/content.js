@@ -20,9 +20,17 @@ import useRouterQuery from '../../../src/hooks/router-query';
 import useContents from '../hooks/content';
 import ModalContent from '../views/modal-content';
 
+const LABELS = {
+  createContent: 'Create content',
+  emptyContent: 'No Content',
+  saveContent: 'Save content'
+};
 
-
-const Contents = ({ namespace, title }) => {
+const Contents = ({ 
+  namespace, 
+  title,
+  labels
+ }) => {
   //const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId }, setQuery } = useRouterQuery();
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10, sortField: 'createdAt', sortType: 'desc' });
   const [ filters, setFilters ] = useState({ categoryId: null, language: null, slug: null });
@@ -42,6 +50,8 @@ const Contents = ({ namespace, title }) => {
     refetch 
   } = useContents({ limit, page, sortField, sortType, categoryId, language, slug, namespace });
   
+  labels = { ...LABELS, ...labels };
+
   return (
     <PageContainer className="page-contents">
       <Breadcrumbs pages={[title]}/>
@@ -51,6 +61,7 @@ const Contents = ({ namespace, title }) => {
           error={error}
           disabled={saving}
           categories={data.categories}
+          labels={labels}
           onCancel={() => setContent(null)}
           onSubmit={async content => {
 
@@ -108,7 +119,7 @@ const Contents = ({ namespace, title }) => {
               <Button 
                 appearance="primary"
                 disabled={loading || saving} 
-                onClick={() => setContent({ title: '', body: '', fields: [] })}>Create Content
+                onClick={() => setContent({ title: '', body: '', fields: [] })}>{labels.createContent}
               </Button>
             </FlexboxGrid.Item>
           </FlexboxGrid>          
@@ -122,7 +133,7 @@ const Contents = ({ namespace, title }) => {
           loading={loading}
           sortColumn={sortField}
           sortType={sortType}
-          renderEmpty={() => <div style={{ textAlign: 'center', padding: 80}}>No Content</div>}
+          renderEmpty={() => <div style={{ textAlign: 'center', padding: 80}}>{labels.emptyContent}</div>}
           onSortColumn={(sortField, sortType) => setCursor({ ...cursor, sortField, sortType })}
           autoHeight
         >

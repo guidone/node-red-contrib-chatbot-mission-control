@@ -23,7 +23,15 @@ import { Views } from '../../../lib/code-plug';
 import { content as contentModel } from '../models';
 import '../styles/modal-content.scss';
 
-const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabled = false, categories, error }) => {
+const ModalContent = ({ 
+  content, 
+  onCancel = () => {}, 
+  onSubmit = () => {}, 
+  disabled = false, 
+  categories, 
+  error,
+  labels = {}
+}) => {
   const [formValue, setFormValue] = useState(content);
   const [formError, setFormError] = useState(null);
   const [jsonValue, setJsonValue] = useState({
@@ -195,7 +203,7 @@ const ModalContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disab
             onSubmit(formValue);
           }}
         >
-          Save content
+          {labels.saveContent}
         </Button>
         <Button onClick={onCancel} appearance="subtle">
           Cancel
