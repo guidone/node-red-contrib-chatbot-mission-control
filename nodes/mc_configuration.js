@@ -1,5 +1,7 @@
 const _ = require('lodash');
 const request = require('request').defaults({ encoding: null });
+const minisearch = require('minisearch');
+
 const lcd = require('../lib/lcd/index');
 
 const saveConfiguration = (configuration, context, namespace) => {
@@ -60,6 +62,11 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     const node = this;
     this.namespace = config.namespace;
+    
+    // store globally the minisearch lib
+    const global = this.context().global;
+    global.set('minisearch', minisearch);
+    
     // ask configuration until it comes online
     this.requestConfiguration = new RequestConfiguration({
       url: `http://localhost:${RED.settings.uiPort}/mc/api/configuration/${node.namespace}`,
@@ -78,8 +85,6 @@ module.exports = function(RED) {
           clearInterval(this.timerId);
         }
         
-
-
         saveConfiguration(payload, this.context().global, node.namespace);
         // pass through
         node.send({ payload });

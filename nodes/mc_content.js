@@ -3,6 +3,7 @@ const gql = require('graphql-tag');
 
 const client = require('../database/client');
 const MessageTemplate = require('../lib/message-template/index');
+const LIMIT = 100;
 
 const { 
   isValidMessage, 
@@ -24,6 +25,7 @@ query($id: Int,$slug: String) {
     body,
     categoryId,
     category {
+      id,
       name
     }
   }
@@ -37,7 +39,6 @@ module.exports = function(RED) {
     this.slug = config.slug;
     this.language = config.language;
     this.failbackLanguage = config.failbackLanguage;
-    this.chain = config.chain;
     
     this.on('input', async function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
@@ -49,39 +50,67 @@ module.exports = function(RED) {
       }
       const chat = msg.chat();
       const template = MessageTemplate(msg, node);
-      const slug = extractValue('string', 'slug', node, msg, false);
+      const slug = extractValue('string', 'slug', node, msg, false, true);
+      const id = extractValue('number', 'id', node, msg, false, true);
       const language = extractValue('string', 'language', node, msg, false);
       const failbackLanguage = extractValue('string', 'failbackLanguage', node, msg, false);
       
       // build query variables
       let variables;
+      let usingId = false;
       if (!isNaN(parseInt(slug, 10))) {
-        variables = { id: parseInt(slug, 10), limit: 100 };
+        variables = { id: parseInt(slug, 10), limit: LIMIT };
+        usingId = true;
+      } else if (_.isNumber(id)) {
+        variables = { id, limit: LIMIT };
+        usingId = true;
+      } else if (!_.isEmpty(slug)) {
+        variables = { slug, limit: LIMIT };
       } else {
-        variables = { slug, limit: 100 };
+        done('Invalid or empty slug/id, unable to retrieve content');
+        return;
       }
+
       // get user's language from context
       const contextLanguage = await when(chat.get('language'));
 
       try {
-        const response = await client.query({ query: CONTENT, variables, fetchPolicy: 'network-only' });        
+        const response = await client.query({ query: CONTENT, variables, fetchPolicy: 'network-only' });                
         const { contents } = response.data;
 
         let content;
-        if (_.isEmpty(language) && !_.isEmpty(contextLanguage)) {
-          content = contents.find(content => content.language === contextLanguage);
-        } else if (!_.isEmpty(language)) {
-          content = contents.find(content => content.language === language);
-        }
-        if (content == null && !_.isEmpty(failbackLanguage)) {
-          content = contents.find(content => content.language === failbackLanguage);
-        }
-        const payload = await template(content);
-        if (node.chain) {
-          send({ ...msg, data: payload });
+        if (usingId) {
+          // if using id, then just get the first
+          content = !_.isEmpty(contents) ? contents[0] : null;
         } else {
-          send({ ...msg, payload });
+          // if not using id but the slug, then apply language logic, try to find the right one
+          // matching the chat context language or the one defined in the configuration or the 
+          // failback language
+          if (_.isEmpty(language) && !_.isEmpty(contextLanguage)) {
+            c.find(content => content.language === contextLanguage);
+          } else if (!_.isEmpty(language)) {
+            content = contents.find(content => content.language === language);
+          }
+          if (content == null && !_.isEmpty(failbackLanguage)) {
+            content = contents.find(content => content.language === failbackLanguage);
+          }
         }
+        // error if still empty
+        if (content == null) {
+          send(msg);
+          done(`Content not found for id: ${id} or slug: €{slug}`);
+          return;
+        }
+        const payload = await template(content);        
+        // store the result in the payload and save the previous content in "previous" key
+        // to be used with the "Pop Message" node if needed, store also the result in data
+        // in case the "Pop Message" node is used
+        send({ 
+          ...msg, 
+          data: payload,
+          payload,
+          previous: msg.payload 
+        });
         
         done();
       } catch(error) {

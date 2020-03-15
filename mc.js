@@ -179,9 +179,6 @@ function bootstrap(server, app, log, redSettings) {
     }
   );
 
-  console.log('assets', `${mcSettings.root}/main.js`)
-  
-
   // Setup web socket
   const wss = new WebSocket.Server({ port: Settings.wsPort });
   wss.on('connection', ws => {
