@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useQuery, useMutation } from 'react-apollo';
 
-// TODO move this in a common component
-import ModalContent from '../../../../plugins/content/views/modal-content';
+
+import { ModalContent } from '../../content';
 import withoutParams from '../../../../src/helpers/without-params';
 
 import { CONTENT, EDIT_CONTENT } from '../queries';

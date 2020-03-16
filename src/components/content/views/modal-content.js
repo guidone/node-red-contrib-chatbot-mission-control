@@ -13,15 +13,19 @@ import {
   Nav
 } from 'rsuite';
 
-import FieldsEditor from '../../../src/components/fields-editor';
-import MarkdownEditor from '../../../src/components/markdown-editor';
-import ShowError from '../../../src/components/show-error';
-import LanguagePicker from '../../../src/components/language-picker';
-import JSONEditor from '../../../src/components/json-editor';
-import { Views } from '../../../lib/code-plug';
+import FieldsEditor from '../../../../src/components/fields-editor';
+import MarkdownEditor from '../../../../src/components/markdown-editor';
+import ShowError from '../../../../src/components/show-error';
+import LanguagePicker from '../../../../src/components/language-picker';
+import JSONEditor from '../../../../src/components/json-editor';
+import { Views } from '../../../../lib/code-plug';
 
 import { content as contentModel } from '../models';
 import '../styles/modal-content.scss';
+
+const LABELS = {  
+  saveContent: 'Save content'
+};
 
 const ModalContent = ({ 
   content, 
@@ -42,6 +46,7 @@ const ModalContent = ({
 
   const isNew = content.id == null;
 
+  labels = { ...LABELS, ...labels };
   // TODO prevent close if changes
 
   return (
@@ -229,6 +234,9 @@ ModalContent.propTypes = {
       type: PropTypes.string,
       value: PropTypes.any
     }))
+  }),
+  labels: PropTypes.shape({    
+    saveContent: PropTypes.string
   })
 };
 

@@ -6,9 +6,9 @@ import { Table, Icon, Placeholder, ButtonGroup, Button, FlexboxGrid } from 'rsui
 const { Column, HeaderCell, Cell, Pagination } = Table;
 const { Grid } = Placeholder
 
-import PageContainer from '../../../src/components/page-container';
-import Breadcrumbs from '../../../src/components/breadcrumbs';
-import SmartDate from '../../../src/components/smart-date';
+import PageContainer from '../../../../src/components/page-container';
+import Breadcrumbs from '../../../../src/components/breadcrumbs';
+import SmartDate from '../../../../src/components/smart-date';
 
 import useCategories from '../hooks/category';
 import ModalCategory from '../views/modal-category';

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from 'react-apollo';
 
-import withoutParams from '../../../src/helpers/without-params';
+import withoutParams from '../../../../src/helpers/without-params';
 
 const CONTENTS = gql`
 query($offset: Int, $limit: Int, $order: String, $categoryId: Int, $slug: String, $language: String, $namespace: String) {

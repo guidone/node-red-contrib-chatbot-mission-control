@@ -11,12 +11,12 @@ import { useHistory } from 'react-router-dom';
 const { Column, HeaderCell, Cell, Pagination } = Table;
 const { Grid } = Placeholder
 
-import PageContainer from '../../../src/components/page-container';
-import Breadcrumbs from '../../../src/components/breadcrumbs';
-import SmartDate from '../../../src/components/smart-date';
-import Language from '../../../src/components/language';
-import LanguagePicker from '../../../src/components/language-picker';
-import useRouterQuery from '../../../src/hooks/router-query';
+import PageContainer from '../../../../src/components/page-container';
+import Breadcrumbs from '../../../../src/components/breadcrumbs';
+import SmartDate from '../../../../src/components/smart-date';
+import Language from '../../../../src/components/language';
+import LanguagePicker from '../../../../src/components/language-picker';
+import useRouterQuery from '../../../../src/hooks/router-query';
 
 import useContents from '../hooks/content';
 import ModalContent from '../views/modal-content';

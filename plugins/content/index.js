@@ -3,9 +3,7 @@ import _ from 'lodash';
 
 import { plug } from '../../lib/code-plug';
 
-import Contents from './pages/content'
-import Categories from './pages/categories';
-
+import { Contents, Categories } from '../../src/components/content';
 
 plug(
   'sidebar', 

@@ -2,9 +2,8 @@ import React, { Fragment } from 'react';
 import _ from 'lodash';
 
 import { plug } from '../../lib/code-plug';
+import { Contents, Categories } from '../../src/components/content';
 
-import Contents from '../content/pages/content'
-import Categories from '../content/pages/categories';
 import Configuration from './pages/configuration';
 
 plug(
@@ -26,7 +25,7 @@ plug(
 plug('pages', Categories, { 
   url: '/knowledge-base/categories', 
   title: 'Categories', 
-  id: 'faq-categories',
+  id: 'faq-categories', 
   namespace: 'faq',
   breadcrumbs: [
     { title: 'Knowledge Base', url: '/knowledge-base' }, 
@@ -43,5 +42,8 @@ plug('pages', Contents, {
   title: 'Knowledge Base', 
   id: 'faqs',
   namespace: 'faq',
-  breadcrumbs: ['Knowledge Base', 'Articles'] 
+  breadcrumbs: ['Knowledge Base', 'Articles'],
+  labels: {
+    saveContent: 'Save article'
+  } 
 });
