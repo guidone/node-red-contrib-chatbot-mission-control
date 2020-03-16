@@ -11,7 +11,6 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     const node = this;
     this.query = config.query;
-    this.chain = config.chain;
     
     this.on('input', async function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
@@ -35,12 +34,13 @@ module.exports = function(RED) {
       const query = gql`${translatedQuery}`;
 
       try {
-        const response = await client.query({ query, variables, fetchPolicy: 'network-only' });
-        if (node.chain) {
-          send({ ...msg, data: response.data });
-        } else {
-          send({ ...msg, payload: response.data });
-        }        
+        const response = await client.query({ query, variables, fetchPolicy: 'network-only' });        
+        send({ 
+          ...msg, 
+          data: response.data,
+          payload: response.data,
+          previous: msg.payload
+        });                
         done();
       } catch(error) {
         // format error
