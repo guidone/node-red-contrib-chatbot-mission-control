@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { Table, Icon, Placeholder, ButtonGroup, Button, FlexboxGrid } from 'rsuite';
 
@@ -12,9 +13,7 @@ import SmartDate from '../../../src/components/smart-date';
 import useCategories from '../hooks/category';
 import ModalCategory from '../views/modal-category';
 
-
-
-const Categories = ({ namespace, title }) => {
+const Categories = ({ namespace, title, breadcrumbs }) => {
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10, sortField: 'createdAt', sortType: 'desc' });  
   const [ category, setCategory ] = useState(null);
 
@@ -33,7 +32,7 @@ const Categories = ({ namespace, title }) => {
   
   return (
     <PageContainer className="page-contents">
-      <Breadcrumbs pages={[title]}/>
+      <Breadcrumbs pages={breadcrumbs != null ? breadcrumbs : [title]}/>
       {category != null && (
         <ModalCategory 
           category={category}
@@ -145,6 +144,17 @@ const Categories = ({ namespace, title }) => {
       )}
     </PageContainer>
   );
+};
+Categories.propTypes = {
+  namespace: PropTypes.string,
+  title: PropTypes.string,  
+  breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([
+    PropTypes.string, // the title of the page or the id of the page
+    PropTypes.shape({
+      title: PropTypes.string,
+      url: PropTypes.string
+    })
+  ]))
 };
 
 export default Categories;

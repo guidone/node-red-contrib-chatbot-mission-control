@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { FlexboxGrid, Notification, Tag } from 'rsuite';
 
 import PageContainer from '../../../src/components/page-container';
@@ -7,6 +8,11 @@ import InfoPanel from '../../../src/components/info-panel';
 import withSocket from '../../../src/wrappers/with-socket';
 import ConfigurationForm from '../views/form';
 import useConfiguration from '../../../src/hooks/configuration';
+
+const BREADCRUMBS = [
+  { title: 'Knowledge Base', url: '/knowledge-base' }, 
+  'Configuration'
+];
 
 const ConfigurationPage = ({ sendMessage }) => {
   const { loading, saving, error, data, update } = useConfiguration({ 
@@ -19,7 +25,7 @@ const ConfigurationPage = ({ sendMessage }) => {
 
   return (
     <PageContainer className="page-configuration">
-      <Breadcrumbs pages={['Knowledge Base', 'Configuration']}/>
+      <Breadcrumbs pages={BREADCRUMBS}/>
       <FlexboxGrid justify="space-between">
         <FlexboxGrid.Item colspan={17} style={{ paddingTop: '20px', paddingLeft: '20px' }}>
           {loading && <div>loading</div>}
@@ -43,5 +49,6 @@ const ConfigurationPage = ({ sendMessage }) => {
     </PageContainer>
   );
 };
+
 
 export default withSocket(ConfigurationPage);

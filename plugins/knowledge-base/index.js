@@ -27,7 +27,11 @@ plug('pages', Categories, {
   url: '/knowledge-base/categories', 
   title: 'Categories', 
   id: 'faq-categories',
-  namespace: 'faq' 
+  namespace: 'faq',
+  breadcrumbs: [
+    { title: 'Knowledge Base', url: '/knowledge-base' }, 
+    'Configuration'
+  ] 
 });
 plug('pages', Configuration, { 
   url: '/knowledge-base/configure', 
@@ -38,5 +42,6 @@ plug('pages', Contents, {
   url: '/knowledge-base', 
   title: 'Knowledge Base', 
   id: 'faqs',
-  namespace: 'faq' 
+  namespace: 'faq',
+  breadcrumbs: ['Knowledge Base', 'Articles'] 
 });

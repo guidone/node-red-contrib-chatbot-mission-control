@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import { useQuery } from 'react-apollo';
 import classNames from 'classnames';
@@ -29,7 +30,8 @@ const LABELS = {
 const Contents = ({ 
   namespace, 
   title,
-  labels
+  labels,
+  breadcrumbs
  }) => {
   //const { query: { chatId: urlChatId, messageId: urlMessageId, userId: urlUserId }, setQuery } = useRouterQuery();
   const [ cursor, setCursor ] = useState({ page: 1, limit: 10, sortField: 'createdAt', sortType: 'desc' });
@@ -54,7 +56,7 @@ const Contents = ({
 
   return (
     <PageContainer className="page-contents">
-      <Breadcrumbs pages={[title]}/>
+      <Breadcrumbs pages={breadcrumbs != null ? breadcrumbs : [title]}/>
       {content != null && (
         <ModalContent 
           content={content}
@@ -224,6 +226,22 @@ const Contents = ({
       )}
     </PageContainer>
   );
+};
+Contents.propTypes = {
+  namespace: PropTypes.string,
+  title: PropTypes.string,
+  labels: PropTypes.shape({
+    createContent: PropTypes.string,
+    emptyContent: PropTypes.string,
+    saveContent: PropTypes.string
+  }),
+  breadcrumbs: PropTypes.arrayOf(PropTypes.oneOfType([
+    PropTypes.string, // the title of the page or the id of the page
+    PropTypes.shape({
+      title: PropTypes.string,
+      url: PropTypes.string
+    })
+  ]))
 };
 
 export default Contents;

@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { Breadcrumb } from 'rsuite';
 import { Link } from 'react-router-dom';
@@ -29,6 +30,15 @@ const Breadcrumbs = ({ pages = [], codePlug }) => {
       {breadcrumbs}
     </Breadcrumb>
   );
+};
+Breadcrumbs.propTypes = {
+  pages: PropTypes.arrayOf(PropTypes.oneOfType([
+    PropTypes.string, // the title of the page or the id of the page
+    PropTypes.shape({
+      title: PropTypes.string,
+      url: PropTypes.string
+    })
+  ]))
 };
 
 export default withCodePlug(Breadcrumbs);
