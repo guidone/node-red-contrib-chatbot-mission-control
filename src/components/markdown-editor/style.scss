@@ -1,22 +1,29 @@
-.CodeMirror {
-  pre {
-    font-size: 16px;
-  }
-
-  .CodeMirror-code {
-    .cm-header-1 {
-      font-size: 120% !important;
-      line-height: 120% !important;
+.ui-markdown-editor {
+  .CodeMirror {
+    min-height: 200px;
+    .CodeMirror-scroll {
+      min-height: 200px;
     }
 
-    .cm-header-2 {
-      font-size: 110% !important;
-      line-height: 110% !important;
+    pre {
+      font-size: 16px;
     }
 
-    .cm-header-3 {
-      font-size: 100% !important;
-      line-height: 100% !important;
+    .CodeMirror-code {
+      .cm-header-1 {
+        font-size: 120% !important;
+        line-height: 120% !important;
+      }
+
+      .cm-header-2 {
+        font-size: 110% !important;
+        line-height: 110% !important;
+      }
+
+      .cm-header-3 {
+        font-size: 100% !important;
+        line-height: 100% !important;
+      }
     }
   }
 }

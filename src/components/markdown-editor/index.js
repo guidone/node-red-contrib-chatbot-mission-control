@@ -16,7 +16,6 @@ class MarkdownEditor extends React.Component {
       spellChecker: false
     });
     this.simplemde.codemirror.on('change', () => onChange(this.simplemde.value()));
-
   }
 
   componentWillUnmount() {
@@ -26,7 +25,9 @@ class MarkdownEditor extends React.Component {
 
   render() {
     return (
-      <textarea ref={ref => this.textarea = ref}/>
+      <div className="ui-markdown-editor">
+        <textarea ref={ref => this.textarea = ref}/>
+      </div>
     );
   }
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 
 import Language from '../../../components/language';
 
@@ -12,7 +13,7 @@ const ContentIcon = ({ language, disabled = false, title, onClick = () => {} }) 
         onClick();
       }}
     >
-      <Language tooltip={title}>{language}</Language>
+      <Language tooltip={title}>{!_.isEmpty(language) ? language : '?'}</Language>
     </a>
   );
 };

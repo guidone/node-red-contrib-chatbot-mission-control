@@ -1,3 +1,18 @@
 .ui-content-autocomplete {
   max-width: 550px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-content: stretch;
+  align-items: center;
+
+  .autocomplete {
+    flex: 1 0 auto;
+  }
+
+  .create {
+    flex: 0 0 auto;
+    margin-left: 10px;
+  }
 }

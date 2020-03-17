@@ -76,7 +76,6 @@ const FieldsEditor = ({ value, onChange = () => {}, labelAddField = 'Add custom 
           field={field}
           key={field.id || field.cid}
           onChange={field => {
-            console.log('changed', field)
             const newFields = [...value];
             newFields[idx] = field;
             onChange(newFields);
@@ -85,7 +84,6 @@ const FieldsEditor = ({ value, onChange = () => {}, labelAddField = 'Add custom 
             let newFields = [...value];
             newFields[idx] = null;
             onChange(_.compact(newFields));
-
           }}  
         />
       ))}

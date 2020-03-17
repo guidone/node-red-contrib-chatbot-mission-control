@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const SEARCH = gql`
-query($title: String, $id: Int, $slug: String) {
-	contents(title: $title, id: $id, slug: $slug) {
+query($title: String, $id: Int, $slug: String, $namespace: String) {
+	contents(title: $title, id: $id, slug: $slug, namespace: $namespace) {
     id,
     title,
     language,
@@ -56,4 +56,34 @@ mutation($id: Int!, $content: NewContent!) {
 }
 `;
 
-export { SEARCH, CONTENT, EDIT_CONTENT };
+const CREATE_CONTENT = gql`
+mutation($content: NewContent!) {
+  createContent(content: $content) {
+    id,
+    slug,
+    title,
+    body,
+    language,
+    payload,
+    fields {
+      id,
+      name,
+      value,
+      type
+    }
+  }
+}
+`;
+
+const CATEGORIES = gql`
+query($offset: Int, $limit: Int, $order: String, $namespace: String) {  
+  categories(offset: $offset, limit: $limit, order: $order, namespace: $namespace) {
+    id,
+    name,
+    createdAt
+  }
+}
+`;
+
+
+export { SEARCH, CONTENT, EDIT_CONTENT, CREATE_CONTENT, CATEGORIES };

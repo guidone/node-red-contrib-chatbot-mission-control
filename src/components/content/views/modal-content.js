@@ -50,7 +50,7 @@ const ModalContent = ({
   // TODO prevent close if changes
 
   return (
-    <Modal backdrop show onHide={onCancel} className="modal-content" size="md">
+    <Modal backdrop show onHide={onCancel} className="modal-content" overflow={false} size="md">
       <Modal.Header>
         <Modal.Title>{isNew ? 'Create content' : `Edit content "${content.title}"`}</Modal.Title>
       </Modal.Header>
