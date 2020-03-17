@@ -53,7 +53,7 @@ const ContentAutocomplete = ({
 
   return (
     <div className="ui-content-autocomplete">
-      <div class="autocomplete">
+      <div className="autocomplete">
         <InputGroup inside style={style}>
           <AutoComplete 
             value={current}

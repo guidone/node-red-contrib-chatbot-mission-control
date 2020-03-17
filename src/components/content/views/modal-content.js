@@ -74,7 +74,7 @@ const ModalContent = ({
           <Nav.Item eventKey="content">Content</Nav.Item>
           <Nav.Item eventKey="custom_fields">Custom Fields</Nav.Item>
           <Views region="content-tabs">
-            {(View, { label, id}) => <Nav.Item active={id === tab} eventKey={id} onSelect={() => setTab(id)}>{label}</Nav.Item>}
+            {(View, { label, id}) => <Nav.Item key={id} active={id === tab} eventKey={id} onSelect={() => setTab(id)}>{label}</Nav.Item>}
           </Views>
           <Nav.Item eventKey="content-payload">Content payload</Nav.Item>
         </Nav>      
@@ -152,7 +152,8 @@ const ModalContent = ({
             </FormGroup>
           )}
           <Views region="content-tabs">
-            {(View, { id }) => {        
+            {(View, { id }) => {    
+              console.log('id---', id)    
               if (id === tab) {
                 return (
                   <View 
@@ -162,7 +163,7 @@ const ModalContent = ({
                   />
                 );
               }
-              return <div/>;
+              return <div key={id}/>;
             }}
           </Views>
           {tab === 'content-payload' && (
