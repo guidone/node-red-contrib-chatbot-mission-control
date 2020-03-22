@@ -5,13 +5,13 @@ const client = require('../database/client');
 const MessageTemplate = require('../lib/message-template/index');
 const LIMIT = 100;
 
-const { 
-  isValidMessage, 
-  getChatId, 
-  getTransport, 
+const {
+  isValidMessage,
+  getChatId,
+  getTransport,
   extractValue,
   append,
-  when 
+  when
 } = require('../lib/helpers/utils');
 
 
@@ -32,14 +32,14 @@ query($id: Int,$slug: String) {
 }`;
 
 module.exports = function(RED) {
-  
+
   function MissionControlContent(config) {
     RED.nodes.createNode(this, config);
     const node = this;
     this.slug = config.slug;
     this.language = config.language;
     this.failbackLanguage = config.failbackLanguage;
-    
+
     this.on('input', async function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
@@ -52,13 +52,17 @@ module.exports = function(RED) {
       const template = MessageTemplate(msg, node);
       const slug = extractValue('string', 'slug', node, msg, false, true);
       const id = extractValue('number', 'id', node, msg, false, true);
+      const ids = extractValue('array', 'ids', node, msg, false, true);
       const language = extractValue('string', 'language', node, msg, false);
       const failbackLanguage = extractValue('string', 'failbackLanguage', node, msg, false);
-      
+
       // build query variables
       let variables;
       let usingId = false;
-      if (!isNaN(parseInt(slug, 10))) {
+      if (_.isArray(ids) && !_.isEmpty(ids)) {
+        variables = { ids: ids.map(id => _.isNumber(id))};
+        usingId = true;
+      } else if (!isNaN(parseInt(slug, 10))) {
         variables = { id: parseInt(slug, 10), limit: LIMIT };
         usingId = true;
       } else if (_.isNumber(id)) {
@@ -75,7 +79,7 @@ module.exports = function(RED) {
       const contextLanguage = await when(chat.get('language'));
 
       try {
-        const response = await client.query({ query: CONTENT, variables, fetchPolicy: 'network-only' });                
+        const response = await client.query({ query: CONTENT, variables, fetchPolicy: 'network-only' });
         const { contents } = response.data;
 
         let content;
@@ -84,10 +88,10 @@ module.exports = function(RED) {
           content = !_.isEmpty(contents) ? contents[0] : null;
         } else {
           // if not using id but the slug, then apply language logic, try to find the right one
-          // matching the chat context language or the one defined in the configuration or the 
+          // matching the chat context language or the one defined in the configuration or the
           // failback language
           if (_.isEmpty(language) && !_.isEmpty(contextLanguage)) {
-            c.find(content => content.language === contextLanguage);
+            contents.find(content => content.language === contextLanguage);
           } else if (!_.isEmpty(language)) {
             content = contents.find(content => content.language === language);
           }
@@ -101,17 +105,17 @@ module.exports = function(RED) {
           done(`Content not found for id: ${id} or slug: €{slug}`);
           return;
         }
-        const payload = await template(content);        
+        const payload = await template(content);
         // store the result in the payload and save the previous content in "previous" key
         // to be used with the "Pop Message" node if needed, store also the result in data
         // in case the "Pop Message" node is used
-        send({ 
-          ...msg, 
+        send({
+          ...msg,
           data: payload,
           payload,
-          previous: msg.payload 
+          previous: msg.payload
         });
-        
+
         done();
       } catch(error) {
         done(error);

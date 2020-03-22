@@ -3,25 +3,74 @@ import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, Help
 
 
 import Dictionary from '../../../src/components/dictionary';
+import Confidence from '../../../src/components/confidence';
 
 
 
 
 const dictionarySchema = [
-  { 
+  {
     name: 'faq.bestMatch',
     description: 'Text shown before the list of opening hours'
   },
-  
+  {
+    name: 'faq.sorryNotFound1',
+    description: 'Answer when no support articles were found (first version)'
+  },
+  {
+    name: 'faq.sorryNotFound2',
+    description: 'Answer when no support articles were found (second version)'
+  },
+  {
+    name: 'faq.sorryNotFound3',
+    description: 'Answer when no support articles were found (third version)'
+  },
+  {
+    name: 'faq.askSomething1',
+    description: 'What the chatbot answer when the user requests help (first version)'
+  },
+  {
+    name: 'faq.askSomething2',
+    description: 'What the chatbot answer when the user requests help (second version)'
+  },
+  {
+    name: 'faq.askSomething3',
+    description: 'What the chatbot answer when the user requests help (third version)'
+  },
+  {
+    name: 'faq.no'
+  },
+  {
+    name: 'faq.yes'
+  },
+  {
+    name: 'faq.ok'
+  },
+  {
+    name: 'faq.wasUseful',
+    description: 'Asked if an article is useful after a search'
+  },
+  {
+    name: 'faq.thanksBye1',
+    description: 'Answer when the user is satisfied with the found article (first version)'
+  },
+  {
+    name: 'faq.thanksBye2',
+    description: 'Answer when the user is satisfied with the found article (second version)'
+  },
+  {
+    name: 'faq.thanksBye3',
+    description: 'Answer when the user is satisfied with the found article (third version)'
+  }
 ];
 
 
 
-export default ({ 
-  value, 
-  onSubmit = () => { }, 
-  disabled = false 
-}) => {  
+export default ({
+  value,
+  onSubmit = () => { },
+  disabled = false
+}) => {
   const [formValue, setFormValue] = useState(value);
   const [formError, setFormError] = useState(null);
   const [tab, setTab] = useState('openings');
@@ -33,31 +82,31 @@ export default ({
         <Nav.Item eventKey="openings">Knowledge Base</Nav.Item>
         <Nav.Item eventKey="translations">Translations</Nav.Item>
       </Nav>
-      <Form 
-        disabled={true} 
+      <Form
+        disabled={true}
         formValue={formValue}
         formError={formError}
         ref={form}
         checkTrigger="none"
         layout="vertical"
-        fluid 
+        fluid
         onChange={formValue => {
           setFormValue(formValue);
           setFormError(null);
-        }} 
-        onCheck={errors => {
-          setFormError(errors);        
         }}
-      >          
+        onCheck={errors => {
+          setFormError(errors);
+        }}
+      >
         {tab === 'translations' && (
           <Fragment>
             <FormGroup>
-              <FormControl 
-                name="translations" 
-                accepter={Dictionary}           
-                schema={dictionarySchema}          
+              <FormControl
+                name="translations"
+                accepter={Dictionary}
+                schema={dictionarySchema}
                 disabled={disabled}
-              />        
+              />
             </FormGroup>
           </Fragment>
         )}
@@ -65,35 +114,34 @@ export default ({
           <Fragment>
             <FormGroup>
               <ControlLabel>Answer by Default</ControlLabel>
-              <FormControl 
-                name="answerByDefault" 
-                accepter={Toggle}                           
+              <FormControl
+                name="answerByDefault"
+                accepter={Toggle}
                 disabled={disabled}
-              />        
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel>Content</ControlLabel>
-              <FormControl 
-                readOnly={disabled} 
-                name="threshold"         
-                defaultValue={50} 
-                min={1} 
-                step={1} 
-                max={100}                            
-                accepter={Slider}           
               />
               <HelpBlock>
-                Select a <em>slug</em> for a multi-language content to show additional information when a user requests
-                information about opening hours
-              </HelpBlock>        
+                With this option <em>enabled</em>, the block execute a search for every input of the user, if <em>disabled</em>
+                the user has to enter in the <em>ask question state</em> entering some sentences like <em>"I need help"</em>
+              </HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>Sensitivity</ControlLabel>
+              <FormControl
+                disabled={disabled}
+                name="threshold"
+                accepter={Confidence}
+              />
+              <HelpBlock>
+                The minimum score of an article to be considered relevant. Lower this value if the search doesn't return any value.
+              </HelpBlock>
             </FormGroup>
           </Fragment>
         )}
         <FormGroup style={{ marginTop: '40px' }}>
           <ButtonToolbar>
-            <Button 
-              disabled={disabled} 
-              appearance="primary" 
+            <Button
+              disabled={disabled}
+              appearance="primary"
               onClick={() => {
                 if (!form.current.check()) {
                   return;
@@ -102,9 +150,9 @@ export default ({
               }}>
               Save configuration
               </Button>
-            <Button 
-              disabled={disabled} 
-              appearance="default" 
+            <Button
+              disabled={disabled}
+              appearance="default"
               onClick={() => {
                 if (confirm('Reset configuration?')) {
                   setFormValue(value);

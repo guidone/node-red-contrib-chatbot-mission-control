@@ -13,7 +13,7 @@ const isCircularPaths = require('../lib/get-circular-paths');
 const compactObject = obj => {
   return Object.entries(obj)
     .reduce((accumulator, current) => {
-      return current[1] != null ? { ...accumulator, [current[0]]: current[1] } : accumulator; 
+      return current[1] != null ? { ...accumulator, [current[0]]: current[1] } : accumulator;
     }, {});
 }
 
@@ -88,7 +88,7 @@ const PayloadType = new GraphQLScalarType({
         result[field.name] = JSON.parse(field.value);
       } catch(e) {
         // do nothing
-      }  
+      }
     });
     return result;
   },
@@ -158,7 +158,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       user: {
         type: userType,
         description: 'User related to this chatId',
-        resolve: (chatId, args) => User.findOne({ where: { userId: chatId.userId }}) 
+        resolve: (chatId, args) => User.findOne({ where: { userId: chatId.userId }})
       }
     })
   });
@@ -210,8 +210,8 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         resolve: (user, args) => {
           const where = { userId: user.userId };
           if (args.transport != null) {
-            where.transport = args.transport;  
-          } 
+            where.transport = args.transport;
+          }
           return ChatId.findAll({ where });
         }
       },
@@ -227,9 +227,9 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           if (args.order != null) {
             order = [
               [args.order.replace('reverse:', ''), args.order.startsWith('reverse:') ? 'ASC' : 'DESC']
-            ]; 
+            ];
           }
-          return Message.findAll({ 
+          return Message.findAll({
             where: { userId: user.userId},
             limit: args.limit,
             offset: args.offset,
@@ -283,11 +283,11 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       inbound: {
         type: GraphQLBoolean,
         description: ''
-      }, 
+      },
       ts: {
         type: GraphQLString,
         description: '',
-      }  
+      }
     })
   });
 
@@ -443,7 +443,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     }
   });
 
-  
+
 
   const configurationType = new GraphQLObjectType({
     name: 'Configuration',
@@ -467,11 +467,11 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
   const newFieldType = new GraphQLInputObjectType({
     name: 'NewField',
     description: 'tbd',
-    fields: {  
+    fields: {
       id: {
         type: GraphQLInt,
         description: 'The id of the field',
-      },  
+      },
       name: {
         type: GraphQLString,
         description: '',
@@ -542,7 +542,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       },
       fields: {
         type: new GraphQLList(newFieldType),
-        description: ''        
+        description: ''
       },
       categoryId: {
         type: GraphQLInt
@@ -608,7 +608,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       }
     }
   });
-  
+
   const newConfigurationType = new GraphQLInputObjectType({
     name: 'NewConfiguration',
     description: 'tbd',
@@ -623,15 +623,15 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       }
     })
   });
-  
 
-  const messageCounterType = new GraphQLObjectType({ 
+
+  const messageCounterType = new GraphQLObjectType({
     name: 'MessageCounters',
     description: 'Message Counters',
     fields: {
       count: {
         type: GraphQLInt,
-        args: {                    
+        args: {
           type: { type: GraphQLString },
           transport: { type: GraphQLString },
           messageId: { type: GraphQLString },
@@ -642,7 +642,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         },
         description: 'Total messages',
         resolve: (root, { type, transport, messageId, chatId, userId, flag, inbound }) => Message.count({
-          where: compactObject({  
+          where: compactObject({
             type, transport, messageId, chatId, userId, flag, inbound
           })
         })
@@ -663,7 +663,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     }
   });
 
-  const eventCounterType = new GraphQLObjectType({ 
+  const eventCounterType = new GraphQLObjectType({
     name: 'EventCounters',
     description: 'Event Counters',
     fields: {
@@ -686,19 +686,19 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     }
   });
 
-  const userCounterType = new GraphQLObjectType({ 
+  const userCounterType = new GraphQLObjectType({
     name: 'UserCounters',
     description: 'User Counters',
     fields: {
       count: {
         type: GraphQLInt,
         description: 'Total users',
-        args: {          
+        args: {
           userId: { type: GraphQLString },
           username: { type: GraphQLString }
         },
         resolve: (root, { userId, username }) => User.count({
-          where: compactObject({  
+          where: compactObject({
             userId,
             username: username != null ? { [Op.like]: `%${username}%` } : null
           })
@@ -707,13 +707,13 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     }
   });
 
-  const categoryCounterType = new GraphQLObjectType({ 
+  const categoryCounterType = new GraphQLObjectType({
     name: 'CategoryCounters',
     description: 'Category Counters',
     fields: {
       count: {
         type: GraphQLInt,
-        args: {        
+        args: {
           namespace: { type: GraphQLString }
         },
         description: 'Total categories', // TODO put also namespace
@@ -726,7 +726,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     }
   });
 
-  const contentCounterType = new GraphQLObjectType({ 
+  const contentCounterType = new GraphQLObjectType({
     name: 'ContentCounters',
     description: 'Content Counters',
     fields: {
@@ -757,17 +757,17 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     fields: {
       messages: {
         type: messageCounterType,
-        description: 'Counters for messages',        
+        description: 'Counters for messages',
         resolve: (root, args) => {
           return {};
-        } 
+        }
       },
       users: {
         type: userCounterType,
         description: 'Counters for users',
         resolve: (root, args) => {
           return {};
-        } 
+        }
       },
       events: {
         type: eventCounterType,
@@ -795,12 +795,12 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
 
 
   const schema = new GraphQLSchema({
-    
+
     mutation: new GraphQLObjectType({
       name: 'Mutations',
       description: 'These are the things we can change',
-      fields: {        
-        
+      fields: {
+
         deleteEvent: {
           type: GraphQLString,
           args: {
@@ -818,16 +818,16 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             event: { type: new GraphQLNonNull(newEventType) }
           },
           resolve: async function(root, { event }) {
-                        
+
             // get all connections for this flow
             const nodes = await Event.findAll({ where: { flow: event.flow }})
-                  
+
             let sources = [...event.sources];
 
-            // while the last event of history is circular, chop the array remove the last event, 
+            // while the last event of history is circular, chop the array remove the last event,
             // then try again
             while (!_.isEmpty(sources) && isCircularPaths(event.name, _.last(sources), nodes, false)) {
-              console.log('* IS circular ', _.last(sources),  ' -> ', event.name)  
+              console.log('* IS circular ', _.last(sources),  ' -> ', event.name)
               sources = _.initial(sources);
             }
 
@@ -844,9 +844,9 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
                 existingEvent.count += 1;
                 return { ...existingEvent.toJSON(), sources: [...sources, event.name] };
               } else {
-                let newEvent = await Event.create({ name: event.name, flow: event.flow, source, count: 1 });                 
+                let newEvent = await Event.create({ name: event.name, flow: event.flow, source, count: 1 });
                 return { ...newEvent.toJSON(), sources: [...sources, event.name] };
-              }            
+              }
             //}
           }
         },
@@ -861,8 +861,8 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
               .then(found => {
                 if (found != null) {
                   return Configuration.update(configuration, { where: { id: found.id }})
-                    .then(() => Configuration.findByPk(found.id));  
-                } 
+                    .then(() => Configuration.findByPk(found.id));
+                }
                 return Configuration.create(configuration);
               });
           }
@@ -925,10 +925,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           },
           resolve: async (root, { id, content }) => {
             await Content.update(content, { where: { id } })
-            const updatedContent = await Content.findByPk(id, { include: [Content.Fields]} );            
+            const updatedContent = await Content.findByPk(id, { include: [Content.Fields]} );
             const currentFieldIds = updatedContent.fields.map(field => field.id);
             if (_.isArray(content.fields) && content.fields.length !== 0) {
-              let task = when(true); 
+              let task = when(true);
               const newFieldIds = _.compact(content.fields.map(field => field.id));
               // now add or update each field present in the payload
               content.fields.forEach(field => {
@@ -949,7 +949,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
 
             } else {
               return updatedContent;
-            }            
+            }
           }
         },
 
@@ -1001,7 +1001,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           args: {
             message: { type: new GraphQLNonNull(newMessageType) }
           },
-          resolve: async function(root, { message }) {            
+          resolve: async function(root, { message }) {
             const { user, ...newMessage } = message;
             // if user with a valid id
             if (user != null && user.userId != null) {
@@ -1010,7 +1010,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
               if (existingUser == null) {
                 const newUser = await User.create(user);
               }
-              // check if exists userid / transport and create or update  
+              // check if exists userid / transport and create or update
               const existingChatId = await ChatId.findOne({ where: { userId: user.userId, transport: message.transport }});
               if (existingChatId == null) {
                 // creating new triplet userId / transport / chatId
@@ -1018,19 +1018,19 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
               } else if (existingChatId != null && existingChatId.chatId != message.chatId) {
                 // it exists but with a different chatId, could be changed, then update
                 await ChatId.update({ chatId: message.chatId }, { where: { userId: user.userId, transport: message.transport }});
-              } 
-              // triplet already exists, doing nothing 
+              }
+              // triplet already exists, doing nothing
             }
-            return Message.create({ ...newMessage, userId: user.userId });    
+            return Message.create({ ...newMessage, userId: user.userId });
           }
-        }        
+        }
       }
     }),
 
     query: new GraphQLObjectType({
       name: 'Queries',
       fields: {
-  
+
         configurations: {
           type: new GraphQLList(configurationType),
           args: {
@@ -1053,12 +1053,12 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             username: { type: GraphQLString }
           },
           resolve(root, { order, offset = 0, limit = 10, userId, username, id }) {
-            return User.findAll({              
+            return User.findAll({
               limit,
               offset,
               order: splitOrder(order),
               where: compactObject({
-                id,  
+                id,
                 userId,
                 username: username != null ? { [Op.like]: `%${username}%` } : null
               })
@@ -1091,17 +1091,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             limit: { type: GraphQLInt },
             categoryId: { type: GraphQLInt },
             id: { type: GraphQLInt },
+            ids: { type: new GraphQLList(GraphQLInt)},
             language: { type: GraphQLString },
             namespace: { type: GraphQLString },
             title: { type: GraphQLString }
           },
-          resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language, title, id, namespace }) {
+          resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language, title, id, ids, namespace }) {
             return Content.findAll({
               limit,
               offset,
               order: splitOrder(order),
               where: compactObject({
-                id,
+                id: _.isArray(ids) && !_.isEmpty(ids) ? { [Op.in]: ids } : id,
                 categoryId,
                 slug,
                 language,
@@ -1115,7 +1116,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         content: {
           type: contentType,
           args: {
-            slug: { type: GraphQLString },      
+            slug: { type: GraphQLString },
             id: { type: GraphQLInt }
           },
           resolve: resolver(Content)
@@ -1147,7 +1148,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           },
           resolve: resolver(Message)
         },
-  
+
         categories: {
           type: new GraphQLList(categoryType),
           args: {
@@ -1161,8 +1162,8 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
               limit,
               offset,
               order: splitOrder(order),
-              where: compactObject({                
-                namespace                
+              where: compactObject({
+                namespace
               })
             });
           }
@@ -1172,7 +1173,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           type: countersType,
           resolve: (root, args) => {
             return {};
-          } 
+          }
         },
 
         version: {
@@ -1182,13 +1183,8 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       }
     })
   });
-  
+
   const graphQLServer = new ApolloServer({ schema });
 
   return graphQLServer;
 };
-
-
-
-
-

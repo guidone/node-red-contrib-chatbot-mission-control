@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { FlexboxGrid, Notification, Tag } from 'rsuite';
+import { FlexboxGrid, Notification, Tag, Button } from 'rsuite';
 
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import InfoPanel from '../../../src/components/info-panel';
+import ChatbotStatus from '../../../src/components/chatbot-status';
 import withSocket from '../../../src/wrappers/with-socket';
 import ConfigurationForm from '../views/form';
 import useConfiguration from '../../../src/hooks/configuration';
@@ -42,8 +43,23 @@ const ConfigurationPage = ({ sendMessage }) => {
           )}
         </FlexboxGrid.Item>
         <InfoPanel colspan={7}>
-          what to configure
-
+          Configure the <b>Knowledge Base</b> block, use the <b>Articles</b> section to enter the knowledge base of your product or
+          service.<br/>
+          For articles that represent the same content but in different languages, use the same <em>slug</em>, the block will take care of 
+          the rest.<br/>
+          Adjust the sensitivity of the search engine, raise it when the results are not relevant to the user's question, lower it when the
+          search is not returning anything, keep an eye on the system console to see the score of the searches.<br/>
+          With <b>Answer by Default</b> Tthe block can answer automatically to any input text message or can start answering only when the
+          chatbot in <ChatbotStatus>faq.answer</ChatbotStatus> status, which is entered when the user types senteces like <em>"I need help"</em>. 
+          <div style={{ textAlign: 'center', marginTop: '10px' }}>
+            <Button
+              appearance="primary"
+              onClick={() => {
+                sendMessage('faq.refresh');
+                Notification.success({ title: 'Knowledge Base', description: 'Re-index of articles started' })
+              }}
+              >Refresh index</Button>
+          </div>
         </InfoPanel>
       </FlexboxGrid>
     </PageContainer>
