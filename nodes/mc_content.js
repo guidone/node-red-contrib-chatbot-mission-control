@@ -16,8 +16,8 @@ const {
 
 
 const CONTENT = gql`
-query($id: Int,$slug: String) {
-  contents(id: $id, slug: $slug) {
+query($id: Int,$slug: String, $ids: [Int]) {
+  contents(id: $id, slug: $slug, ids: $ids) {
     id,
     title,
     slug,
@@ -59,9 +59,11 @@ module.exports = function(RED) {
       // build query variables
       let variables;
       let usingId = false;
+      let usingIds = false;
+
       if (_.isArray(ids) && !_.isEmpty(ids)) {
-        variables = { ids: ids.map(id => _.isNumber(id))};
-        usingId = true;
+        variables = { ids: ids.filter(id => _.isNumber(id))};
+        usingIds = true;
       } else if (!isNaN(parseInt(slug, 10))) {
         variables = { id: parseInt(slug, 10), limit: LIMIT };
         usingId = true;
@@ -83,7 +85,9 @@ module.exports = function(RED) {
         const { contents } = response.data;
 
         let content;
-        if (usingId) {
+        if (usingIds) {
+          content = contents;
+        } else if (usingId) {
           // if using id, then just get the first
           content = !_.isEmpty(contents) ? contents[0] : null;
         } else {

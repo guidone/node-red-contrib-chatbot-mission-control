@@ -61,6 +61,18 @@ const dictionarySchema = [
   {
     name: 'faq.thanksBye3',
     description: 'Answer when the user is satisfied with the found article (third version)'
+  },
+  {
+    name: 'faq.selectOneOfThese',
+    description: 'Shown when the user is asked to select on of the related articles of a search'
+  },
+  {
+    name: 'faq.somethingWentWrong',
+    description: 'Shown when an unrecoverable error occurs'
+  },
+  {
+    name: 'faq.noMoreArticles',
+    description: `Shown when user ask to more results but there aren't`
   }
 ];
 
