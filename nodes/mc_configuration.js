@@ -85,11 +85,19 @@ module.exports = function(RED) {
 
     const handler = (topic, payload) => {
       if (topic === 'mc.configuration') {
+        const { namespace, ...rest } = payload;
+        if (_.isEmpty(namespace)) {
+          console.log('Error: configuration payload without namespace');
+          return;
+        }
+        // skip different namespace
+        if (namespace !== node.namespace) {
+          return;
+        }
         // clear interval
         if (this.timerId != null) {
           clearInterval(this.timerId);
         }
-
         saveConfiguration(payload, this.context().global, node.namespace);
         // pass through
         node.send({ payload });

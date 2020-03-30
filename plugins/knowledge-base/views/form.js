@@ -1,12 +1,10 @@
 import React, { useState, useRef, Fragment } from 'react';
-import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav, InputNumber, Toggle } from 'rsuite';
+import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav, Toggle } from 'rsuite';
 
 
 import Dictionary from '../../../src/components/dictionary';
 import Confidence from '../../../src/components/confidence';
-
-
-
+import InputInteger from '../../../src/components/input-integer';
 
 const dictionarySchema = [
   {
@@ -137,7 +135,7 @@ export default ({
               </HelpBlock>
             </FormGroup>
             <FormGroup>
-              <ControlLabel>Sensitivity</ControlLabel>
+              <ControlLabel>Articles Sensitivity</ControlLabel>
               <FormControl
                 disabled={disabled}
                 name="threshold"
@@ -148,11 +146,23 @@ export default ({
               </HelpBlock>
             </FormGroup>
             <FormGroup>
+              <ControlLabel>NLP Sensitivity</ControlLabel>
+              <FormControl
+                disabled={disabled}
+                name="nlpThreshold"
+                accepter={Confidence}
+              />
+              <HelpBlock>
+                The minimum score of an intent to be considered relevant. Lower this value if the NLP doesn't catch any intent of the user input,
+                raise this value if the NLP of this block is interfering with the NLP of other blocks.
+              </HelpBlock>
+            </FormGroup>
+            <FormGroup>
               <ControlLabel>Suggest Articles</ControlLabel>
               <FormControl
                 disabled={disabled}
                 name="articlesToSuggest"
-                accepter={InputNumber}
+                accepter={InputInteger}
                 min={1}
                 max={20}
                 style={{ maxWidth: '200px'}}

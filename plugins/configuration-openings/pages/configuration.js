@@ -9,9 +9,9 @@ import ConfigurationForm from '../views/form';
 import useConfiguration from '../../../src/hooks/configuration';
 
 const ConfigurationPage = ({ sendMessage }) => {
-  const { loading, saving, error, data, update } = useConfiguration({ 
+  const { loading, saving, error, data, update } = useConfiguration({
     namespace: 'openings',
-    onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' }) 
+    onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' })
   });
   // TODO fix loading
   // TODO error component
@@ -25,11 +25,11 @@ const ConfigurationPage = ({ sendMessage }) => {
           {loading && <div>loading</div>}
           {error && <div>{error.message}</div>}
           {!loading && !error && (
-            <ConfigurationForm 
+            <ConfigurationForm
               disabled={saving}
               value={data}
               onSubmit={formValue => {
-                sendMessage('mc.configuration', formValue);
+                sendMessage('mc.configuration', { namespace: 'openings', ...formValue });
                 update(formValue);
               }}
             />

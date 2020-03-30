@@ -5,7 +5,7 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const moment = require('moment');
 const passport = require('passport');
-const { BasicStrategy } = require('passport-http');  
+const { BasicStrategy } = require('passport-http');
 const _ = require('lodash');
 
 const lcd = require('./lib/lcd/index');
@@ -40,7 +40,7 @@ function sendMessage(topic, payload) {
 // web socket docs
 // https://github.com/websockets/ws#api-docs
 
-// design 
+// design
 // https://adminlte.io/themes/v3/index2.html
 
 // Inspiration design
@@ -113,13 +113,13 @@ function bootstrap(server, app, log, redSettings) {
         console.log('Hashed password: ', hashedPassword);
         //console.log('DB password', user.password);
         if (user.password === hashedPassword) {
-          done(null, { 
+          done(null, {
             id: user.id,
-            username: user.username, 
-            firstName: user.first_name, 
-            lastName: user.last_name, 
+            username: user.username,
+            firstName: user.first_name,
+            lastName: user.last_name,
             avatar: user.avatar,
-            email: user.email 
+            email: user.email
           });
         } else {
           done(null, false);
@@ -153,7 +153,7 @@ function bootstrap(server, app, log, redSettings) {
           //
         }
         if (json != null) {
-          res.send(json);
+          res.send({ ...json, namespace: req.params.namespace });
         } else {
           res.status(400).send('Invalid JSON');
         }
@@ -164,16 +164,16 @@ function bootstrap(server, app, log, redSettings) {
   app.use(`${mcSettings.root}/main.js`, serveStatic(path.join(__dirname, 'dist/main.js')));
   // serve mission control page and assets
   app.use(
-    '^' + mcSettings.root, 
+    '^' + mcSettings.root,
     passport.authenticate('basic', { session: false }),
     (req, res, next) => {
       // inject user info into template
       fs.readFile(`${__dirname}/src/index.html`, (err, data) => {
         const template = data.toString();
         const bootstrap = { user: req.user, settings: mcSettings };
-        const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};</script>`;  
+        const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};</script>`;
         const assets = mcSettings.environment === 'development' ?
-          'http://localhost:8080/main.js' : `${mcSettings.root}/main.js`;      
+          'http://localhost:8080/main.js' : `${mcSettings.root}/main.js`;
         res.send(template.replace('{{data}}', json).replace('{{assets}}', assets));
      });
     }
@@ -193,10 +193,10 @@ function bootstrap(server, app, log, redSettings) {
       }
       if (parsed != null) {
         Events.emit('message', parsed.topic, parsed.payload);
-      } 
+      }
     });
     ws.on('close', () => {
-      Events.removeListener('send', sendHandler);  
+      Events.removeListener('send', sendHandler);
     });
     Events.on('send', (topic, payload) => {
       sendHandler(topic, payload);

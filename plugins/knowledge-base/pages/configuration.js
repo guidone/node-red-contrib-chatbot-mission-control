@@ -11,14 +11,14 @@ import ConfigurationForm from '../views/form';
 import useConfiguration from '../../../src/hooks/configuration';
 
 const BREADCRUMBS = [
-  { title: 'Knowledge Base', url: '/knowledge-base' }, 
+  { title: 'Knowledge Base', url: '/knowledge-base' },
   'Configuration'
 ];
 
 const ConfigurationPage = ({ sendMessage }) => {
-  const { loading, saving, error, data, update } = useConfiguration({ 
+  const { loading, saving, error, data, update } = useConfiguration({
     namespace: 'faq',
-    onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' }) 
+    onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' })
   });
   // TODO fix loading
   // TODO error component
@@ -32,11 +32,11 @@ const ConfigurationPage = ({ sendMessage }) => {
           {loading && <div>loading</div>}
           {error && <div>{error.message}</div>}
           {!loading && !error && (
-            <ConfigurationForm 
+            <ConfigurationForm
               disabled={saving}
               value={data}
               onSubmit={formValue => {
-                sendMessage('mc.configuration', formValue);
+                sendMessage('mc.configuration', { namespace: 'faq', ...formValue });
                 update(formValue);
               }}
             />
@@ -45,12 +45,12 @@ const ConfigurationPage = ({ sendMessage }) => {
         <InfoPanel colspan={7}>
           Configure the <b>Knowledge Base</b> block, use the <b>Articles</b> section to enter the knowledge base of your product or
           service.<br/>
-          For articles that represent the same content but in different languages, use the same <em>slug</em>, the block will take care of 
+          For articles that represent the same content but in different languages, use the same <em>slug</em>, the block will take care of
           the rest.<br/>
           Adjust the sensitivity of the search engine, raise it when the results are not relevant to the user's question, lower it when the
           search is not returning anything, keep an eye on the system console to see the score of the searches.<br/>
           With <b>Answer by Default</b> Tthe block can answer automatically to any input text message or can start answering only when the
-          chatbot in <ChatbotStatus>faq.answer</ChatbotStatus> status, which is entered when the user types senteces like <em>"I need help"</em>. 
+          chatbot in <ChatbotStatus>faq.answer</ChatbotStatus> status, which is entered when the user types senteces like <em>"I need help"</em>.
           <div style={{ textAlign: 'center', marginTop: '10px' }}>
             <Button
               appearance="primary"
