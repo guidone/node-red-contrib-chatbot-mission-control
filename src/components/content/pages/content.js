@@ -27,8 +27,8 @@ const LABELS = {
   saveContent: 'Save content'
 };
 
-const Contents = ({ 
-  namespace, 
+const Contents = ({
+  namespace,
   title,
   labels,
   breadcrumbs
@@ -40,25 +40,25 @@ const Contents = ({
 
   const { limit, page, sortField, sortType } = cursor;
   const { categoryId, language, slug } = filters;
-  const { 
+  const {
     bootstrapping,
-    loading, 
-    saving, 
-    error, 
-    data, 
-    deleteContent, 
-    editContent, 
-    createContent, 
-    refetch 
+    loading,
+    saving,
+    error,
+    data,
+    deleteContent,
+    editContent,
+    createContent,
+    refetch
   } = useContents({ limit, page, sortField, sortType, categoryId, language, slug, namespace });
-  
+
   labels = { ...LABELS, ...labels };
 
   return (
     <PageContainer className="page-contents">
       <Breadcrumbs pages={breadcrumbs != null ? breadcrumbs : [title]}/>
       {content != null && (
-        <ModalContent 
+        <ModalContent
           content={content}
           error={error}
           disabled={saving}
@@ -66,24 +66,23 @@ const Contents = ({
           labels={labels}
           onCancel={() => setContent(null)}
           onSubmit={async content => {
-
             if (content.id != null) {
               await editContent({ variables: { id: content.id, content }})
             } else {
               await createContent({ variables: { content: { ...content, namespace } } });
             }
-            // TODO: catch errorrs                          
+            // TODO: catch errorrs
             setContent(null);
-            refetch();        
+            refetch();
           }}
         />
       )}
       {!bootstrapping && (
         <div className="filters" style={{ marginBottom: '10px' }}>
-          <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
+          <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>
             <FlexboxGrid.Item colspan={18}>
-              <SelectPicker           
-                readOnly={loading || saving} 
+              <SelectPicker
+                readOnly={loading || saving}
                 value={categoryId}
                 cleanable
                 placeholder="Filter by category"
@@ -95,7 +94,7 @@ const Contents = ({
               />
               &nbsp;
               <LanguagePicker
-                readOnly={loading || saving} 
+                readOnly={loading || saving}
                 value={language}
                 cleanable
                 placeholder="Filter by language"
@@ -112,22 +111,22 @@ const Contents = ({
                 onKeyUp={e => {
                   if (e.keyCode === 13) {
                     setFilters({ ...filters, slug: !_.isEmpty(e.target.value) ? e.target.value : undefined });
-                    setCursor({ ...cursor, page: 1 });                                          
+                    setCursor({ ...cursor, page: 1 });
                   }
                 }}
-              />  
-            </FlexboxGrid.Item>            
+              />
+            </FlexboxGrid.Item>
             <FlexboxGrid.Item colspan={6} align="right">
-              <Button 
+              <Button
                 appearance="primary"
-                disabled={loading || saving} 
+                disabled={loading || saving}
                 onClick={() => setContent({ title: '', body: '', fields: [] })}>{labels.createContent}
               </Button>
             </FlexboxGrid.Item>
-          </FlexboxGrid>          
+          </FlexboxGrid>
         </div>
       )}
-      {bootstrapping && <Grid columns={9} rows={3} />}      
+      {bootstrapping && <Grid columns={9} rows={3} />}
       {!bootstrapping && (
         <Table
           height={600}
@@ -145,7 +144,7 @@ const Contents = ({
           </Column>
 
           <Column width={140} resizable sortable>
-            <HeaderCell>Date</HeaderCell>            
+            <HeaderCell>Date</HeaderCell>
             <Cell dataKey="createdAt">
               {({ createdAt }) => <SmartDate date={createdAt} />}
             </Cell>
@@ -185,23 +184,23 @@ const Contents = ({
             <Cell>
               {content => (
                 <ButtonGroup>
-                  <Button 
-                    disabled={saving} 
+                  <Button
+                    disabled={saving}
                     size="xs"
                     onClick={async () => {
                       if (confirm(`Delete "${content.title}"?`)) {
                         await deleteContent({ variables: { id: content.id }})
-                        refetch();  
+                        refetch();
                       }
                     }}
                   >
                     <Icon icon="trash" />
                   </Button>
-                  <Button 
-                    disabled={saving} 
+                  <Button
+                    disabled={saving}
                     size="xs"
                     onClick={() => {
-                      setContent(content)  
+                      setContent(content)
                     }}
                   >
                     <Icon icon="edit2" />
@@ -220,7 +219,7 @@ const Contents = ({
           disabled={loading}
           onChangePage={page => setCursor({ ...cursor, page })}
           lengthMenu={[{ label: '10', value: 10 }, { label: '20', value: 20 }, { label: '30', value: 30 } ]}
-          onChangeLength={limit => setCursor({ limit, page: 1 })}
+          onChangeLength={limit => setCursor({ ...cursor, limit, page: 1 })}
           total={data.counters.contents.count}
       />
       )}
@@ -245,4 +244,3 @@ Contents.propTypes = {
 };
 
 export default Contents;
-
