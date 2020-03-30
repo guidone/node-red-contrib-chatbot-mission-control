@@ -4,12 +4,14 @@ import CreateContent from '../views/create-content';
 
 const useCreateContent = ({ onComplete = () => {} }) => {
   const [content, setContent] = useState(null);
+  const [props, setProps] = useState(null)
 
   let modal;
   if (content != null) {
     modal = (
       <CreateContent
         content={content}
+        {...props}
         onCancel={() => setContent(null)}
         onSubmit={response => {
           setContent(null);
@@ -20,8 +22,9 @@ const useCreateContent = ({ onComplete = () => {} }) => {
   }
 
   return {
-    createContent: contentDefault => {
+    createContent: (contentDefault, props) => {
       setContent(contentDefault);
+      setProps(props);
     },
     modal
   };

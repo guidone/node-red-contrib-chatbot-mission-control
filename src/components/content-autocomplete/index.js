@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { AutoComplete, InputGroup, Button, FlexboxGrid } from 'rsuite';
+import { AutoComplete, InputGroup, Button, FlexboxGrid, ButtonGroup, IconButton, Icon } from 'rsuite';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 import { useQuery } from 'react-apollo';
 
@@ -12,20 +13,23 @@ import useCreateContent from './hooks/create-content';
 import { SEARCH } from './queries';
 import './style.scss';
 
-const ContentAutocomplete = ({ 
-  value, 
-  onChange = () => {}, 
-  style, 
+const ContentAutocomplete = ({
+  value,
+  onChange = () => {},
+  style,
   useSlug = false,
   canCreate = true,
-  namespace = 'content' 
+  fluid = false,
+  namespace = 'content'
 }) => {
   const [search, setSearch] = useState(null);
   const [items, setItems] = useState(null);
   const [content, setContent] = useState(null);
   const { createContent, modal } = useCreateContent({
     onComplete: content => onChange(useSlug ? content.slug : content.id)
-  });    
+  });
+
+  const hasButtons = true; // TODO evaluate if has buttons
 
   const variables = {
     title: search != null ? search : undefined,
@@ -38,7 +42,7 @@ const ContentAutocomplete = ({
     fetchPolicy: 'network-only',
     variables,
     onCompleted: data => setItems(data.contents)
-  }); 
+  });
 
   let current;
   if (search != null) {
@@ -52,20 +56,21 @@ const ContentAutocomplete = ({
   }
 
   return (
-    <div className="ui-content-autocomplete">
+    <div className={classNames('ui-content-autocomplete', { fluid })}>
       <div className="autocomplete">
         <InputGroup inside style={style}>
-          <AutoComplete 
+          <AutoComplete
             value={current}
+            className={classNames('autocomplete-box', { 'with-buttons': hasButtons })}
             renderItem={({ label, slug, language }) => {
-              return useSlug ? 
-                <div><em>({slug})</em>: {label} <Language>{language}</Language></div>  
+              return useSlug ?
+                <div><em>({slug})</em>: {label} <Language>{language}</Language></div>
                 :
                 <div>{label} <em>({slug})</em> <Language>{language}</Language></div>;
             }}
             onChange={(current, event) => {
               const isBackspace = event.nativeEvent != null && event.nativeEvent.inputType === 'deleteContentBackward';
-              if (event.keyCode === 13) {              
+              if (event.keyCode === 13) {
                 const found = items.find(item => item.id === current);
                 if (found != null) {
                   setSearch(null);
@@ -74,67 +79,72 @@ const ContentAutocomplete = ({
               } else if (isBackspace) {
                 if (search != null) {
                   setSearch(current);
-                } 
+                }
                 setItems(null);
                 onChange(null);
-              } else if (useSlug && event.nativeEvent != null && event.nativeEvent.inputType === 'insertText' && current.startsWith('slug: ')) {              
+              } else if (useSlug && event.nativeEvent != null && event.nativeEvent.inputType === 'insertText' && current.startsWith('slug: ')) {
                 setSearch(event.nativeEvent.data);
               } else if (event.nativeEvent != null && event.nativeEvent.inputType === 'insertText') {
                 setSearch(String(current));
-              }            
+              }
             }}
-            onSelect={item => {    
-              if (item != null) {                          
+            onSelect={item => {
+              if (item != null) {
                 setSearch(null);
                 onChange(useSlug ? item.slug : item.id);
               }
-            }}          
-            data={(items || []).map(item => ({ 
+            }}
+            data={(items || []).map(item => ({
               key: item.id,
               value: item.id,
               label: item.title,
-              ...item 
+              ...item
               }))}
           />
           {search == null && items != null && (
             <InputGroup.Addon  style={{ marginTop: '-2px', marginRight: '-2px' }}>
               {items.map(item => (
-                <ContentIcon 
-                  key={item.id} 
+                <ContentIcon
+                  key={item.id}
                   disabled={item.id === content}
-                  {...item} 
+                  {...item}
                   onClick={() => setContent(item.id)}
                 />
               ))}
             </InputGroup.Addon>
           )}
+
         </InputGroup>
       </div>
-      {canCreate && value == null && (
-        <div className="create">
-          <Button 
-            appearance="primary"
-            size="sm"
-            onClick={() => createContent({ namespace })}
-          >Create</Button>
-        </div>
-      )}
-      {value != null && (
-        <div className="create">
-          <Button 
+      <ButtonGroup className="content-buttons">
+        {canCreate && (
+          <IconButton
             appearance="default"
-            size="sm"
-            onClick={() => onChange(null)}
-          >Clear</Button>
-        </div>
-      )}    
+            icon={<Icon icon="plus-square"/>}
+            size="md"
+            onClick={() => createContent({
+              namespace,
+              slug: useSlug && value != null ? value : undefined
+            }, {
+              disabledLanguages: ['it']
+            })}
+          />
+        )}
+        <IconButton
+          appearance="default"
+          size="md"
+          icon={<Icon icon="trash"/>}
+          onClick={() => onChange(null)}
+          disabled={value == null}
+        />
+      </ButtonGroup>
       {modal}
       {content != null && (
-        <ContentPreview 
+        <ContentPreview
           contentId={content}
           onCancel={() => setContent(null)}
           onSubmit={async () => {
-            setContent(null);            
+            setContent(null);
             const { data } = await client.query({ query: SEARCH, fetchPolicy: 'network-only', variables });
             setItems(data.contents);
           }}
@@ -148,6 +158,7 @@ ContentAutocomplete.propTypes = {
   // select content using the slug and not the id (slug could include a group of posts)
   useSlug: PropTypes.bool,
   canCreate: PropTypes.bool,
+  fluid: PropTypes.bool,
   onChange: PropTypes.func,
   style: PropTypes.object,
   // restrict autocomplete and creation to this namespace

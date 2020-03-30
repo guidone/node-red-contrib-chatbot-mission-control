@@ -7,8 +7,8 @@ import withoutParams from '../../../../src/helpers/without-params';
 
 import { CATEGORIES, CREATE_CONTENT } from '../queries';
 
-const CreateContent = ({ content, onCancel = () => {}, onSubmit = () => {} }) => {
-  const [createContent, { loading: createLoading, error: editError }] = useMutation(CREATE_CONTENT, { 
+const CreateContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabledLanguages }) => {
+  const [createContent, { loading: createLoading, error: editError }] = useMutation(CREATE_CONTENT, {
     onCompleted: onSubmit
   });
   const { loading, error, data } = useQuery(CATEGORIES, {
@@ -22,11 +22,23 @@ const CreateContent = ({ content, onCancel = () => {}, onSubmit = () => {} }) =>
       content={content}
       categories={data != null ? data.categories : []}
       error={editError || error}
-      disabled={createLoading || loading}          
+      disabled={createLoading || loading}
       onCancel={onCancel}
+      disabledLanguages={disabledLanguages}
       onSubmit={content => create({ variables: { content }})}
     />
   );
+};
+CreateContent.propTypes = {
+  content: PropTypes.shape({
+    title: PropTypes.string,
+    id: PropTypes.number,
+    slug: PropTypes.string,
+    body: PropTypes.string
+  }),
+  onCancel: PropTypes.func,
+  onSubmit: PropTypes.func,
+  disabledLanguages: PropTypes.arrayOf(PropTypes.string)
 };
 
 export default CreateContent;

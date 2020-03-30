@@ -1,15 +1,15 @@
 import React, { useState, Fragment, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { 
-  Modal, 
-  Button, 
-  Form, 
-  FormGroup, 
-  ControlLabel, 
-  FormControl, 
-  FlexboxGrid, 
+import {
+  Modal,
+  Button,
+  Form,
+  FormGroup,
+  ControlLabel,
+  FormControl,
+  FlexboxGrid,
   SelectPicker,
-  HelpBlock,  
+  HelpBlock,
   Nav
 } from 'rsuite';
 
@@ -23,18 +23,19 @@ import { Views } from '../../../../lib/code-plug';
 import { content as contentModel } from '../models';
 import '../styles/modal-content.scss';
 
-const LABELS = {  
+const LABELS = {
   saveContent: 'Save content'
 };
 
-const ModalContent = ({ 
-  content, 
-  onCancel = () => {}, 
-  onSubmit = () => {}, 
-  disabled = false, 
-  categories, 
+const ModalContent = ({
+  content,
+  onCancel = () => {},
+  onSubmit = () => {},
+  disabled = false,
+  categories,
   error,
-  labels = {}
+  labels = {},
+  disabledLanguages
 }) => {
   const [formValue, setFormValue] = useState(content);
   const [formError, setFormError] = useState(null);
@@ -56,19 +57,19 @@ const ModalContent = ({
       </Modal.Header>
       <Modal.Body>
         {error != null && <ShowError error={error}/>}
-        <Nav 
-          appearance="tabs" 
-          active={tab} 
+        <Nav
+          appearance="tabs"
+          active={tab}
           onSelect={tab => {
             // tab is switched to manual edit of payload, make sure the current payload field is serialized
             // in serialized payload in order to show the updated one
             if (tab === 'content-payload') {
-              setJsonValue({                  
+              setJsonValue({
                 json: !_.isEmpty(formValue.payload) ? JSON.stringify(formValue.payload) : ''
               });
             }
             setTab(tab);
-          }}  
+          }}
           activeKey={tab}
         >
           <Nav.Item eventKey="content">Content</Nav.Item>
@@ -77,17 +78,17 @@ const ModalContent = ({
             {(View, { label, id}) => <Nav.Item key={id} active={id === tab} eventKey={id} onSelect={() => setTab(id)}>{label}</Nav.Item>}
           </Views>
           <Nav.Item eventKey="content-payload">Content payload</Nav.Item>
-        </Nav>      
-        <Form 
+        </Nav>
+        <Form
           model={contentModel}
           ref={form}
           checkTrigger="none"
-          formValue={formValue} 
-          formError={formError} 
+          formValue={formValue}
+          formError={formError}
           onChange={formValue => {
             setFormValue(formValue);
             setFormError(null);
-          }} 
+          }}
           onCheck={errors => {
             setFormError(errors);
             setTab(errors.fields != null ? 'custom_fields' : 'content');
@@ -98,48 +99,49 @@ const ModalContent = ({
             <Fragment>
               <FormGroup>
                 <ControlLabel>Title</ControlLabel>
-                <FormControl name="title"/>                      
+                <FormControl name="title"/>
               </FormGroup>
-              <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
+              <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>
                 <FlexboxGrid.Item colspan={7}>
                   <FormGroup>
                     <ControlLabel>
                       Slug
                       <HelpBlock tooltip>
-                        The <em>slug</em> is a shortcut for a content or a group of contents 
+                        The <em>slug</em> is a shortcut for a content or a group of contents
                         (for example the same article translated in different languages)
                       </HelpBlock>
                     </ControlLabel>
                     <FormControl autoComplete="off" readOnly={disabled} name="slug" />
                   </FormGroup>
-                </FlexboxGrid.Item>            
+                </FlexboxGrid.Item>
                 <FlexboxGrid.Item colspan={7}>
                   <FormGroup>
                     <ControlLabel>Category</ControlLabel>
-                    <FormControl 
-                      autoComplete="off" 
-                      readOnly={disabled} 
+                    <FormControl
+                      autoComplete="off"
+                      readOnly={disabled}
                       name="categoryId"
                       block
                       cleanable={false}
                       data={categories.map(category => ({ value: category.id, label: category.name }))}
-                      accepter={SelectPicker} 
+                      accepter={SelectPicker}
                     />
                   </FormGroup>
                 </FlexboxGrid.Item>
                 <FlexboxGrid.Item colspan={7}>
                   <FormGroup>
                     <ControlLabel>Language</ControlLabel>
-                    <FormControl 
-                      readOnly={disabled} 
-                      name="language" 
+                    <FormControl
+                      readOnly={disabled}
+                      name="language"
+                      disabledItemValues={disabledLanguages}
                       cleanable={false}
                       block
                       accepter={LanguagePicker}
                     />
                   </FormGroup>
                 </FlexboxGrid.Item>
-              </FlexboxGrid>                
+              </FlexboxGrid>
               <FormGroup>
                 <FormControl readOnly={disabled} name="body" accepter={MarkdownEditor}/>
               </FormGroup>
@@ -152,12 +154,12 @@ const ModalContent = ({
             </FormGroup>
           )}
           <Views region="content-tabs">
-            {(View, { id }) => {    
-              console.log('id---', id)    
+            {(View, { id }) => {
+              console.log('id---', id)
               if (id === tab) {
                 return (
-                  <View 
-                    key={id} 
+                  <View
+                    key={id}
                     formValue={formValue.payload}
                     onChange={payload => setFormValue({ ...formValue, payload })}
                   />
@@ -167,16 +169,16 @@ const ModalContent = ({
             }}
           </Views>
           {tab === 'content-payload' && (
-          <Form 
-            formValue={jsonValue} 
-            formError={formError}              
+          <Form
+            formValue={jsonValue}
+            formError={formError}
             fluid autoComplete="off"
           >
             <FormGroup>
               <ControlLabel>Payload</ControlLabel>
-              <FormControl 
-                readOnly={disabled} 
-                name="json" 
+              <FormControl
+                readOnly={disabled}
+                name="json"
                 accepter={JSONEditor}
                 onChange={json => {
                   if (!_.isEmpty(json)) {
@@ -184,10 +186,10 @@ const ModalContent = ({
                     setJsonValue({ json });
                     try {
                       payload = JSON.parse(json);
-                    } catch(e) {    
-                      // error do nothing                
+                    } catch(e) {
+                      // error do nothing
                       return;
-                    }                    
+                    }
                     setFormValue({ ...formValue, payload });
                   }
                 }}
@@ -198,14 +200,14 @@ const ModalContent = ({
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button 
+        <Button
           appearance="primary"
-          disabled={disabled} 
-          appearance="primary" 
-          onClick={() => {   
+          disabled={disabled}
+          appearance="primary"
+          onClick={() => {
             if (!form.current.check()) {
               return;
-            }         
+            }
             onSubmit(formValue);
           }}
         >
@@ -236,10 +238,9 @@ ModalContent.propTypes = {
       value: PropTypes.any
     }))
   }),
-  labels: PropTypes.shape({    
+  labels: PropTypes.shape({
     saveContent: PropTypes.string
   })
 };
 
 export default ModalContent;
-

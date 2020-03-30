@@ -13,3 +13,4 @@ import './plugins/simulator';
 import './plugins/content';
 import './plugins/content-image';
 import './plugins/knowledge-base';
+import './plugins/carousel';

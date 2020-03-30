@@ -7,6 +7,10 @@
   align-content: stretch;
   align-items: center;
 
+  &.fluid {
+    max-width: 100%;
+  }
+
   .autocomplete {
     flex: 1 0 auto;
   }
@@ -14,5 +18,20 @@
   .create {
     flex: 0 0 auto;
     margin-left: 10px;
+  }
+
+  .content-buttons {
+    button.rs-btn:first-child {
+      border-bottom-left-radius: 0px;
+      border-top-left-radius: 0px;
+    }
+  }
+
+  .autocomplete-box.with-buttons {
+    input.rs-input {
+      border-bottom-right-radius: 0px;
+      border-top-right-radius: 0px;
+
+    }
   }
 }
