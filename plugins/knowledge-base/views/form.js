@@ -1,5 +1,5 @@
 import React, { useState, useRef, Fragment } from 'react';
-import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav, Slider, Toggle } from 'rsuite';
+import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav, InputNumber, Toggle } from 'rsuite';
 
 
 import Dictionary from '../../../src/components/dictionary';
@@ -132,8 +132,8 @@ export default ({
                 disabled={disabled}
               />
               <HelpBlock>
-                With this option <em>enabled</em>, the block execute a search for every input of the user, if <em>disabled</em>
-                the user has to enter in the <em>ask question state</em> entering some sentences like <em>"I need help"</em>
+                With this option <em>enabled</em>, the block execute a search for every input of the user, if <em>disabled</em> the
+                user has to enter in the <em>ask question state</em> entering some sentences like <em>"I need help"</em>
               </HelpBlock>
             </FormGroup>
             <FormGroup>
@@ -145,6 +145,21 @@ export default ({
               />
               <HelpBlock>
                 The minimum score of an article to be considered relevant. Lower this value if the search doesn't return any value.
+              </HelpBlock>
+            </FormGroup>
+            <FormGroup>
+              <ControlLabel>Suggest Articles</ControlLabel>
+              <FormControl
+                disabled={disabled}
+                name="articlesToSuggest"
+                accepter={InputNumber}
+                min={1}
+                max={20}
+                style={{ maxWidth: '200px'}}
+                postfix={<span> articles</span>}
+              />
+              <HelpBlock>
+                The maximum articles to suggest if user clicks on "More articles"
               </HelpBlock>
             </FormGroup>
           </Fragment>
