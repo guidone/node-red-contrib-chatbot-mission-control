@@ -75,7 +75,7 @@ module.exports = function(RED) {
       callback: configuration => {
         if (node.debug) {
           console.log(lcd.green('Initial configuration received') + ' (' + lcd.grey(this.namespace) +')');
-          console.log(prettyjson.render(lcd.beautify(configuration)));
+          console.log(lcd.prettify(_.omit(configuration, 'translations'), { indent: 2 }))
         }
         saveConfiguration(configuration, this.context().global, node.namespace);
         node.send({ payload: configuration });
