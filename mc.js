@@ -9,12 +9,13 @@ const { BasicStrategy } = require('passport-http');
 const _ = require('lodash');
 const fileupload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
-const streamifier = require('streamifier');
 
 const lcd = require('./lib/lcd/index');
 const { hash } = require('./lib/utils/index');
 const DatabaseSchema = require('./database/index');
 const Settings = require('./src/settings');
+const validators = require('./lib/helpers/validators');
+const uploadFromBuffer = require('./lib/helpers/upload-from-buffer');
 
 let initialized = false;
 const Events = new events.EventEmitter();
@@ -100,6 +101,18 @@ function bootstrap(server, app, log, redSettings) {
   } else {
     console.log(lcd.timestamp() + '  ' + lcd.green('salt: ') + lcd.grey('****'));
   }
+  if (validators.credentials.cloudinary(mcSettings.cloudinary)) {
+    console.log(lcd.timestamp() + '  ' + lcd.green('cloudinary name: ') + lcd.grey(mcSettings.cloudinary.cloudName));
+    console.log(lcd.timestamp() + '  ' + lcd.green('cloudinary apiKey: ') + lcd.grey(mcSettings.cloudinary.apiKey));
+    console.log(lcd.timestamp() + '  ' + lcd.green('cloudinary apiSecret: ') + lcd.grey('****'));
+    cloudinary.config({
+      cloud_name: mcSettings.cloudinary.cloudName,
+      api_key: mcSettings.cloudinary.apiKey,
+      api_secret: mcSettings.cloudinary.apiSecret
+    });
+  } else {
+    mcSettings.cloudinary = null;
+  }
 
   // todo put db schema here
   const databaseSchema = DatabaseSchema(mcSettings)
@@ -141,67 +154,13 @@ function bootstrap(server, app, log, redSettings) {
   + ' - [info] GraphQL ready at :')
   + ' ' + lcd.green(`http://localhost:${mcSettings.port}${graphQLServer.graphqlPath}`));
 
-
-
-
-  cloudinary.config({
-
-  });
-
-//app.use(fileupload());
-
-let uploadFromBuffer = (buffer) => {
-
-  return new Promise((resolve, reject) => {
-
-    let cld_upload_stream = cloudinary.uploader.upload_stream(
-     {
-       folder: 'mc',
-       use_filename: true
-     },
-     (error, result) => {
-
-       if (result) {
-         resolve(result);
-       } else {
-         reject(error);
-        }
-      }
-    );
-
-    streamifier.createReadStream(buffer).pipe(cld_upload_stream);
-  });
-
-};
-
+  // handle upload file
   app.post(`${mcSettings.root}/api/upload`, fileupload(), async (req, res) => {
-
-    let result = await uploadFromBuffer(req.files.file.data);
-
-
-
-    /*
-    { public_id: 'foo/dics9jrvjw2dhicevn31',
-      version: 1585657458,
-      signature: 'dfbff67c83dcd09099a4cf39e4e648559f210688',
-      width: 1554,
-      height: 952,
-      format: 'png',
-      resource_type: 'image',
-      created_at: '2020-03-31T12:24:18Z',
-      tags: [],
-      bytes: 192272,
-      type: 'upload',
-      etag: '95e2578849c40aecc58ad8a9fe6fd04e',
-      placeholder: false,
-      url:
-      'http://res.cloudinary.com/guido-bellomo/image/upload/v1585657458/foo/dics9jrvjw2dhicevn31.png',
-      secure_url:
-      'https://res.cloudinary.com/guido-bellomo/image/upload/v1585657458/foo/dics9jrvjw2dhicevn31.png',
-      original_filename: 'file'
+    if (mcSettings.cloudinary == null) {
+      res.status(400).send('Missing or invalid Cloudinary credentials');
+      return;
     }
-    */
-
+    let result = await uploadFromBuffer(req.files.file.data, cloudinary);
     res.send({
       id: result.public_id,
       name: result.public_id,
@@ -242,7 +201,7 @@ let uploadFromBuffer = (buffer) => {
   app.use(
     '^' + mcSettings.root,
     passport.authenticate('basic', { session: false }),
-    (req, res, next) => {
+    (req, res) => {
       // inject user info into template
       fs.readFile(`${__dirname}/src/index.html`, (err, data) => {
         const template = data.toString();

@@ -28,14 +28,11 @@ import '../style.scss';
 
 
 const UploadImage = ({ formValue = {}, onChange = () => {} }) => {
-
-  console.log('current payload', formValue)
-
-  const { image } = formValue;
+  const { image } = formValue || {};
 
   const size = image != null ? filesize(image.size, { output: 'object' }) : null;
-
   const hasImage = formValue != null && formValue.image != null;
+
   return (
     <div className="content-upload-image">
       {hasImage && (

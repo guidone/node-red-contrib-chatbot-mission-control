@@ -163,10 +163,7 @@ const ModalContent = ({
                   <View
                     key={id}
                     formValue={formValue.payload}
-                    onChange={payload => {
-                      console.log('setto payload', payload)
-                      setFormValue({ ...formValue, payload })
-                    }}
+                    onChange={payload => setFormValue({ ...formValue, payload })}
                   />
                 );
               }
