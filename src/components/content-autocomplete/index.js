@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { AutoComplete, InputGroup, Button, FlexboxGrid, ButtonGroup, IconButton, Icon } from 'rsuite';
+import { AutoComplete, InputGroup, Button, FlexboxGrid, ButtonGroup, IconButton, Icon, Tooltip, Whisper } from 'rsuite';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-
 import { useQuery } from 'react-apollo';
 
 import Language from '../../components/language';
@@ -12,6 +11,20 @@ import ContentIcon from './views/content-icon';
 import useCreateContent from './hooks/create-content';
 import { SEARCH } from './queries';
 import './style.scss';
+
+const withTooltip = Component => {
+  return ({ children, tooltip, ...rest }) => (
+    <Whisper
+      placement="top"
+      trigger="hover"
+      speaker={<Tooltip>{tooltip}</Tooltip>}
+    >
+      <Component {...rest}>{children}</Component>
+    </Whisper>
+  )
+};
+
+const IconButtonTooltip = withTooltip(IconButton);
 
 const ContentAutocomplete = ({
   value,
@@ -26,7 +39,11 @@ const ContentAutocomplete = ({
   const [items, setItems] = useState(null);
   const [content, setContent] = useState(null);
   const { createContent, modal } = useCreateContent({
-    onComplete: content => onChange(useSlug ? content.slug : content.id)
+    onComplete: async content => {
+      onChange(useSlug ? content.slug : content.id);
+      const result = await refetch();
+      setItems(result.data.contents);
+    }
   });
 
   const hasButtons = true; // TODO evaluate if has buttons
@@ -38,7 +55,7 @@ const ContentAutocomplete = ({
     namespace
   };
 
-  const { client } = useQuery(SEARCH, {
+  const { client, refetch } = useQuery(SEARCH, {
     fetchPolicy: 'network-only',
     variables,
     onCompleted: data => setItems(data.contents)
@@ -118,7 +135,8 @@ const ContentAutocomplete = ({
       </div>
       <ButtonGroup className="content-buttons">
         {canCreate && (
-          <IconButton
+          <IconButtonTooltip
+            tooltip={useSlug && !_.isEmpty(value) ? `Create content for slug "${value}"`: 'Create content'}
             appearance="default"
             icon={<Icon icon="plus-square"/>}
             size="md"
@@ -126,11 +144,12 @@ const ContentAutocomplete = ({
               namespace,
               slug: useSlug && value != null ? value : undefined
             }, {
-              disabledLanguages: ['it']
+              disabledLanguages: (items || []).map(item => item.language)
             })}
           />
         )}
-        <IconButton
+        <IconButtonTooltip
+          tooltip="Remove all"
           appearance="default"
           size="md"
           icon={<Icon icon="trash"/>}
