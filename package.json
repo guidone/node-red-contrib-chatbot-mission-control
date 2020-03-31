@@ -38,6 +38,9 @@
     "apollo-server-express": "^2.9.14",
     "classnames": "^2.2.6",
     "cli-color": "^2.0.0",
+    "cloudinary": "^1.21.0",
+    "express-fileupload": "^1.1.6",
+    "filesize": "^6.1.0",
     "graphql": "^14.5.8",
     "graphql-relay": "^0.6.0",
     "graphql-sequelize": "^9.3.6",
@@ -66,6 +69,7 @@
     "socket.io-client": "^2.3.0",
     "sockette": "^2.0.6",
     "sqlite3": "^4.1.1",
+    "streamifier": "^0.1.1",
     "ws": "^7.2.0"
   },
   "devDependencies": {

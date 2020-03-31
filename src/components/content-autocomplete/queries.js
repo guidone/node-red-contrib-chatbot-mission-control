@@ -24,6 +24,7 @@ query($id: Int) {
     categoryId,
     language,
     createdAt,
+    payload,
     category {
       id,
       name
@@ -46,6 +47,7 @@ mutation($id: Int!, $content: NewContent!) {
     title,
     body,
     language,
+    payload,
     fields {
       id,
       name,

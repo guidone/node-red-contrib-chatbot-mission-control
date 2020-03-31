@@ -7,6 +7,9 @@ const moment = require('moment');
 const passport = require('passport');
 const { BasicStrategy } = require('passport-http');
 const _ = require('lodash');
+const fileupload = require('express-fileupload');
+const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier');
 
 const lcd = require('./lib/lcd/index');
 const { hash } = require('./lib/utils/index');
@@ -137,6 +140,79 @@ function bootstrap(server, app, log, redSettings) {
   console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
   + ' - [info] GraphQL ready at :')
   + ' ' + lcd.green(`http://localhost:${mcSettings.port}${graphQLServer.graphqlPath}`));
+
+
+
+
+  cloudinary.config({
+
+  });
+
+//app.use(fileupload());
+
+let uploadFromBuffer = (buffer) => {
+
+  return new Promise((resolve, reject) => {
+
+    let cld_upload_stream = cloudinary.uploader.upload_stream(
+     {
+       folder: 'mc',
+       use_filename: true
+     },
+     (error, result) => {
+
+       if (result) {
+         resolve(result);
+       } else {
+         reject(error);
+        }
+      }
+    );
+
+    streamifier.createReadStream(buffer).pipe(cld_upload_stream);
+  });
+
+};
+
+  app.post(`${mcSettings.root}/api/upload`, fileupload(), async (req, res) => {
+
+    let result = await uploadFromBuffer(req.files.file.data);
+
+
+
+    /*
+    { public_id: 'foo/dics9jrvjw2dhicevn31',
+      version: 1585657458,
+      signature: 'dfbff67c83dcd09099a4cf39e4e648559f210688',
+      width: 1554,
+      height: 952,
+      format: 'png',
+      resource_type: 'image',
+      created_at: '2020-03-31T12:24:18Z',
+      tags: [],
+      bytes: 192272,
+      type: 'upload',
+      etag: '95e2578849c40aecc58ad8a9fe6fd04e',
+      placeholder: false,
+      url:
+      'http://res.cloudinary.com/guido-bellomo/image/upload/v1585657458/foo/dics9jrvjw2dhicevn31.png',
+      secure_url:
+      'https://res.cloudinary.com/guido-bellomo/image/upload/v1585657458/foo/dics9jrvjw2dhicevn31.png',
+      original_filename: 'file'
+    }
+    */
+
+    res.send({
+      id: result.public_id,
+      name: result.public_id,
+      width: result.width,
+      height: result.height,
+      format: result.format,
+      size: result.bytes,
+      url: result.url,
+      secure_url: result.secure_url
+    });
+  });
 
   // serve a configuration given the namespace
   app.get(`${mcSettings.root}/api/configuration/:namespace`, (req, res) => {

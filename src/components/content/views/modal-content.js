@@ -158,13 +158,15 @@ const ModalContent = ({
           )}
           <Views region="content-tabs">
             {(View, { id }) => {
-              console.log('id---', id)
               if (id === tab) {
                 return (
                   <View
                     key={id}
                     formValue={formValue.payload}
-                    onChange={payload => setFormValue({ ...formValue, payload })}
+                    onChange={payload => {
+                      console.log('setto payload', payload)
+                      setFormValue({ ...formValue, payload })
+                    }}
                   />
                 );
               }
@@ -182,6 +184,7 @@ const ModalContent = ({
               <FormControl
                 readOnly={disabled}
                 name="json"
+                style={{ marginBottom: '20px' }}
                 accepter={JSONEditor}
                 onChange={json => {
                   if (!_.isEmpty(json)) {
