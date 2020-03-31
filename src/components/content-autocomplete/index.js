@@ -46,15 +46,12 @@ const ContentAutocomplete = ({
     }
   });
 
-  const hasButtons = true; // TODO evaluate if has buttons
-
   const variables = {
     title: search != null ? search : undefined,
     id: search == null && !useSlug ? value || 0 : undefined,
     slug: search == null && useSlug ? value || 'invalid-slug' : undefined,
     namespace
   };
-
   const { client, refetch } = useQuery(SEARCH, {
     fetchPolicy: 'network-only',
     variables,
@@ -78,7 +75,7 @@ const ContentAutocomplete = ({
         <InputGroup inside style={style}>
           <AutoComplete
             value={current}
-            className={classNames('autocomplete-box', { 'with-buttons': hasButtons })}
+            className="autocomplete-box with-buttons"
             renderItem={({ label, slug, language }) => {
               return useSlug ?
                 <div><em>({slug})</em>: {label} <Language>{language}</Language></div>
@@ -130,7 +127,6 @@ const ContentAutocomplete = ({
               ))}
             </InputGroup.Addon>
           )}
-
         </InputGroup>
       </div>
       <ButtonGroup className="content-buttons">
@@ -152,7 +148,7 @@ const ContentAutocomplete = ({
           tooltip="Remove all"
           appearance="default"
           size="md"
-          icon={<Icon icon="trash"/>}
+          icon={<Icon icon="close"/>}
           onClick={() => onChange(null)}
           disabled={value == null}
         />
@@ -162,6 +158,11 @@ const ContentAutocomplete = ({
         <ContentPreview
           contentId={content}
           onCancel={() => setContent(null)}
+          onDelete={async () => {
+            setContent(null);
+            const { data } = await client.query({ query: SEARCH, fetchPolicy: 'network-only', variables });
+            setItems(data.contents);
+          }}
           onSubmit={async () => {
             setContent(null);
             const { data } = await client.query({ query: SEARCH, fetchPolicy: 'network-only', variables });
@@ -176,7 +177,9 @@ ContentAutocomplete.propTypes = {
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   // select content using the slug and not the id (slug could include a group of posts)
   useSlug: PropTypes.bool,
+  // add can create button
   canCreate: PropTypes.bool,
+  // component takes all the width
   fluid: PropTypes.bool,
   onChange: PropTypes.func,
   style: PropTypes.object,

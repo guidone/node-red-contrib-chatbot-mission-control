@@ -7,7 +7,13 @@ import withoutParams from '../../../../src/helpers/without-params';
 
 import { CATEGORIES, CREATE_CONTENT } from '../queries';
 
-const CreateContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disabledLanguages }) => {
+const CreateContent = ({
+  content,
+  onCancel = () => {},
+  onSubmit = () => {},
+  disabledLanguages,
+  hasDelete = false
+}) => {
   const [createContent, { loading: createLoading, error: editError }] = useMutation(CREATE_CONTENT, {
     onCompleted: onSubmit
   });
@@ -24,6 +30,7 @@ const CreateContent = ({ content, onCancel = () => {}, onSubmit = () => {}, disa
       error={editError || error}
       disabled={createLoading || loading}
       onCancel={onCancel}
+      hasDelete={hasDelete}
       disabledLanguages={disabledLanguages}
       onSubmit={content => create({ variables: { content }})}
     />
@@ -36,6 +43,7 @@ CreateContent.propTypes = {
     slug: PropTypes.string,
     body: PropTypes.string
   }),
+  hasDelete: PropTypes.bool,
   onCancel: PropTypes.func,
   onSubmit: PropTypes.func,
   disabledLanguages: PropTypes.arrayOf(PropTypes.string)

@@ -33,7 +33,7 @@ query($id: Int) {
       name,
       value,
       type
-    } 
+    }
   }
 }
 `;
@@ -76,7 +76,7 @@ mutation($content: NewContent!) {
 `;
 
 const CATEGORIES = gql`
-query($offset: Int, $limit: Int, $order: String, $namespace: String) {  
+query($offset: Int, $limit: Int, $order: String, $namespace: String) {
   categories(offset: $offset, limit: $limit, order: $order, namespace: $namespace) {
     id,
     name,
@@ -85,5 +85,12 @@ query($offset: Int, $limit: Int, $order: String, $namespace: String) {
 }
 `;
 
+const DELETE_CONTENT = gql`
+mutation($id: Int!) {
+  deleteContent(id: $id) {
+    id
+  }
+}`;
 
-export { SEARCH, CONTENT, EDIT_CONTENT, CREATE_CONTENT, CATEGORIES };
+
+export { SEARCH, CONTENT, EDIT_CONTENT, CREATE_CONTENT, CATEGORIES, DELETE_CONTENT };

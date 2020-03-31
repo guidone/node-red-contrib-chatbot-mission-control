@@ -24,14 +24,17 @@ import { content as contentModel } from '../models';
 import '../styles/modal-content.scss';
 
 const LABELS = {
-  saveContent: 'Save content'
+  saveContent: 'Save content',
+  deleteContent: 'Delete'
 };
 
 const ModalContent = ({
   content,
   onCancel = () => {},
   onSubmit = () => {},
+  onDelete = () => {},
   disabled = false,
+  hasDelete = false,
   categories,
   error,
   labels = {},
@@ -200,6 +203,21 @@ const ModalContent = ({
         </Form>
       </Modal.Body>
       <Modal.Footer>
+        {hasDelete && (
+          <Button
+            className="btn-delete"
+            appearance="default"
+            color="orange"
+            disabled={disabled}
+            onClick={() => {
+              if (confirm(`Delete "${formValue.title}" ?`)) {
+                onDelete(formValue)
+              }
+            }}
+          >
+            {labels.deleteContent}
+          </Button>
+        )}
         <Button
           appearance="primary"
           disabled={disabled}
@@ -225,7 +243,9 @@ ModalContent.propTypes = {
   category: PropTypes.array,
   onCancel: PropTypes.func,
   onSubmit: PropTypes.func,
+  onDelete: PropTypes.func,
   disabled: PropTypes.bool,
+  hasDelete: PropTypes.bool,
   content: PropTypes.shape({
     title: PropTypes.string,
     language: PropTypes.string,
@@ -239,7 +259,8 @@ ModalContent.propTypes = {
     }))
   }),
   labels: PropTypes.shape({
-    saveContent: PropTypes.string
+    saveContent: PropTypes.string,
+    deleteContent: PropTypes.string
   })
 };
 

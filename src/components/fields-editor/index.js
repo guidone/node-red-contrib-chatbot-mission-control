@@ -1,13 +1,13 @@
 import React from 'react';
 import _ from 'lodash';
 
-import { 
-  Button, 
-  Form, 
-  FormControl, 
-  FlexboxGrid, 
-  IconButton, 
-  Icon, 
+import {
+  Button,
+  Form,
+  FormControl,
+  FlexboxGrid,
+  IconButton,
+  Icon,
   SelectPicker
 } from 'rsuite';
 
@@ -29,10 +29,10 @@ const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
 
   return (
     <div className="field-editor">
-      <Form 
+      <Form
         layout="inline"
-        formValue={field}            
-        onChange={field => onChange(field)} 
+        formValue={field}
+        onChange={field => onChange(field)}
           autoComplete="off"
         >
         <FlexboxGrid justify="space-between" style={{ marginBottom: '10px', marginRight: '0px' }}>
@@ -40,10 +40,10 @@ const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
             <FormControl name="name" placeholder="Name"/>
           </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={4}>
-            <FormControl 
-              name="type" 
-              placeholder="Type" 
-              accepter={SelectPicker} 
+            <FormControl
+              name="type"
+              placeholder="Type"
+              accepter={SelectPicker}
               data={FieldTypes}
               block
               searchable={false}
@@ -54,10 +54,10 @@ const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
             <FormControl name="value" placeholder="value" accepter={accepter}/>
           </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={1} align="right">
-            <IconButton 
-              onClick={() => onRemove()} 
-              icon={<Icon icon="trash" />} 
-              size="sm" 
+            <IconButton
+              onClick={() => onRemove()}
+              icon={<Icon icon="trash" />}
+              size="sm"
             />
           </FlexboxGrid.Item>
         </FlexboxGrid>
@@ -67,12 +67,12 @@ const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
 };
 
 
-const FieldsEditor = ({ value, onChange = () => {}, labelAddField = 'Add custom field' }) => {
+const FieldsEditor = ({ value = [], onChange = () => {}, labelAddField = 'Add custom field' }) => {
   return (
     <div className="ui-fields-editor">
       <div>
       {(value || []).map((field, idx) => (
-        <FieldEditor 
+        <FieldEditor
           field={field}
           key={field.id || field.cid}
           onChange={field => {
@@ -84,13 +84,13 @@ const FieldsEditor = ({ value, onChange = () => {}, labelAddField = 'Add custom 
             let newFields = [...value];
             newFields[idx] = null;
             onChange(_.compact(newFields));
-          }}  
+          }}
         />
       ))}
       </div>
       <div>
-        <Button onClick={() => {          
-          onChange([...value, { name: '', type: 'string', value: '', cid: _.uniqueId('c') }]); 
+        <Button onClick={() => {
+          onChange([...value, { name: '', type: 'string', value: '', cid: _.uniqueId('c') }]);
         }}>{labelAddField}</Button>
       </div>
     </div>
@@ -98,4 +98,3 @@ const FieldsEditor = ({ value, onChange = () => {}, labelAddField = 'Add custom 
 };
 
 export default FieldsEditor;
-
