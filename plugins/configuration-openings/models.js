@@ -3,12 +3,7 @@ import { Schema } from 'rsuite';
 
 const { StringType, ArrayType, ObjectType, DateType } = Schema.Types;
 
-const opening = Schema.Model({  
-  labelOpenings: ObjectType()
-    .addRule(
-      value => Object.keys(value).length !== 0, 
-      'Specify some translations for opening hours label'
-    ),  
+const opening = Schema.Model({
   openings: ArrayType().of(ObjectType()
     .shape({
       start: DateType()
@@ -16,10 +11,10 @@ const opening = Schema.Model({
       end: DateType()
         .isRequired('Specify ending hour'),
       range: StringType()
-        .isRequired('Select a range for opening hours')  
+        .isRequired('Select a range for opening hours')
     }))
     .addRule(
-      value => _.isArray(value) && value.length !== 0, 
+      value => _.isArray(value) && value.length !== 0,
       'Specify at least an opening hour'
     )
 });

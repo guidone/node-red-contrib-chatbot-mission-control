@@ -1094,21 +1094,32 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             ids: { type: new GraphQLList(GraphQLInt)},
             language: { type: GraphQLString },
             namespace: { type: GraphQLString },
-            title: { type: GraphQLString }
+            title: { type: GraphQLString },
+            search: { type: GraphQLString }
           },
-          resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language, title, id, ids, namespace }) {
+          resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language, title, id, ids, namespace, search }) {
+            const whereParams = compactObject({
+              id: _.isArray(ids) && !_.isEmpty(ids) ? { [Op.in]: ids } : id,
+              categoryId,
+              slug,
+              language,
+              namespace
+              // title: title != null ? { [Op.like]: `%${title}%` } : undefined,
+            });
+            if (title != null) {
+              whereParams.title = { [Op.like]: `%${title}%` };
+            }
+            if (search != null) {
+              whereParams[Op.or] = [
+                { title: { [Op.like]: `%${search}%` } },
+                { slug: { [Op.like]: `%${search}%` } },
+              ]
+            }
             return Content.findAll({
               limit,
               offset,
               order: splitOrder(order),
-              where: compactObject({
-                id: _.isArray(ids) && !_.isEmpty(ids) ? { [Op.in]: ids } : id,
-                categoryId,
-                slug,
-                language,
-                namespace,
-                title: title != null ? { [Op.like]: `%${title}%` } : undefined
-              })
+              where: whereParams
             });
           }
         },

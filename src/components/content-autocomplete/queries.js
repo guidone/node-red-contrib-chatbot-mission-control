@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const SEARCH = gql`
-query($title: String, $id: Int, $slug: String, $namespace: String) {
-	contents(title: $title, id: $id, slug: $slug, namespace: $namespace) {
+query($title: String, $id: Int, $slug: String, $namespace: String, $search: String) {
+	contents(title: $title, id: $id, slug: $slug, namespace: $namespace, search: $search) {
     id,
     title,
     language,

@@ -33,7 +33,8 @@ const ContentAutocomplete = ({
   useSlug = false,
   canCreate = true,
   fluid = false,
-  namespace = 'content'
+  namespace = 'content',
+  disabled: componentDisabled = false
 }) => {
   const [search, setSearch] = useState(null);
   const [items, setItems] = useState(null);
@@ -47,7 +48,7 @@ const ContentAutocomplete = ({
   });
 
   const variables = {
-    title: search != null ? search : undefined,
+    search: search != null ? search : undefined,
     id: search == null && !useSlug ? value || 0 : undefined,
     slug: search == null && useSlug ? value || 'invalid-slug' : undefined,
     namespace
@@ -57,6 +58,8 @@ const ContentAutocomplete = ({
     variables,
     onCompleted: data => setItems(data.contents)
   });
+
+  const disabled = componentDisabled;
 
   let current;
   if (search != null) {
@@ -76,11 +79,12 @@ const ContentAutocomplete = ({
           <AutoComplete
             value={current}
             className="autocomplete-box with-buttons"
-            renderItem={({ label, slug, language }) => {
+            disabled={disabled}
+            renderItem={({ label, slug, title, language }) => {
               return useSlug ?
-                <div><em>({slug})</em>: {label} <Language>{language}</Language></div>
+                <div><em>({slug})</em>: {title} <Language>{language}</Language></div>
                 :
-                <div>{label} <em>({slug})</em> <Language>{language}</Language></div>;
+                <div>{title} <em>({slug})</em> <Language>{language}</Language></div>;
             }}
             onChange={(current, event) => {
               const isBackspace = event.nativeEvent != null && event.nativeEvent.inputType === 'deleteContentBackward';
@@ -111,7 +115,7 @@ const ContentAutocomplete = ({
             data={(items || []).map(item => ({
               key: item.id,
               value: item.id,
-              label: item.title,
+              label: item.slug + ' ' + item.title,
               ...item
               }))}
           />
@@ -120,7 +124,7 @@ const ContentAutocomplete = ({
               {items.map(item => (
                 <ContentIcon
                   key={item.id}
-                  disabled={item.id === content}
+                  disabled={item.id === content || disabled}
                   {...item}
                   onClick={() => setContent(item.id)}
                 />
@@ -136,6 +140,7 @@ const ContentAutocomplete = ({
             appearance="default"
             icon={<Icon icon="plus-square"/>}
             size="md"
+            disabled={disabled}
             onClick={() => createContent({
               namespace,
               slug: useSlug && value != null ? value : undefined
@@ -150,7 +155,7 @@ const ContentAutocomplete = ({
           size="md"
           icon={<Icon icon="close"/>}
           onClick={() => onChange(null)}
-          disabled={value == null}
+          disabled={disabled || value == null}
         />
       </ButtonGroup>
       {modal}
