@@ -971,12 +971,21 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         editUser: {
           type: userType,
           args: {
-            id: { type: new GraphQLNonNull(GraphQLInt)},
+            id: { type: GraphQLInt},
+            userId: { type: GraphQLString },
             user: { type: new GraphQLNonNull(newUserType) }
           },
-          resolve(root, { id, user: value }) {
-            return User.update(value, { where: { id } })
-              .then(() => User.findByPk(id));
+          async resolve(root, { id, userId, user: value }) {
+            let where;
+            if (id != null) {
+              where= { id };
+            } else if (userId != null) {
+              where = { userId };
+            } else {
+              throw 'Missing both id and userId';
+            }
+            await User.update(value, { where })
+            return await User.findOne({ where });
           }
         },
 
