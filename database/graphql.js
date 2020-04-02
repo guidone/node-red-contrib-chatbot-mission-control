@@ -1012,25 +1012,55 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           },
           resolve: async function(root, { message }) {
             const { user, ...newMessage } = message;
+
+            // check if exists userid / transport and create or update
+            const existingChatId = await ChatId.findOne({ where: { chatId: message.chatId, transport: message.transport }});
+
+            // if no chatId, the create the user and the related chatId-transport using the userId of the message
+            let userId;
+            let currentUser;
+            if (existingChatId == null) {
+              console.log('chatId not found, creating new user')
+              currentUser = await User.create(user);
+              await ChatId.create({ userId: user.userId, chatId: message.chatId, transport: message.transport });
+              userId = user.userId;
+            } else {
+              userId = existingChatId.userId;
+              //currentUser = await User.findOne({ where: { userId }});
+              console.log('FOUND userId', userId);
+              //console.log(currentUser.toJSON())
+              console.log('');
+            }
+
+            const createdMessage = await Message.create({ ...newMessage, userId });
+
+            return createdMessage;
+
+            // finally store the message
+
+
+            // create user if doesn't exist
+            /*const existingUser = await User.findOne({ where: { userId: user.userId }});
+            if (existingUser == null) {
+              const newUser = await User.create(user);
+            }*/
+
             // if user with a valid id
-            if (user != null && user.userId != null) {
-              // create user if doesn't exist
-              const existingUser = await User.findOne({ where: { userId: user.userId }});
-              if (existingUser == null) {
-                const newUser = await User.create(user);
-              }
-              // check if exists userid / transport and create or update
-              const existingChatId = await ChatId.findOne({ where: { userId: user.userId, transport: message.transport }});
-              if (existingChatId == null) {
+            //if (user != null && user.userId != null) {
+
+
+
+
+
+              /*if (existingChatId == null) {
                 // creating new triplet userId / transport / chatId
-                await ChatId.create({ userId: user.userId, chatId: message.chatId, transport: message.transport });
               } else if (existingChatId != null && existingChatId.chatId != message.chatId) {
                 // it exists but with a different chatId, could be changed, then update
                 await ChatId.update({ chatId: message.chatId }, { where: { userId: user.userId, transport: message.transport }});
-              }
+              }*/
               // triplet already exists, doing nothing
-            }
-            return Message.create({ ...newMessage, userId: user.userId });
+            //}
+            //return Message.create({ ...newMessage, userId });
           }
         }
       }

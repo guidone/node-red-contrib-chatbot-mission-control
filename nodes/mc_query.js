@@ -5,13 +5,16 @@ const client = require('../database/client');
 const lcd = require('../lib/lcd/index');
 const MessageTemplate = require('../lib/message-template/index');
 
+const isMutation = query => query.includes('mutation(');
+
+
 module.exports = function(RED) {
-  
+
   function MissionControlQuery(config) {
     RED.nodes.createNode(this, config);
     const node = this;
     this.query = config.query;
-    
+
     this.on('input', async function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
@@ -31,16 +34,20 @@ module.exports = function(RED) {
       }
 
       const translatedQuery = await template(node.query);
+      const mutate = isMutation(translatedQuery);
       const query = gql`${translatedQuery}`;
 
       try {
-        const response = await client.query({ query, variables, fetchPolicy: 'network-only' });        
-        send({ 
-          ...msg, 
+        const response = mutate ?
+          await client.mutate({ mutation: query, variables }) :
+          await client.query({ query, variables, fetchPolicy: 'network-only' });
+
+        send({
+          ...msg,
           data: response.data,
           payload: response.data,
           previous: msg.payload
-        });                
+        });
         done();
       } catch(error) {
         // format error
@@ -52,7 +59,7 @@ module.exports = function(RED) {
               errorMsg += ` (line: ${error.locations[0].line})`;
             }
             return errorMsg;
-          });            
+          });
           lcd.dump(errors, `GraphQL Error (id: ${node.id})`);
         } else {
           lcd.dump('Unknown GraphQL error', `GraphQL Error (id: ${node.id})`);

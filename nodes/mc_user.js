@@ -4,7 +4,7 @@ const gql = require('graphql-tag');
 const client = require('../database/client');
 const lcd = require('../lib/lcd/index');
 
-const { 
+const {
   getTransport,
   getChatId,
   when,
@@ -15,7 +15,7 @@ const GET_USER = gql`
 query($chatId: String, $transport: String) {
   chatIds(chatId: $chatId, transport: $transport) {
     transport,
-    user {      
+    user {
       id,
       username,
       userId,
@@ -35,21 +35,21 @@ query($chatId: String, $transport: String) {
 }`;
 
 module.exports = function(RED) {
-  
+
   function MissionControlUser(config) {
     RED.nodes.createNode(this, config);
     const node = this;
     this.query = config.query;
     this.chain = config.chain;
-    
+
     this.on('input', async function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
       done = done || function(error) { node.error.call(node, error, msg) };
 
       // check if valid redbot message or simulator, pass thru
-      if (!isValidMessage(msg, node)) {        
-        return;  
+      if (!isValidMessage(msg, node)) {
+        return;
       }
 
       const chatId = getChatId(msg);
@@ -58,18 +58,19 @@ module.exports = function(RED) {
 
       try {
         // get data from context
-        const { firstName, lastName, language } = await when(chat.get('firstName', 'lastName', 'language'));
+        const { firstName, lastName, language, userId } = await when(chat.get('firstName', 'lastName', 'language'));
 
         // get user data from DB
-        const response = await client.query({ 
-          query: GET_USER, 
-          variables: { chatId: String(chatId), transport }, 
-          fetchPolicy: 'network-only' 
+        const response = await client.query({
+          query: GET_USER,
+          variables: { chatId: String(chatId), transport },
+          fetchPolicy: 'network-only'
         });
 
         const user = response.data != null && !_.isEmpty(response.data.chatIds) ? response.data.chatIds[0].user : null;
         // reflect back changes to context
         if (user != null) {
+          // TODO update userId
           // the DB is the single source of truth
           const update = {};
           if (firstName !== user.first_name) {
@@ -81,16 +82,20 @@ module.exports = function(RED) {
           if (language !== user.language) {
             update.language = user.language;
           }
+          if (userId !== user.userId) {
+            update.userId = user.userId;
+          }
+
           // update chat context only if there are changes
-          if (!_.isEmpty(update)) {          
+          if (!_.isEmpty(update)) {
             await when(chat.set(update));
           }
         }
 
-        send({ ...msg, user });              
+        send({ ...msg, user });
         done();
-      } catch(error) {      
-        done(error);  
+      } catch(error) {
+        done(error);
       }
     });
   }

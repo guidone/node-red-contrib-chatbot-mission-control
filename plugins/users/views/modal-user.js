@@ -10,7 +10,7 @@ import LanguagePicker from '../../../src/components/language-picker';
 const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
   const [formValue, setFormValue] = useState({ ...user });
   const [jsonValue, setJsonValue] = useState({
-    json: !_.isEmpty(user.payload) ? JSON.stringify(user.payload) : ''
+    json: !_.isEmpty(user.payload) ? JSON.stringify(user.payload, null, 2) : ''
   });
   const [formError, setFormError] = useState(null);
   const [tab, setTab] = useState('user-details');
@@ -21,58 +21,58 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
         <Modal.Title>Edit User <em>(id: {user.id})</em></Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <Nav 
-          appearance="tabs" 
-          active={tab} 
+        <Nav
+          appearance="tabs"
+          active={tab}
           onSelect={tab => {
             // tab is switched to manual edit of payload, make sure the current payload field is serialized
             // in serialized payload in order to show the updated one
             if (tab === 'user-payload') {
-              setJsonValue({                  
-                json: !_.isEmpty(formValue.payload) ? JSON.stringify(formValue.payload) : ''
+              setJsonValue({
+                json: !_.isEmpty(formValue.payload) ? JSON.stringify(formValue.payload, null, 2) : ''
               });
             }
             setTab(tab);
-          }} 
-          activeKey={tab} 
+          }}
+          activeKey={tab}
           style={{ marginBottom: '15px' }}
         >
           <Nav.Item eventKey="user-details">User details</Nav.Item>
           <Views region="user-tabs">
             {(View, { label, id}) => (
-              <Nav.Item 
-                key={id} 
-                active={id === tab} 
-                eventKey={id} 
+              <Nav.Item
+                key={id}
+                active={id === tab}
+                eventKey={id}
                 onSelect={() => setTab(id)}>
                 {label}
               </Nav.Item>
             )}
           </Views>
-          <Nav.Item eventKey="user-payload">User payload</Nav.Item>          
+          <Nav.Item eventKey="user-payload">User payload</Nav.Item>
         </Nav>
         {tab === 'user-details' && (
-          <Form 
-            formValue={formValue} 
-            formError={formError} 
+          <Form
+            formValue={formValue}
+            formError={formError}
             onChange={formValue => {
               setFormValue(formValue);
               setFormError(null);
-            }} 
+            }}
             fluid autoComplete="off"
           >
             <FormGroup className="chat-id">
               <ControlLabel>UserId</ControlLabel>
               <FormControl readOnly name="userId" className="user-id"/>
-              <HelpBlock tooltip>userId cannot be modified for referencial integrity</HelpBlock>            
+              <HelpBlock tooltip>userId cannot be modified for referencial integrity</HelpBlock>
             </FormGroup>
-            <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
+            <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>
               <FlexboxGrid.Item colspan={11}>
                 <FormGroup>
                   <ControlLabel>First Name</ControlLabel>
                   <FormControl autoComplete="off" readOnly={disabled} name="first_name" />
                 </FormGroup>
-              </FlexboxGrid.Item>            
+              </FlexboxGrid.Item>
               <FlexboxGrid.Item colspan={11}>
                 <FormGroup>
                   <ControlLabel>Last Name</ControlLabel>
@@ -80,7 +80,7 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
                 </FormGroup>
               </FlexboxGrid.Item>
             </FlexboxGrid>
-            <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
+            <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>
               <FlexboxGrid.Item colspan={11}>
                 <FormGroup>
                   <ControlLabel>Username</ControlLabel>
@@ -90,16 +90,16 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
               <FlexboxGrid.Item colspan={11}>
                 <FormGroup>
                   <ControlLabel>Language</ControlLabel>
-                  <FormControl 
-                    readOnly={disabled} 
-                    name="language" 
+                  <FormControl
+                    readOnly={disabled}
+                    name="language"
                     cleanable={false}
                     block
                     accepter={LanguagePicker}
                   />
                 </FormGroup>
               </FlexboxGrid.Item>
-            </FlexboxGrid>          
+            </FlexboxGrid>
             <FormGroup>
               <ControlLabel>Email</ControlLabel>
               <FormControl readOnly={disabled} name="email" />
@@ -118,20 +118,20 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
                   </div>
                 ))}
               </div>
-            </FormGroup>            
+            </FormGroup>
           </Form>
         )}
         {tab === 'user-payload' && (
-          <Form 
-            formValue={jsonValue} 
-            formError={formError}              
+          <Form
+            formValue={jsonValue}
+            formError={formError}
             fluid autoComplete="off"
           >
             <FormGroup>
               <ControlLabel>Payload</ControlLabel>
-              <FormControl 
-                readOnly={disabled} 
-                name="json" 
+              <FormControl
+                readOnly={disabled}
+                name="json"
                 accepter={JSONEditor}
                 onChange={json => {
                   if (!_.isEmpty(json)) {
@@ -139,10 +139,10 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
                     setJsonValue({ json });
                     try {
                       payload = JSON.parse(json);
-                    } catch(e) {    
-                      // error do nothing                
+                    } catch(e) {
+                      // error do nothing
                       return;
-                    }                    
+                    }
                     setFormValue({ ...formValue, payload });
                   }
                 }}
@@ -151,11 +151,11 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
           </Form>
         )}
         <Views region="user-tabs" key="user-tabs">
-          {(View, { id }) => {        
+          {(View, { id }) => {
             if (id === tab) {
               return (
-                <View 
-                  key={id} 
+                <View
+                  key={id}
                   formValue={formValue.payload}
                   onChange={payload => setFormValue({ ...formValue, payload })}
                 />
@@ -165,14 +165,14 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
           }}
         </Views>
       </Modal.Body>
-      <Modal.Footer>        
+      <Modal.Footer>
         <Button onClick={onCancel} appearance="subtle">
           Cancel
         </Button>
-        <Button 
+        <Button
           appearance="primary"
-          disabled={disabled} 
-          appearance="primary" 
+          disabled={disabled}
+          appearance="primary"
           onClick={() => onSubmit(formValue)}
         >
           Save user
@@ -183,4 +183,3 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
 };
 
 export default ModalUser;
-

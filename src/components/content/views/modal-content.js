@@ -43,7 +43,7 @@ const ModalContent = ({
   const [formValue, setFormValue] = useState(content);
   const [formError, setFormError] = useState(null);
   const [jsonValue, setJsonValue] = useState({
-    json: !_.isEmpty(content.payload) ? JSON.stringify(content.payload) : ''
+    json: !_.isEmpty(content.payload) ? JSON.stringify(content.payload, null, 2) : ''
   });
   const [tab, setTab] = useState('content');
   const form = useRef(null);
@@ -68,7 +68,7 @@ const ModalContent = ({
             // in serialized payload in order to show the updated one
             if (tab === 'content-payload') {
               setJsonValue({
-                json: !_.isEmpty(formValue.payload) ? JSON.stringify(formValue.payload) : ''
+                json: !_.isEmpty(formValue.payload) ? JSON.stringify(formValue.payload, null, 2) : ''
               });
             }
             setTab(tab);
