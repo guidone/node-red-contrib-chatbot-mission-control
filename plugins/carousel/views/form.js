@@ -1,5 +1,5 @@
 import React, { useState, useRef, Fragment } from 'react';
-import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav } from 'rsuite';
+import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav, Icon } from 'rsuite';
 
 import ContentAutocomplete from '../../../src/components/content-autocomplete';
 import CollectionEditor from '../../../src/components/collection-editor';
@@ -70,7 +70,10 @@ export default ({
         {tab === 'openings' && (
           <Fragment>
             <FormGroup>
-              <ControlLabel>Carousel Cards</ControlLabel>
+              <ControlLabel>Carousel Cards
+
+                <HelpBlock tooltip>Select one or more content</HelpBlock>
+              </ControlLabel>
               <FormControl
                 name="cards"
                 accepter={CollectionEditor}
@@ -79,6 +82,7 @@ export default ({
                 disabled={disabled}
               />
             </FormGroup>
+
           </Fragment>
         )}
         <FormGroup style={{ marginTop: '40px' }}>

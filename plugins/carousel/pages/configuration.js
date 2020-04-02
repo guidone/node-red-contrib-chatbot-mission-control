@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlexboxGrid, Notification, Tag } from 'rsuite';
+import { FlexboxGrid, Notification, Icon } from 'rsuite';
 
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
@@ -36,7 +36,9 @@ const ConfigurationPage = ({ sendMessage }) => {
           )}
         </FlexboxGrid.Item>
         <InfoPanel colspan={7}>
-          some help here
+          Select a list of contents <em>by slug</em>, each of them will appear as a separate card in the chatbot. A slug is used
+          to group different articles that represent the same content in different languages. Click on the language label to edit
+          the content for a specific language or click on <Icon icon="plus-square"/> to create one.
         </InfoPanel>
       </FlexboxGrid>
     </PageContainer>

@@ -11,7 +11,6 @@ mutation($message: NewMessage!) {
     id,
     chatId,
     user {
-      id,
       username,
       userId,
       first_name,
@@ -22,6 +21,15 @@ mutation($message: NewMessage!) {
       createdAt,
       email
     }
+  }
+}
+`;
+
+const CREATE_MESSAGE_LIGHT = gql`
+mutation($message: NewMessage!) {
+  message: createMessage(message: $message) {
+    id,
+    chatId
   }
 }
 `;
@@ -48,14 +56,24 @@ module.exports = function(RED) {
       // get chat context
       const chat = msg.chat();
       // get the data present in the chat context
-      const { firstName, lastName, username, language, userId } = await when(chat.get('firstName', 'lastName', 'username', 'language', 'userId'))
+      const {
+        firstName,
+        lastName,
+        username,
+        language,
+        userId,
+        resolved
+      } = await when(chat.get('firstName', 'lastName', 'username', 'language', 'userId', 'resolved'));
 
-      // TODO if outbound simplify query no need to lookup (perhaps in the server)
+      // if the message is outbound and the user has already resolved by a mc_store upstream, then skip
+      // the user sincronization is already been made, in order to optimize queries skip.
+      // Of course always sync user for inbound messages
+      const useSimplifiedQuery = resolved === true && !msg.payload.inbound;
 
       try {
         const result = await client
           .mutate({
-            mutation: CREATE_MESSAGE,
+            mutation: useSimplifiedQuery ? CREATE_MESSAGE_LIGHT : CREATE_MESSAGE,
             variables: {
               message: {
                 user: {
@@ -77,19 +95,12 @@ module.exports = function(RED) {
             }
           })
 
-        console.log('result of mutation', result)
-
-
-
         const user = result != null && result.data != null && result.data.message != null && result.data.message.user != null
           ? result.data.message.user : null;
-
-
-        console.log('utente trovato', user)
         // if user sent back, then syncronize the key data present in chat context
         if (user != null) {
           // the DB is the single source of truth
-          const update = {};
+          const update = { resolved: true };
           if (firstName !== user.first_name) {
             update.firstName = user.first_name;
           }
@@ -102,15 +113,12 @@ module.exports = function(RED) {
           if (userId !== user.userId) {
             update.userId = user.userId;
           }
-          console.log('aggiornamento chat context', update)
           // update chat context only if there are changes
           if (!_.isEmpty(update)) {
             await when(chat.set(update));
           }
         }
-
-
-
+        // finally
         send({ ...msg, user });
         done();
       } catch(error) {
@@ -120,7 +128,6 @@ module.exports = function(RED) {
         console.log('error', error.networkError.result)
         done(error.networkError.result)
       }
-
     });
   }
 

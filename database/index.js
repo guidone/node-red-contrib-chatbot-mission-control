@@ -22,7 +22,7 @@ module.exports = mcSettings => {
     storage: dbPath,
     logging
   });
-    
+
   const Configuration = sequelize.define('configuration', {
     namespace: Sequelize.STRING,
     payload: Sequelize.TEXT,
@@ -37,7 +37,7 @@ module.exports = mcSettings => {
     title: Sequelize.STRING,
     slug: Sequelize.STRING,
     language: Sequelize.STRING,
-    namespace: Sequelize.STRING,  
+    namespace: Sequelize.STRING,
     body: Sequelize.TEXT,
     payload: Sequelize.TEXT
   }, {
@@ -99,7 +99,7 @@ module.exports = mcSettings => {
       { name: 'message_ts', using: 'BTREE', fields: ['ts'] }
     ]
   });
- 
+
   const Admin = sequelize.define('admin', {
     username: Sequelize.STRING,
     password: Sequelize.STRING,
@@ -128,7 +128,11 @@ module.exports = mcSettings => {
   });
 
   const User = sequelize.define('user', {
-    userId: Sequelize.STRING,
+    userId: {
+      type: Sequelize.STRING,
+      unique: true,
+      allowNull: false
+    },
     email: Sequelize.STRING,
     first_name: Sequelize.STRING,
     last_name: Sequelize.STRING,
@@ -171,7 +175,7 @@ module.exports = mcSettings => {
 
   const Event = sequelize.define('event', {
     flow: Sequelize.STRING,
-    source: Sequelize.STRING, 
+    source: Sequelize.STRING,
     name: Sequelize.STRING,
     count: Sequelize.INTEGER
   }, {
@@ -198,7 +202,7 @@ module.exports = mcSettings => {
   }
 
   const graphQLServer = GraphQLServer({ Configuration, Message, User, ChatId, Event, Content, Category,Field, sequelize });
-  
+
   exportCache = {
     Configuration,
     Message,
