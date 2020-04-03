@@ -22,6 +22,7 @@ query($id: Int,$slug: String, $ids: [Int], $slugs: [String]) {
     body,
     categoryId,
     payload,
+    json,
     category {
       id,
       name

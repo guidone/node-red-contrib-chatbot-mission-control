@@ -55,13 +55,13 @@ module.exports = function(RED) {
 
       // get chat context
       const chat = msg.chat();
+      const userId = msg.get('userId');
       // get the data present in the chat context
       const {
         firstName,
         lastName,
         username,
         language,
-        userId,
         resolved
       } = await when(chat.get('firstName', 'lastName', 'username', 'language', 'userId', 'resolved'));
 
@@ -70,30 +70,32 @@ module.exports = function(RED) {
       // Of course always sync user for inbound messages
       const useSimplifiedQuery = resolved === true && !msg.payload.inbound;
 
+      const variables = {
+        message: {
+          user: {
+            userId: userId != null ? String(userId) : null,
+            first_name: firstName,
+            last_name: lastName,
+            username,
+            language
+          },
+          chatId: String(msg.payload.chatId),
+          messageId: msg.payload.messageId != null ? String(msg.payload.messageId) : undefined,
+          inbound: msg.payload.inbound,
+          type: msg.payload.type,
+          ts: moment(),
+          transport: msg.originalMessage.transport,
+          flag,
+          content: _.isString(msg.payload.content) ? msg.payload.content : '<buffer>'
+        }
+      };
+
       try {
         const result = await client
           .mutate({
             mutation: useSimplifiedQuery ? CREATE_MESSAGE_LIGHT : CREATE_MESSAGE,
-            variables: {
-              message: {
-                user: {
-                  userId: userId != null ? String(userId) : null,
-                  first_name: firstName,
-                  last_name: lastName,
-                  username,
-                  language
-                },
-                chatId: String(msg.payload.chatId),
-                messageId: msg.payload.messageId != null ? String(msg.payload.messageId) : undefined,
-                inbound: msg.payload.inbound,
-                type: msg.payload.type,
-                ts: moment(),
-                transport: msg.originalMessage.transport,
-                flag,
-                content: _.isString(msg.payload.content) ? msg.payload.content : '<buffer>'
-              }
-            }
-          })
+            variables
+          });
 
         const user = result != null && result.data != null && result.data.message != null && result.data.message.user != null
           ? result.data.message.user : null;
@@ -110,22 +112,35 @@ module.exports = function(RED) {
           if (language !== user.language) {
             update.language = user.language;
           }
-          if (userId !== user.userId) {
-            update.userId = user.userId;
-          }
+
           // update chat context only if there are changes
           if (!_.isEmpty(update)) {
             await when(chat.set(update));
           }
+
+          // if a chat context still not exists for this user, then assign
+          // the current one (which could be enriched of information) to the
+          // user resolved previously
+          const { contextProvider } = msg.api().getOptions();
+          if (contextProvider.get(null, user.userId) == null) {
+            contextProvider.assignToUser(user.userId, msg.chat());
+          }
+          msg.chat = () => {
+            // override the chat context with the one got using userId and not chatId
+            const { contextProvider } = msg.api().getOptions();
+            return contextProvider.get(null, user.userId)
+          };
+          msg.originalMessage.userId = user.userId;
+          msg.user = user;
         }
-        // finally
-        send({ ...msg, user });
+
+        send(msg);
         done();
       } catch(error) {
 
         console.log(error)
         // TODO: improve error handling here
-        console.log('error', error.networkError.result)
+        console.log('error', error.networkError)
         done(error.networkError.result)
       }
     });
