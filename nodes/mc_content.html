@@ -3,7 +3,7 @@
     category: 'Mission Control',
     color: '#6699CC',
     defaults: {
-      slug: {
+      query: {
         value: ''
       },
       language: {
@@ -20,7 +20,7 @@
     outputs: 1,
     paletteLabel: 'MC Content',
     icon: 'chatbot-command.png',
-    label: function() {        
+    label: function() {
       return 'MC Content' + (this.slug !== null && this.slug !== '' ? ' (' + this.slug + ')' : '');
     }
   });
@@ -28,8 +28,8 @@
 
 <script type="text/x-red" data-template-name="mc-content">
   <div class="form-row">
-    <label for="node-input-slug">Id or Slug</label>
-    <input type="text" id="node-input-slug" placeholder="">
+    <label for="node-input-query">Get by id(s) or slug(s)</label>
+    <input type="text" id="node-input-query" placeholder="">
   </div>
   <div class="form-row form-row-language">
     <label for="node-input-language">Language</label>
@@ -72,7 +72,7 @@
   </div>
   <div class="form-row form-row-language">
     <label for="node-input-language">Failback Language</label>
-    <select id="node-input-failbackLanguage">      
+    <select id="node-input-failbackLanguage">
       <option value="ar">Arabic</option>
       <option value="bn">Bengali</option>
       <option value="ca">Catalan</option>
@@ -107,11 +107,8 @@
       <option value="uk">Ukrainian</option>
       <option value="zh">Chinese</option>
     </select>
-  </div>  
+  </div>
 </script>
 
 <script type="text/x-red" data-help-name="mc-content">
 </script>
-  
-  
-  

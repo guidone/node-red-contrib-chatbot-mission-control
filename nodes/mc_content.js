@@ -7,23 +7,21 @@ const LIMIT = 100;
 
 const {
   isValidMessage,
-  getChatId,
-  getTransport,
   extractValue,
-  append,
   when
 } = require('../lib/helpers/utils');
 
 
 const CONTENT = gql`
-query($id: Int,$slug: String, $ids: [Int]) {
-  contents(id: $id, slug: $slug, ids: $ids) {
+query($id: Int,$slug: String, $ids: [Int], $slugs: [String]) {
+  contents(id: $id, slug: $slug, ids: $ids, slugs: $slugs) {
     id,
     title,
     slug,
     language,
     body,
     categoryId,
+    payload,
     category {
       id,
       name
@@ -31,12 +29,28 @@ query($id: Int,$slug: String, $ids: [Int]) {
   }
 }`;
 
+const findContent = (contents, { language, contextLanguage, failbackLanguage }) => {
+  // if not using id but the slug, then apply language logic, try to find the right one
+  // matching the chat context language or the one defined in the configuration or the
+  // failback language
+  if (_.isEmpty(language) && !_.isEmpty(contextLanguage)) {
+    content = contents.find(content => content.language === contextLanguage);
+  } else if (!_.isEmpty(language)) {
+    content = contents.find(content => content.language === language);
+  }
+  if (content == null && !_.isEmpty(failbackLanguage)) {
+    content = contents.find(content => content.language === failbackLanguage);
+  }
+  return content;
+}
+
+
 module.exports = function(RED) {
 
   function MissionControlContent(config) {
     RED.nodes.createNode(this, config);
     const node = this;
-    this.slug = config.slug;
+    this.query = config.query;
     this.language = config.language;
     this.failbackLanguage = config.failbackLanguage;
 
@@ -50,30 +64,43 @@ module.exports = function(RED) {
       }
       const chat = msg.chat();
       const template = MessageTemplate(msg, node);
-      const slug = extractValue('string', 'slug', node, msg, false, true);
-      const id = extractValue('number', 'id', node, msg, false, true);
-      const ids = extractValue('array', 'ids', node, msg, false, true);
+
+      let query = extractValue(['string', 'number', 'array'], 'query', node, msg, false, true);
       const language = extractValue('string', 'language', node, msg, false);
       const failbackLanguage = extractValue('string', 'failbackLanguage', node, msg, false);
+
+      // if query (from the UI) is comma separated, then convert to array, trim it and try to convert
+      if (_.isString(query) && query.includes(',')) {
+        query = query
+          .split(',')
+          .map(item => item.trim())
+          .map(item => !isNaN(parseInt(item, 10)) ? parseInt(item, 10) : item);
+      }
 
       // build query variables
       let variables;
       let usingId = false;
       let usingIds = false;
-
-      if (_.isArray(ids) && !_.isEmpty(ids)) {
-        variables = { ids: ids.filter(id => _.isNumber(id))};
+      let usingSlugs = false;
+      let slugs, ids;
+      if (_.isArray(query) && query.every(item => _.isString(item))) {
+        slugs = query;
+        variables = { slugs };
+        usingSlugs = true;
+      } else if (_.isArray(query) && query.every(item => _.isNumber(item))) {
+        ids = query;
+        variables = { ids };
         usingIds = true;
-      } else if (!isNaN(parseInt(slug, 10))) {
-        variables = { id: parseInt(slug, 10), limit: LIMIT };
+      } else if (!isNaN(parseInt(query, 10))) {
+        variables = { id: parseInt(query, 10), limit: LIMIT };
         usingId = true;
-      } else if (_.isNumber(id)) {
+      } else if (_.isNumber(query)) {
         variables = { id, limit: LIMIT };
         usingId = true;
-      } else if (!_.isEmpty(slug)) {
-        variables = { slug, limit: LIMIT };
+      } else if (_.isString(query) && !_.isEmpty(query)) {
+        variables = { slug: query, limit: LIMIT };
       } else {
-        done('Invalid or empty slug/id, unable to retrieve content');
+        done('Invalid or empty slug/id, unable to retrieve content with this query: ' + query.toString());
         return;
       }
 
@@ -86,36 +113,37 @@ module.exports = function(RED) {
 
         let content;
         if (usingIds) {
-          content = contents;
+          // sort the same order of ids
+          content = _.compact(ids.map(id => contents.find(content => content.id === id)));
+        } else if (usingSlugs) {
+          // take all articles with the same slug, in the same order the slugs were provided and pass thru
+          // the language chooser function
+          const filteredContents = slugs.map(slug => findContent(
+            contents.filter(content => content.slug === slug),
+            { language, contextLanguage, failbackLanguage }
+          ));
+          content = _.compact(filteredContents);
         } else if (usingId) {
           // if using id, then just get the first
           content = !_.isEmpty(contents) ? contents[0] : null;
         } else {
-          // if not using id but the slug, then apply language logic, try to find the right one
-          // matching the chat context language or the one defined in the configuration or the
-          // failback language
-          if (_.isEmpty(language) && !_.isEmpty(contextLanguage)) {
-            contents.find(content => content.language === contextLanguage);
-          } else if (!_.isEmpty(language)) {
-            content = contents.find(content => content.language === language);
-          }
-          if (content == null && !_.isEmpty(failbackLanguage)) {
-            content = contents.find(content => content.language === failbackLanguage);
-          }
+          // from all content with the same slug, take the one with the right language
+          content = findContent(contents, { language, contextLanguage, failbackLanguage });
         }
         // error if still empty
         if (content == null) {
           send(msg);
-          done(`Content not found for id: ${id} or slug: €{slug}`);
+          done(`Content not found for query: ${query}`);
           return;
         }
         const payload = await template(content);
         // store the result in the payload and save the previous content in "previous" key
         // to be used with the "Pop Message" node if needed, store also the result in data
         // in case the "Pop Message" node is used
+        console.log('payload', payload  )
         send({
           ...msg,
-          data: payload,
+          data: payload, // TODO remove this?
           payload,
           previous: msg.payload
         });
