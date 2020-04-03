@@ -1097,19 +1097,19 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             categoryId: { type: GraphQLInt },
             id: { type: GraphQLInt },
             ids: { type: new GraphQLList(GraphQLInt)},
+            slugs: { type: new GraphQLList(GraphQLString)},
             language: { type: GraphQLString },
             namespace: { type: GraphQLString },
             title: { type: GraphQLString },
             search: { type: GraphQLString }
           },
-          resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language, title, id, ids, namespace, search }) {
+          resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language, title, id, ids, namespace, search, slugs }) {
             const whereParams = compactObject({
               id: _.isArray(ids) && !_.isEmpty(ids) ? { [Op.in]: ids } : id,
               categoryId,
-              slug,
+              slug: _.isArray(slugs) && !_.isEmpty(slugs) ? { [Op.in]: slugs } : slug,
               language,
               namespace
-              // title: title != null ? { [Op.like]: `%${title}%` } : undefined,
             });
             if (title != null) {
               whereParams.title = { [Op.like]: `%${title}%` };
