@@ -7,7 +7,13 @@ import withoutParams from '../../../../src/helpers/without-params';
 
 import { CONTENT, EDIT_CONTENT, DELETE_CONTENT } from '../queries';
 
-const ContentPreview = ({ contentId, onCancel = () => {}, onSubmit = () => {}, onDelete = () => {} }) => {
+const ContentPreview = ({
+  contentId,
+  onCancel = () => {},
+  onSubmit = () => {},
+  onDelete = () => {},
+  customFieldsSchema
+}) => {
   const { loading, error, data } = useQuery(CONTENT, {
     fetchPolicy: 'network-only',
     variables: {
@@ -37,6 +43,7 @@ const ContentPreview = ({ contentId, onCancel = () => {}, onSubmit = () => {}, o
       disabled={editLoading || deleteLoading}
       categories={data.categories}
       onCancel={onCancel}
+      customFieldsSchema={customFieldsSchema}
       onDelete={content => deleteContent({ variables: { id: content.id }})}
       onSubmit={content => edit({ variables: { id: content.id, content }})}
     />
@@ -46,7 +53,14 @@ ContentPreview.propTypes = {
   contentId: PropTypes.number,
   onCancel: PropTypes.func,
   onSubmit: PropTypes.func,
-  onDelete: PropTypes.func
+  onDelete: PropTypes.func,
+  customFieldsSchema: PropTypes.arrayOf(PropTypes.shape({
+    key: PropTypes.string,
+    type: PropTypes.string,
+    description: PropTypes.string,
+    defaultValue: PropTypes.string,
+    color: PropTypes.oneOf(['red','orange', 'yellow', 'green', 'cyan', 'blue', 'violet'])
+  }))
 };
 
 export default ContentPreview;

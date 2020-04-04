@@ -8,6 +8,7 @@ const useCreateContent = ({ onComplete = () => {} }) => {
 
   let modal;
   if (content != null) {
+    console.log('create content', props)
     modal = (
       <CreateContent
         content={content}
@@ -23,8 +24,9 @@ const useCreateContent = ({ onComplete = () => {} }) => {
 
   return {
     createContent: (contentDefault, props) => {
-      setContent(contentDefault);
       setProps(props);
+      setContent(contentDefault);
+
     },
     modal
   };

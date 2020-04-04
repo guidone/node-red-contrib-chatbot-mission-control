@@ -1,100 +1,121 @@
-import React from 'react';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
+import React, { Fragment } from 'react';
+import { Button } from 'rsuite';
 
-import {
-  Button,
-  Form,
-  FormControl,
-  FlexboxGrid,
-  IconButton,
-  Icon,
-  SelectPicker
-} from 'rsuite';
+import FieldEditor from './field-editor';
+import KeyTag from './key-tag';
+import './style.scss';
 
-import FieldTypes from './field-types';
-import BooleanField from './fields/boolean';
-import DateField from './fields/date';
-import NumberField from './fields/number';
+const FieldsEditor = ({
+  value = [],
+  onChange = () => {},
+  schema,
+  labels = {}
+}) => {
+  const {
+    addField = 'Add custom field',
+    emptyFields = 'No custom fields',
+    addAvailableFields = 'Add one of these available fields',
+    availableFields = 'Available fields:',
+    noPredefinedFields = 'No predefined fields'
+  } = labels;
+  const usedFields = (value || []).map(item => item.name);
+  const addTag = keyTag => {
+    onChange([
+      ...value,
+      { name: keyTag.key, type: keyTag.type, value: keyTag.defaultValue, cid: _.uniqueId('c')
+    }]);
+  };
+  // TODO these can be evaluated once
+  const availableKeyTag = (schema || []).filter(keyTag => !usedFields.includes(keyTag.key));
+  const helps = (schema || []).reduce((acc, { key, description}) => ({ ...acc, [key]: description }), {});
 
-const FieldEditor = ({ field, onChange = () => {}, onRemove = () => {} }) => {
-
-  let accepter;
-  if (field.type === 'boolean') {
-    accepter = BooleanField;
-  } else if (field.type === 'date') {
-    accepter = DateField;
-  } else if (field.type === 'number') {
-    accepter = NumberField;
-  }
-
-  return (
-    <div className="field-editor">
-      <Form
-        layout="inline"
-        formValue={field}
-        onChange={field => onChange(field)}
-          autoComplete="off"
-        >
-        <FlexboxGrid justify="space-between" style={{ marginBottom: '10px', marginRight: '0px' }}>
-          <FlexboxGrid.Item colspan={7}>
-            <FormControl name="name" placeholder="Name"/>
-          </FlexboxGrid.Item>
-          <FlexboxGrid.Item colspan={4}>
-            <FormControl
-              name="type"
-              placeholder="Type"
-              accepter={SelectPicker}
-              data={FieldTypes}
-              block
-              searchable={false}
-              cleanable={false}
-            />
-          </FlexboxGrid.Item>
-          <FlexboxGrid.Item colspan={10}>
-            <FormControl name="value" placeholder="value" accepter={accepter}/>
-          </FlexboxGrid.Item>
-          <FlexboxGrid.Item colspan={1} align="right">
-            <IconButton
-              onClick={() => onRemove()}
-              icon={<Icon icon="trash" />}
-              size="sm"
-            />
-          </FlexboxGrid.Item>
-        </FlexboxGrid>
-      </Form>
-    </div>
-  );
-};
-
-
-const FieldsEditor = ({ value = [], onChange = () => {}, labelAddField = 'Add custom field' }) => {
   return (
     <div className="ui-fields-editor">
-      <div>
-      {(value || []).map((field, idx) => (
-        <FieldEditor
-          field={field}
-          key={field.id || field.cid}
-          onChange={field => {
-            const newFields = [...value];
-            newFields[idx] = field;
-            onChange(newFields);
-          }}
-          onRemove={() => {
-            let newFields = [...value];
-            newFields[idx] = null;
-            onChange(_.compact(newFields));
-          }}
-        />
-      ))}
+      <div className="fields-container">
+        <div className="fields">
+          {(value || []).map((field, idx) => (
+            <FieldEditor
+              field={field}
+              key={field.id || field.cid}
+              description={helps[field.name]}
+              onChange={field => {
+                const newFields = [...value];
+                newFields[idx] = field;
+                onChange(newFields);
+              }}
+              onRemove={() => {
+                let newFields = [...value];
+                newFields[idx] = null;
+                onChange(_.compact(newFields));
+              }}
+            />
+          ))}
+        </div>
+        {!_.isEmpty(value) && schema != null && (
+          <div className="available-keys">
+            <Fragment>
+              <div className="available-fields">{availableFields}</div>
+              {availableKeyTag.map(keyTag => (
+                <KeyTag
+                  keyTag={keyTag}
+                  key={keyTag.key}
+                  onClick={addTag}
+                />
+              ))}
+              {availableKeyTag.length === 0 && (
+                <div className="no-predefined-fields">{noPredefinedFields}</div>
+              )}
+            </Fragment>
+          </div>
+        )}
       </div>
+      {_.isEmpty(value) && (
+        <div className="empty">
+          <div className="label">{emptyFields}</div>
+          {schema != null && (
+            <div className="schema">
+              <Fragment>
+                <div className="available-fields">{addAvailableFields}</div>
+                {schema.map(keyTag => (
+                  <KeyTag
+                    keyTag={keyTag}
+                    key={keyTag.key}
+                    onClick={addTag}
+                  />
+                ))}
+            </Fragment>
+            </div>
+          )}
+        </div>
+      )}
       <div>
         <Button onClick={() => {
           onChange([...value, { name: '', type: 'string', value: '', cid: _.uniqueId('c') }]);
-        }}>{labelAddField}</Button>
+        }}>{addField}</Button>
       </div>
     </div>
   );
+};
+FieldsEditor.propTypes = {
+  value: PropTypes.arrayOf(PropTypes.shape({
+    name: PropTypes.string,
+    type: PropTypes.oneOf(['string', 'boolean', 'date', 'number']),
+    value: PropTypes.any
+  })),
+  onChange: PropTypes.func,
+  labels: PropTypes.shape({
+    addField: PropTypes.string,
+    emptyFields: PropTypes.string
+  }),
+  schema: PropTypes.arrayOf(PropTypes.shape({
+    key: PropTypes.string,
+    type: PropTypes.string,
+    description: PropTypes.string,
+    defaultValue: PropTypes.string,
+    color: PropTypes.oneOf(['red','orange', 'yellow', 'green', 'cyan', 'blue', 'violet'])
+  }))
 };
 
 export default FieldsEditor;

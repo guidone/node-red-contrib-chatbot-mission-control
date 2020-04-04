@@ -38,7 +38,8 @@ const ModalContent = ({
   categories,
   error,
   labels = {},
-  disabledLanguages
+  disabledLanguages,
+  customFieldsSchema
 }) => {
   const [formValue, setFormValue] = useState(content);
   const [formError, setFormError] = useState(null);
@@ -153,7 +154,12 @@ const ModalContent = ({
           {tab === 'custom_fields' && (
             <FormGroup>
               <ControlLabel>Fields</ControlLabel>
-              <FormControl readOnly={disabled} name="fields" accepter={FieldsEditor}/>
+              <FormControl
+                readOnly={disabled}
+                name="fields"
+                accepter={FieldsEditor}
+                schema={customFieldsSchema}
+              />
             </FormGroup>
           )}
           <Views region="content-tabs">
@@ -261,7 +267,14 @@ ModalContent.propTypes = {
   labels: PropTypes.shape({
     saveContent: PropTypes.string,
     deleteContent: PropTypes.string
-  })
+  }),
+  customFieldsSchema: PropTypes.arrayOf(PropTypes.shape({
+    key: PropTypes.string,
+    type: PropTypes.string,
+    description: PropTypes.string,
+    defaultValue: PropTypes.string,
+    color: PropTypes.oneOf(['red','orange', 'yellow', 'green', 'cyan', 'blue', 'violet'])
+  }))
 };
 
 export default ModalContent;

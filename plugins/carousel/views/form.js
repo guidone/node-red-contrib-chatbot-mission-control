@@ -71,7 +71,6 @@ export default ({
           <Fragment>
             <FormGroup>
               <ControlLabel>Carousel Cards
-
                 <HelpBlock tooltip>Select one or more content</HelpBlock>
               </ControlLabel>
               <FormControl
@@ -82,7 +81,6 @@ export default ({
                 disabled={disabled}
               />
             </FormGroup>
-
           </Fragment>
         )}
         <FormGroup style={{ marginTop: '40px' }}>

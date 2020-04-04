@@ -34,6 +34,7 @@ const ContentAutocomplete = ({
   canCreate = true,
   fluid = false,
   namespace = 'content',
+  customFieldsSchema,
   disabled: componentDisabled = false
 }) => {
   const [search, setSearch] = useState(null);
@@ -145,7 +146,8 @@ const ContentAutocomplete = ({
               namespace,
               slug: useSlug && value != null ? value : undefined
             }, {
-              disabledLanguages: (items || []).map(item => item.language)
+              disabledLanguages: (items || []).map(item => item.language),
+              customFieldsSchema
             })}
           />
         )}
@@ -163,6 +165,7 @@ const ContentAutocomplete = ({
         <ContentPreview
           contentId={content}
           onCancel={() => setContent(null)}
+          customFieldsSchema={customFieldsSchema}
           onDelete={async () => {
             setContent(null);
             const { data } = await client.query({ query: SEARCH, fetchPolicy: 'network-only', variables });
@@ -189,7 +192,15 @@ ContentAutocomplete.propTypes = {
   onChange: PropTypes.func,
   style: PropTypes.object,
   // restrict autocomplete and creation to this namespace
-  namespace: PropTypes.string
+  namespace: PropTypes.string,
+  // the schema for custom fields (suggest a limited set of custom field name)
+  customFieldsSchema: PropTypes.arrayOf(PropTypes.shape({
+    key: PropTypes.string,
+    type: PropTypes.string,
+    description: PropTypes.string,
+    defaultValue: PropTypes.string,
+    color: PropTypes.oneOf(['red','orange', 'yellow', 'green', 'cyan', 'blue', 'violet'])
+  }))
 };
 
 
