@@ -1015,22 +1015,15 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             if (_.isEmpty(updateToUser)) {
               await User.update(updateToUser, { where: { id: toUser.id }});
             }
-
-            // TODO merge also contact information
+            // turn only chatIds that don't already exists
             for (const item of fromChatIds) {
-
-              console.log('cerco', item.id, item.chatId, item.transport);
               const hasTransport = toChatIds.filter(({ transport }) => transport === item.transport).length !== 0;
               if (!hasTransport) {
-                console.log('merging', item.id)
                 await ChatId.update({ userId: toUser.userId }, { where: { id: item.id }});
               }
             };
-
             // finally destroy source user
             await User.destroy({ where: { id: fromUser.id }});
-
-
             return toUser;
           }
         },

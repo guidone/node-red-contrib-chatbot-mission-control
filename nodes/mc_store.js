@@ -90,7 +90,6 @@ module.exports = function(RED) {
         }
       };
 
-      console.log('variables', variables)
       try {
         const result = await client
           .mutate({
@@ -100,7 +99,7 @@ module.exports = function(RED) {
 
         const user = result != null && result.data != null && result.data.message != null && result.data.message.user != null
           ? result.data.message.user : null;
-        // if user sent back, then syncronize the key data present in chat context
+        // if user data sent back, then syncronize the data present in chat context
         if (user != null) {
           // the DB is the single source of truth
           const update = { resolved: true };
