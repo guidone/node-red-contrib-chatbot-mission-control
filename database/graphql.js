@@ -989,6 +989,52 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           }
         },
 
+        mergeUser: {
+          type: userType,
+          args: {
+            fromId: { type: new GraphQLNonNull(GraphQLInt)},
+            toId: { type: new GraphQLNonNull(GraphQLInt)}
+          },
+          resolve: async function(root, { fromId, toId }) {
+            const fromUser = await User.findByPk(fromId);
+            const toUser = await User.findByPk(toId);
+
+            const fromChatIds = await ChatId.findAll({ where: { userId: fromUser.userId }});
+            const toChatIds = await ChatId.findAll({ where: { userId: toUser.userId }});
+
+            // find all fields from the source user that are empty in the destination user and can be used
+            const fieldsToUpdate = ['email', 'first_name', 'last_name', 'username', 'language'];
+            const updateToUser = {};
+            for (const field of fieldsToUpdate) {
+              if (!_.isEmpty(fromUser[field]) && _.isEmpty(toUser[field])) {
+                updateToUser[field] = fromUser[field];
+                toUser[field] = fromUser[field];
+              }
+            }
+            // update user if not empty
+            if (_.isEmpty(updateToUser)) {
+              await User.update(updateToUser, { where: { id: toUser.id }});
+            }
+
+            // TODO merge also contact information
+            for (const item of fromChatIds) {
+
+              console.log('cerco', item.id, item.chatId, item.transport);
+              const hasTransport = toChatIds.filter(({ transport }) => transport === item.transport).length !== 0;
+              if (!hasTransport) {
+                console.log('merging', item.id)
+                await ChatId.update({ userId: toUser.userId }, { where: { id: item.id }});
+              }
+            };
+
+            // finally destroy source user
+            await User.destroy({ where: { id: fromUser.id }});
+
+
+            return toUser;
+          }
+        },
+
         deleteUser: {
           type: userType,
           args: {
@@ -1006,6 +1052,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           }
         },
 
+        deleteChatId: {
+          type: userType,
+          args: {
+            id: { type: new GraphQLNonNull(GraphQLInt)}
+          },
+          resolve: async function(root, { id }) {
+            const chatId = await ChatId.findByPk(id);
+            await chatId.destroy();
+            return User.findOne({ where: { userId: chatId.userId }});
+          }
+        },
+
         createMessage: {
           type: messageType,
           args: {
@@ -1019,9 +1077,16 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             let currentUser;
             // if no chatId, the create the user and the related chatId-transport using the userId of the message
             if (existingChatId == null) {
-              currentUser = await User.create(user);
-              await ChatId.create({ userId: user.userId, chatId: message.chatId, transport: message.transport });
+              try {
+                currentUser = await User.create(user);
+              } catch(e) {
+                // this could fail, the user already exists (was only deleted the chatId)
+                // keep the existing one, the admin may have enriched the payload
+                // then get the current user
+                currentUser = await User.findOne({ where: { userId: user.userId }});
+              }
               userId = user.userId;
+              await ChatId.create({ userId: user.userId, chatId: message.chatId, transport: message.transport });
             } else {
               userId = existingChatId.userId;
             }
@@ -1055,18 +1120,27 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             id: { type: GraphQLInt },
             order: { type: GraphQLString },
             userId: { type: GraphQLString },
-            username: { type: GraphQLString }
+            username: { type: GraphQLString },
+            search: { type: GraphQLString }
           },
-          resolve(root, { order, offset = 0, limit = 10, userId, username, id }) {
+          resolve(root, { order, offset = 0, limit = 10, userId, username, id, search }) {
+            const whereParams = compactObject({
+              id,
+              userId,
+              username: username != null ? { [Op.like]: `%${username}%` } : null,
+            });
+            if (search != null) {
+              whereParams[Op.or] = [
+                { username: { [Op.like]: `%${search}%` } },
+                { first_name: { [Op.like]: `%${search}%` } },
+                { last_name: { [Op.like]: `%${search}%` } }
+              ]
+            }
             return User.findAll({
               limit,
               offset,
               order: splitOrder(order),
-              where: compactObject({
-                id,
-                userId,
-                username: username != null ? { [Op.like]: `%${username}%` } : null
-              })
+              where: whereParams
             });
           }
         },

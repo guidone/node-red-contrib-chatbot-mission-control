@@ -23,6 +23,7 @@ query ($limit: Int, $offset: Int, $order: String, $username: String, $userId: St
     createdAt,
     email,
     chatIds {
+      id,
       transport,
       chatId
     }
@@ -54,15 +55,15 @@ mutation($id: Int!, $user: NewUser!) {
 }`;
 
 export default ({ limit, page, onCompleted = () => {}, filters = {} }) => {
-  
+
   const { loading, error, data, refetch } = useQuery(USERS, {
     fetchPolicy: 'network-only',
-    variables: { 
-      limit, 
-      offset: (page - 1) * limit, 
+    variables: {
+      limit,
+      offset: (page - 1) * limit,
       order: 'reverse:createdAt',
       username: !_.isEmpty(filters.username) ? filters.username : undefined,
-      userId: !_.isEmpty(filters.userId) ? filters.userId : undefined       
+      userId: !_.isEmpty(filters.userId) ? filters.userId : undefined
      },
      onCompleted: () => setBootstrapping(false)
   });
@@ -76,13 +77,13 @@ export default ({ limit, page, onCompleted = () => {}, filters = {} }) => {
     { loading: editLoading, error: editError },
   ] = useMutation(EDIT_USER, { onCompleted });
 
-  return { 
+  return {
     bootstrapping,
-    loading, 
+    loading,
     saving: mutationLoading || mutationLoading,
-    error: error || mutationError || editError, 
+    error: error || mutationError || editError,
     data,
-    deleteUser,    
+    deleteUser,
     editUser: withoutParams(editUser, ['id', 'updatedAt', 'createdAt', '__typename', 'chatIds']),
     refetch
   };

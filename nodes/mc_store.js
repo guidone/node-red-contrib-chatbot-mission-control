@@ -90,6 +90,7 @@ module.exports = function(RED) {
         }
       };
 
+      console.log('variables', variables)
       try {
         const result = await client
           .mutate({
@@ -112,7 +113,9 @@ module.exports = function(RED) {
           if (language !== user.language) {
             update.language = user.language;
           }
-
+          if (username !== user.username) {
+            update.username = user.username;
+          }
           // update chat context only if there are changes
           if (!_.isEmpty(update)) {
             await when(chat.set(update));
@@ -140,8 +143,9 @@ module.exports = function(RED) {
 
         console.log(error)
         // TODO: improve error handling here
-        console.log('error', error.networkError)
-        done(error.networkError.result)
+        console.log('error', error.graphQLErrors)
+        console.log('error', error.graphQLErrors[0].locations)
+        done(error.graphQLErrors)
       }
     });
   }

@@ -162,9 +162,9 @@ module.exports = mcSettings => {
   });
 
   const ChatId = sequelize.define('chatid', {
-    userId: Sequelize.STRING,
-    chatId: Sequelize.STRING,
-    transport: Sequelize.STRING
+    userId: { type: Sequelize.STRING, allowNull: false },
+    chatId: { type: Sequelize.STRING, allowNull: false },
+    transport: { type: Sequelize.STRING, allowNull: false }
   }, {
     indexes: [
       { name: 'chatid_userid', using: 'BTREE', fields: ['userId'] },

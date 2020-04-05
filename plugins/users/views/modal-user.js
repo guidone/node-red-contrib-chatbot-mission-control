@@ -3,9 +3,8 @@ import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid,
 
 import { Views } from '../../../lib/code-plug';
 import JSONEditor from '../../../src/components/json-editor';
-import Transport from '../../../src/components/transport';
 import LanguagePicker from '../../../src/components/language-picker';
-
+import ChatIdsManager from '../../../src/components/chat-ids-manager';
 
 const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
   const [formValue, setFormValue] = useState({ ...user });
@@ -16,7 +15,7 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
   const [tab, setTab] = useState('user-details');
 
   return (
-    <Modal backdrop show onHide={onCancel} size="md" className="modal-user">
+    <Modal backdrop show onHide={onCancel} size="md" overflow={false} className="modal-user">
       <Modal.Header>
         <Modal.Title>Edit User <em>(id: {user.id})</em></Modal.Title>
       </Modal.Header>
@@ -106,18 +105,11 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
             </FormGroup>
             <FormGroup>
               <ControlLabel>ChatIds</ControlLabel>
-              <div className="chat-ids">
-                {user.chatIds.map(item => (
-                  <div key={item.chatId} className="chat-id-item">
-                    <div  className="transport">
-                      <Transport transport={item.transport}/>
-                    </div>
-                    <div className="chat-id">
-                      {item.chatId}
-                    </div>
-                  </div>
-                ))}
-              </div>
+              <FormControl
+                readOnly={disabled}
+                name="chatIds"
+                accepter={ChatIdsManager}
+              />
             </FormGroup>
           </Form>
         )}

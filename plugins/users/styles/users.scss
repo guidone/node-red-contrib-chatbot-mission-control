@@ -8,11 +8,11 @@
 }
 
 .modal-user {
-  
+
   .ace_editor {
     border-radius: 5px;
   }
-  
+
   .rs-form-group.chat-id {
     .rs-form-control-wrapper {
       width: calc(100% - 25px);
@@ -20,18 +20,6 @@
     input {
       background-color: #eeeeee;
     }
-  } 
-
-  .chat-ids {
-    .chat-id-item {
-      .transport {
-        width: 200px;
-        display: inline-block;
-      }
-      .chat-id {
-        display: inline-block;
-        font-style: italic;
-      }
-    }
   }
+
 }

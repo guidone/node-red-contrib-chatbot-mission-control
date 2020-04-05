@@ -8,10 +8,11 @@ import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import Language from '../../../src/components/language';
 import SmartDate from '../../../src/components/smart-date';
-import useRouterQuery from '../../../src/hooks/router-query'; 
+import useRouterQuery from '../../../src/hooks/router-query';
 
 import '../styles/users.scss';
 import useUsers from '../hooks/users';
+import useMergeUser from '../hooks/merge-user';
 import ModalUser from '../views/modal-user';
 
 const Users = () => {
@@ -20,24 +21,31 @@ const Users = () => {
   const [ user, setUser ] = useState(null);
   const [ filters, setFilters ] = useState({ userId: urlUserId, username: urlUsername });
   const { loading, saving, error, data, deleteUser, editUser, refetch, bootstrapping } = useUsers({ limit, page, filters });
+  const { mergeModal, mergeUser } = useMergeUser({
+    onComplete: () => {
+      console.log('completed merge');
+      refetch();
+    }
+  });
 
   const { username, userId } = filters;
 
   return (
     <PageContainer className="page-users">
-      <Breadcrumbs pages={['Users']}/>    
+      <Breadcrumbs pages={['Users']}/>
       {user != null && (
-        <ModalUser 
+        <ModalUser
           user={user}
           error={error}
           disabled={saving}
           onCancel={() => setUser(null)}
-          onSubmit={async user => {            
-            await editUser({ variables: { id: user.id, user }})              
+          onSubmit={async user => {
+            await editUser({ variables: { id: user.id, user }})
             setUser(null);
             refetch();
           }}
         />)}
+      {mergeModal}
       {bootstrapping && <Grid columns={9} rows={3} />}
       {error && <div>error</div>}
       {!bootstrapping && (<div className="filters" style={{ marginBottom: '10px' }}>
@@ -50,7 +58,7 @@ const Users = () => {
               setFilters({ ...filters, userId: e.target.value });
               setPage({ limit, page: 1 });
               setQuery({ userId: e.target.value});
-              refetch({ userId: e.target.value });  
+              refetch({ userId: e.target.value });
             }
           }}
         />
@@ -64,11 +72,14 @@ const Users = () => {
               setFilters({ ...filters, username: e.target.value });
               setPage({ limit, page: 1 });
               setQuery({ username: e.target.value});
-              refetch({ username: e.target.value });  
+              refetch({ username: e.target.value });
             }
           }}
         />
-
+        &nbsp;
+        <Button onClick={() => refetch()} disabled={loading}>
+          Refresh
+        </Button>
       </div>
       )}
       {!error && !bootstrapping && (
@@ -90,7 +101,7 @@ const Users = () => {
           </Column>
 
           <Column width={140} resizable>
-            <HeaderCell>Subscribed</HeaderCell>            
+            <HeaderCell>Subscribed</HeaderCell>
             <Cell>
               {({ createdAt }) => <SmartDate date={createdAt} />}
             </Cell>
@@ -122,32 +133,41 @@ const Users = () => {
             <HeaderCell>Email</HeaderCell>
             <Cell dataKey="email"/>
           </Column>
-          
-          <Column width={80}>
+
+          <Column width={120}>
             <HeaderCell>Action</HeaderCell>
             <Cell>
               {user => (
                 <ButtonGroup>
-                  <Button 
-                    disabled={saving || loading} 
+                  <Button
+                    disabled={saving || loading}
                     size="xs"
                     onClick={() => {
                       const name = [user.first_name, user.last_name].join(' ');
                       if (confirm(`Delete user${!_.isEmpty(name.trim()) ? ` "${name}"` : ''} (${user.userId})?`)) {
                         deleteUser({ variables: { id: user.id }})
-                          .then(refetch);  
+                          .then(refetch);
                       }
                     }}
                   >
                     <Icon icon="trash" />
                   </Button>
-                  <Button 
-                    disabled={saving || loading} 
+                  <Button
+                    disabled={saving || loading}
                     size="xs"
                     onClick={() => setUser(user)}
                   >
                     <Icon icon="edit2" />
                   </Button>
+                  {user.chatIds.length !== 0 && (
+                    <Button
+                      disabled={saving || loading}
+                      size="xs"
+                      onClick={() => mergeUser(user)}
+                    >
+                      <Icon icon="user-plus"/>
+                    </Button>
+                  )}
               </ButtonGroup>
               )}
             </Cell>
@@ -172,4 +192,3 @@ const Users = () => {
 };
 
 export default Users;
-
