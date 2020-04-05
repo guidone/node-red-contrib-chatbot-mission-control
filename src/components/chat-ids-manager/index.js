@@ -16,7 +16,10 @@ const ChatIdsManager = ({
     deleteChatId,
     { loading: deleteLoading },
   ] = useMutation(DELETE_CHAT_ID, {
-    onCompleted: ({ chatIds }) => onChange(chatIds)
+    onCompleted: ({ user: { chatIds }}) => {
+      //console.log('cosa torna??', value)
+      onChange(chatIds)
+    }
   });
 
   return (

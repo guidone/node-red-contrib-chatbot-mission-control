@@ -19,6 +19,7 @@ import ShowError from '../../../../src/components/show-error';
 import LanguagePicker from '../../../../src/components/language-picker';
 import JSONEditor from '../../../../src/components/json-editor';
 import { Views } from '../../../../lib/code-plug';
+import useCanCloseModal from '../../../../src/hooks/modal-can-close';
 
 import { content as contentModel } from '../models';
 import '../styles/modal-content.scss';
@@ -41,6 +42,7 @@ const ModalContent = ({
   disabledLanguages,
   customFieldsSchema
 }) => {
+  const { isChanged, setIsChanged, handleCancel } = useCanCloseModal({ onCancel });
   const [formValue, setFormValue] = useState(content);
   const [formError, setFormError] = useState(null);
   const [jsonValue, setJsonValue] = useState({
@@ -52,10 +54,10 @@ const ModalContent = ({
   const isNew = content.id == null;
 
   labels = { ...LABELS, ...labels };
-  // TODO prevent close if changes
+
 
   return (
-    <Modal backdrop show onHide={onCancel} className="modal-content" overflow={false} size="md">
+    <Modal backdrop show onHide={handleCancel} className="modal-content" overflow={false} size="md">
       <Modal.Header>
         <Modal.Title>{isNew ? 'Create content' : `Edit content "${content.title}"`}</Modal.Title>
       </Modal.Header>
@@ -90,6 +92,7 @@ const ModalContent = ({
           formValue={formValue}
           formError={formError}
           onChange={formValue => {
+            setIsChanged(true);
             setFormValue(formValue);
             setFormError(null);
           }}
@@ -169,7 +172,10 @@ const ModalContent = ({
                   <View
                     key={id}
                     formValue={formValue.payload}
-                    onChange={payload => setFormValue({ ...formValue, payload })}
+                    onChange={payload => {
+                      setIsChanged(true);
+                      setFormValue({ ...formValue, payload });
+                    }}
                   />
                 );
               }
@@ -199,6 +205,7 @@ const ModalContent = ({
                       // error do nothing
                       return;
                     }
+                    setIsChanged(true);
                     setFormValue({ ...formValue, payload });
                   }
                 }}
@@ -224,9 +231,12 @@ const ModalContent = ({
             {labels.deleteContent}
           </Button>
         )}
+        <Button onClick={handleCancel} appearance="subtle">
+          Cancel
+        </Button>
         <Button
           appearance="primary"
-          disabled={disabled}
+          disabled={disabled || !isChanged}
           appearance="primary"
           onClick={() => {
             if (!form.current.check()) {
@@ -236,9 +246,6 @@ const ModalContent = ({
           }}
         >
           {labels.saveContent}
-        </Button>
-        <Button onClick={onCancel} appearance="subtle">
-          Cancel
         </Button>
       </Modal.Footer>
     </Modal>

@@ -10,7 +10,7 @@ const ChatIdItem = ({ item, onRemove = () => {}, disabled }) => {
       <div className="transport">
         <Transport transport={item.transport}/>
       </div>
-      <div class="icon">
+      <div className="icon">
         <Icon icon="long-arrow-right" size="2x"/>
       </div>
       <div className="chat-id">

@@ -1,12 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, HelpBlock, Nav } from 'rsuite';
 
 import { Views } from '../../../lib/code-plug';
 import JSONEditor from '../../../src/components/json-editor';
 import LanguagePicker from '../../../src/components/language-picker';
 import ChatIdsManager from '../../../src/components/chat-ids-manager';
+import useCanCloseModal from '../../../src/hooks/modal-can-close';
 
 const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
+  const { handleCancel, isChanged, setIsChanged } = useCanCloseModal({ onCancel });
   const [formValue, setFormValue] = useState({ ...user });
   const [jsonValue, setJsonValue] = useState({
     json: !_.isEmpty(user.payload) ? JSON.stringify(user.payload, null, 2) : ''
@@ -15,7 +17,7 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
   const [tab, setTab] = useState('user-details');
 
   return (
-    <Modal backdrop show onHide={onCancel} size="md" overflow={false} className="modal-user">
+    <Modal backdrop show onHide={() => handleCancel()} size="md" overflow={false} className="modal-user">
       <Modal.Header>
         <Modal.Title>Edit User <em>(id: {user.id})</em></Modal.Title>
       </Modal.Header>
@@ -55,6 +57,7 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
             formValue={formValue}
             formError={formError}
             onChange={formValue => {
+              setIsChanged(true);
               setFormValue(formValue);
               setFormError(null);
             }}
@@ -136,6 +139,7 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
                       return;
                     }
                     setFormValue({ ...formValue, payload });
+                    setIsChanged(true);
                   }
                 }}
               />
@@ -149,7 +153,10 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
                 <View
                   key={id}
                   formValue={formValue.payload}
-                  onChange={payload => setFormValue({ ...formValue, payload })}
+                  onChange={payload => {
+                    setFormValue({ ...formValue, payload });
+                    setIsChanged(true);
+                  }}
                 />
               );
             }
@@ -158,12 +165,12 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
         </Views>
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={onCancel} appearance="subtle">
+        <Button onClick={() => handleCancel()} appearance="subtle">
           Cancel
         </Button>
         <Button
           appearance="primary"
-          disabled={disabled}
+          disabled={disabled || !isChanged}
           appearance="primary"
           onClick={() => onSubmit(formValue)}
         >

@@ -35,6 +35,16 @@ const UserLabel = user => {
     );
   }
 };
+UserLabel.propTypes = {
+  user: PropTypes.shape({
+    id: PropTypes.number,
+    userId: PropTypes.string,
+    chatIds: PropTypes.arrayOf(PropTypes.shape({
+      chatId: PropTypes.string,
+      transport: PropTypes.string
+    }))
+  })
+};
 
 
 
