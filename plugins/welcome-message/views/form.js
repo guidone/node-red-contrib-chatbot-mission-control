@@ -61,12 +61,13 @@ export default ({
         {tab === 'carousel' && (
           <Fragment>
             <FormGroup>
-              <ControlLabel>Carousel Cards
-                <HelpBlock tooltip>Select one or more content</HelpBlock>
+              <ControlLabel>Welcome message
+                <HelpBlock tooltip>Select the content to show when the user joins the chatbot</HelpBlock>
               </ControlLabel>
               <FormControl
                 name="page"
                 accepter={ContentAutocomplete}
+                useSlug={true}
                 disabled={disabled}
               />
             </FormGroup>

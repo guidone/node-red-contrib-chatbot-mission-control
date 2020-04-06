@@ -10,12 +10,12 @@ plug('sidebar', null, {
     {
       id: 'welcome-message',
       label: 'Welcome Message',
-      url: '/welcome-message',
+      url: '/welcome',
     }
   ]
 });
 plug('pages', ConfigurationPage, {
-  url: '/configuration-message',
+  url: '/welcome',
   title: 'Welcome Message',
   id: 'page-welcome-message'
 });

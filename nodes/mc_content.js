@@ -2,7 +2,7 @@ const _ = require('lodash');
 const gql = require('graphql-tag');
 
 const client = require('../database/client');
-const MessageTemplate = require('../lib/message-template/index');
+const MessageTemplate = require('../lib/message-template-async');
 const LIMIT = 100;
 
 const {
@@ -10,7 +10,9 @@ const {
   extractValue,
   when
 } = require('../lib/helpers/utils');
-
+const {
+  variable: isVariable
+} = require('../lib/helpers/validators');
 
 const CONTENT = gql`
 query($id: Int,$slug: String, $ids: [Int], $slugs: [String]) {
@@ -71,6 +73,10 @@ module.exports = function(RED) {
       const failbackLanguage = extractValue('string', 'failbackLanguage', node, msg, false);
 
       // if query (from the UI) is comma separated, then convert to array, trim it and try to convert
+      if (isVariable(query)) {
+        console.log('variabile===?')
+        query = await template.evaluate(query);
+      }
       if (_.isString(query) && query.includes(',')) {
         query = query
           .split(',')
@@ -141,7 +147,6 @@ module.exports = function(RED) {
         // store the result in the payload and save the previous content in "previous" key
         // to be used with the "Pop Message" node if needed, store also the result in data
         // in case the "Pop Message" node is used
-        console.log('payload', payload  )
         send({
           ...msg,
           data: payload, // TODO remove this?

@@ -73,12 +73,13 @@ module.exports = function(RED) {
     this.requestConfiguration = new RequestConfiguration({
       url: `http://localhost:${RED.settings.uiPort}/mc/api/configuration/${node.namespace}`,
       callback: configuration => {
+        const payload = _.omit(configuration, 'namespace');
         if (node.debug) {
           console.log(lcd.green('Initial configuration received') + ' (' + lcd.grey(this.namespace) +')');
-          console.log(lcd.prettify(_.omit(configuration, 'translations'), { indent: 2 }))
+          console.log(lcd.prettify(_.omit(payload, 'translations'), { indent: 2 }))
         }
-        saveConfiguration(configuration, this.context().global, node.namespace);
-        node.send({ payload: configuration });
+        saveConfiguration(payload, this.context().global, node.namespace);
+        node.send({ payload });
       },
       context: this.context().global
     });
@@ -98,9 +99,9 @@ module.exports = function(RED) {
         if (this.timerId != null) {
           clearInterval(this.timerId);
         }
-        saveConfiguration(payload, this.context().global, node.namespace);
+        saveConfiguration(rest, this.context().global, node.namespace);
         // pass through
-        node.send({ payload });
+        node.send({ payload: rest });
       }
     };
     Events.on('message', handler);
