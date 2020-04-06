@@ -3,7 +3,7 @@ import { Schema } from 'rsuite';
 
 const { StringType, ArrayType, ObjectType, DateType } = Schema.Types;
 
-const opening = Schema.Model({
+const carousel = Schema.Model({
   openings: ArrayType().of(ObjectType()
     .shape({
       start: DateType()
@@ -19,4 +19,4 @@ const opening = Schema.Model({
     )
 });
 
-export { opening };
+export { carousel };

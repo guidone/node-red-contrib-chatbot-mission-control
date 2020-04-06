@@ -10,7 +10,7 @@ const isMutation = query => query.includes('mutation(');
 
 module.exports = function(RED) {
 
-  function MissionControlQuery(config) {
+  function MissionControlGraphQL(config) {
     RED.nodes.createNode(this, config);
     const node = this;
     this.query = config.query;
@@ -70,5 +70,5 @@ module.exports = function(RED) {
     });
   }
 
-  RED.nodes.registerType('mc-query', MissionControlQuery);
+  RED.nodes.registerType('mc-graphql', MissionControlGraphQL);
 };

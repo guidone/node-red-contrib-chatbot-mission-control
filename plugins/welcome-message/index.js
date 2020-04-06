@@ -8,14 +8,14 @@ plug('sidebar', null, {
   icon: 'cog',
   options: [
     {
-      id: 'carousel',
-      label: 'Carousel',
-      url: '/configuration-carousel',
+      id: 'welcome-message',
+      label: 'Welcome Message',
+      url: '/welcome-message',
     }
   ]
 });
 plug('pages', ConfigurationPage, {
-  url: '/configuration-carousel',
-  title: 'Carousel',
-  id: 'configuration-carousel'
+  url: '/configuration-message',
+  title: 'Welcome Message',
+  id: 'page-welcome-message'
 });

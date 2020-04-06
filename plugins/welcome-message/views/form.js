@@ -1,11 +1,10 @@
 import React, { useState, useRef, Fragment } from 'react';
 import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav } from 'rsuite';
 
-import CollectionEditor from '../../../src/components/collection-editor';
+import ContentAutocomplete from '../../../src/components/content-autocomplete';
 import Dictionary from '../../../src/components/dictionary';
 
-import { carousel as carouseModel } from '../models';
-import FormCard from './form-card';
+import { welcomeMessage as welcomeMessageModel } from '../models';
 
 const dictionarySchema = [
   {
@@ -27,11 +26,11 @@ export default ({
   return (
     <div>
       <Nav appearance="tabs" activeKey={tab} onSelect={setTab} style={{ marginBottom: '25px' }}>
-        <Nav.Item eventKey="carousel">Carousel</Nav.Item>
+        <Nav.Item eventKey="carousel">Welcome message</Nav.Item>
         <Nav.Item eventKey="translations">Translations</Nav.Item>
       </Nav>
       <Form
-        model={carouseModel}
+        model={welcomeMessageModel}
         disabled={true}
         formValue={formValue}
         formError={formError}
@@ -66,10 +65,8 @@ export default ({
                 <HelpBlock tooltip>Select one or more content</HelpBlock>
               </ControlLabel>
               <FormControl
-                name="cards"
-                accepter={CollectionEditor}
-                form={FormCard}
-                labelAdd="Add card"
+                name="page"
+                accepter={ContentAutocomplete}
                 disabled={disabled}
               />
             </FormGroup>

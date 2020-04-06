@@ -1,16 +1,7 @@
 import React from 'react';
-import { DatePicker, FlexboxGrid, SelectPicker } from 'rsuite';
 import PropTypes from 'prop-types';
 
 import ContentAutocomplete from '../../../src/components/content-autocomplete';
-
-import SELECT_DAYS from '../helpers/days';
-import isValidDate from '../../../src/helpers/is-valid-date';
-
-const ifDate = str => {
-  const temp = new Date(str);
-  return isValidDate(temp) ? temp : null;
-}
 
 const CUSTOM_FIELDS = [
   {
