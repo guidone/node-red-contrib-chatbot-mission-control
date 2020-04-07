@@ -1,5 +1,5 @@
 import React from 'react';
-import { FlexboxGrid, Notification } from 'rsuite';
+import { FlexboxGrid, Notification, Tag } from 'rsuite';
 
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
@@ -36,9 +36,10 @@ const ConfigurationPage = ({ sendMessage }) => {
           )}
         </FlexboxGrid.Item>
         <InfoPanel colspan={7}>
-          some help here
-
-
+          Configure the behaviour of the <Tag color="violet">New User</Tag> node.<br/>
+          Select a content to show to the user when he joins the chatbot or a group. Use the <em>slug</em> field
+          to group different articles that represents the same content (for example the different translations).<br/>
+          To test the show content type <code>/start</code>
         </InfoPanel>
       </FlexboxGrid>
     </PageContainer>

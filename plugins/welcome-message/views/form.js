@@ -25,10 +25,7 @@ export default ({
 
   return (
     <div>
-      <Nav appearance="tabs" activeKey={tab} onSelect={setTab} style={{ marginBottom: '25px' }}>
-        <Nav.Item eventKey="carousel">Welcome message</Nav.Item>
-        <Nav.Item eventKey="translations">Translations</Nav.Item>
-      </Nav>
+
       <Form
         model={welcomeMessageModel}
         disabled={true}
@@ -46,33 +43,19 @@ export default ({
           setFormError(errors);
         }}
       >
-        {tab === 'translations' && (
-          <Fragment>
-            <FormGroup>
-              <FormControl
-                name="translations"
-                accepter={Dictionary}
-                schema={dictionarySchema}
-                disabled={disabled}
-              />
-            </FormGroup>
-          </Fragment>
-        )}
-        {tab === 'carousel' && (
-          <Fragment>
-            <FormGroup>
-              <ControlLabel>Welcome message
-                <HelpBlock tooltip>Select the content to show when the user joins the chatbot</HelpBlock>
-              </ControlLabel>
-              <FormControl
-                name="page"
-                accepter={ContentAutocomplete}
-                useSlug={true}
-                disabled={disabled}
-              />
-            </FormGroup>
-          </Fragment>
-        )}
+        <Fragment>
+          <FormGroup>
+            <ControlLabel>Welcome message
+              <HelpBlock tooltip>Select the content to show when the user joins the chatbot</HelpBlock>
+            </ControlLabel>
+            <FormControl
+              name="page"
+              accepter={ContentAutocomplete}
+              useSlug={true}
+              disabled={disabled}
+            />
+          </FormGroup>
+        </Fragment>
         <FormGroup style={{ marginTop: '40px' }}>
           <ButtonToolbar>
             <Button

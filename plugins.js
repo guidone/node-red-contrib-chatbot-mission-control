@@ -14,5 +14,5 @@ import './plugins/simulator';
 import './plugins/content';
 import './plugins/content-image';
 import './plugins/knowledge-base';
-//import './plugins/carousel';
+import './plugins/carousel';
 import './plugins/welcome-message';

@@ -139,7 +139,7 @@ module.exports = function(RED) {
         }
         // error if still empty
         if (content == null) {
-          send(msg);
+          send([null, msg]);
           done(`Content not found for query: ${query}`);
           return;
         }
@@ -147,12 +147,12 @@ module.exports = function(RED) {
         // store the result in the payload and save the previous content in "previous" key
         // to be used with the "Pop Message" node if needed, store also the result in data
         // in case the "Pop Message" node is used
-        send({
+        send([{
           ...msg,
           data: payload, // TODO remove this?
           payload,
           previous: msg.payload
-        });
+        }, null]);
 
         done();
       } catch(error) {
