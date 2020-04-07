@@ -61,14 +61,13 @@ module.exports = function(RED) {
         firstName,
         lastName,
         username,
-        language,
-        resolved
-      } = await when(chat.get('firstName', 'lastName', 'username', 'language', 'userId', 'resolved'));
+        language
+      } = await when(chat.get('firstName', 'lastName', 'username', 'language', 'userId'));
 
       // if the message is outbound and the user has already resolved by a mc_store upstream, then skip
       // the user sincronization is already been made, in order to optimize queries skip.
       // Of course always sync user for inbound messages
-      const useSimplifiedQuery = resolved === true && !msg.payload.inbound;
+      const useSimplifiedQuery = msg.originalMessage.resolved === true && !msg.payload.inbound;
 
       const variables = {
         message: {
@@ -102,7 +101,7 @@ module.exports = function(RED) {
         // if user data sent back, then syncronize the data present in chat context
         if (user != null) {
           // the DB is the single source of truth
-          const update = { resolved: true };
+          const update = { };
           if (firstName !== user.first_name) {
             update.firstName = user.first_name;
           }
@@ -115,6 +114,8 @@ module.exports = function(RED) {
           if (username !== user.username) {
             update.username = user.username;
           }
+          // avoid next mc store tries to resolve again the user
+          msg.originalMessage.resolved = true;
           // update chat context only if there are changes
           if (!_.isEmpty(update)) {
             await when(chat.set(update));
