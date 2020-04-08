@@ -4,20 +4,18 @@ const gql = require('graphql-tag');
 const client = require('../database/client');
 const lcd = require('../lib/lcd/index');
 
-const { 
+const {
   getTransport,
-  getChatId
+  getChatId,
+  getUserId,
 } = require('../lib/helpers/utils');
 
 const GET_USER = gql`
-query($chatId: String, $transport: String) {
-  chatIds(chatId: $chatId, transport: $transport) {
-    transport,
-    user {
-      id,      
-      payload,
-      userId
-    }
+query($userId: String) {
+  user(userId: $userId) {
+    id,
+    userId,
+    payload
   }
 }`;
 
@@ -39,40 +37,38 @@ mutation($id: Int!, $user: NewUser!) {
 }`;
 
 module.exports = function(RED) {
-  
+
   function MissionControlUserPayload(config) {
     RED.nodes.createNode(this, config);
     const node = this;
     this.query = config.query;
     this.chain = config.chain;
-    
+
     this.on('input', async function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
       done = done || function(error) { node.error.call(node, error, msg) };
 
-      const chatId = getChatId(msg);
-      const transport = getTransport(msg);
+      const userId = getUserId(msg);
 
       try {
-        const response = await client.query({ 
-          query: GET_USER, 
-          variables: { chatId: String(chatId), transport }, 
-          fetchPolicy: 'network-only' 
+        const response = await client.query({
+          query: GET_USER,
+          variables: { userId },
+          fetchPolicy: 'network-only'
         });
-        
-        if (response.data != null && !_.isEmpty(response.data.chatIds)) {        
-          const chatIdObj = response.data.chatIds[0];
+
+        if (response.data != null && response.data.user != null) {
           // merge payload
-          let payload = chatIdObj.user.payload != null ? chatIdObj.user.payload : {}; 
+          let payload = response.data.user.payload != null ? response.data.user.payload : {};
           payload = _.isObject(msg.payload) ? { ...payload, ...msg.payload } : payload;
 
-          await client.mutate({ 
-            mutation: EDIT_USER, 
-            variables: { 
-              id: chatIdObj.user.id, 
+          await client.mutate({
+            mutation: EDIT_USER,
+            variables: {
+              id: response.data.user.id,
               user: {
-                payload 
+                payload
               }
             }
           });
@@ -91,7 +87,7 @@ module.exports = function(RED) {
               errorMsg += ` (line: ${error.locations[0].line})`;
             }
             return errorMsg;
-          });            
+          });
           lcd.dump(errors, `GraphQL Error (id: ${node.id})`);
         } else {
           lcd.dump('Unknown GraphQL error', `GraphQL Error (id: ${node.id})`);

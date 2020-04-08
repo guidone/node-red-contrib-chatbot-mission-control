@@ -76,7 +76,7 @@ module.exports = function(RED) {
         const payload = _.omit(configuration, 'namespace');
         if (node.debug) {
           console.log(lcd.green('Initial configuration received') + ' (' + lcd.grey(this.namespace) +')');
-          console.log(lcd.prettify(_.omit(payload, 'translations'), { indent: 2 }))
+          console.log(lcd.prettify(_.omit(payload, 'translations'), { indent: 2 }));
         }
         saveConfiguration(payload, this.context().global, node.namespace);
         node.send({ payload });

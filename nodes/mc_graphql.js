@@ -4,6 +4,17 @@ const gql = require('graphql-tag');
 const client = require('../database/client');
 const lcd = require('../lib/lcd/index');
 const MessageTemplate = require('../lib/message-template/index');
+const {
+  isValidMessage,
+  isSimulator,
+  extractValue,
+  when
+} = require('../lib/helpers/utils');
+
+const isEmptyResponse = response => {
+  const keys = Object.keys(response.data);
+  return keys.length === 1 && _.isEmpty(response.data[keys[0]]);
+}
 
 const isMutation = query => query.includes('mutation(');
 
@@ -14,13 +25,16 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     const node = this;
     this.query = config.query;
+    this.debug = config.debug;
+    this.name = config.name;
 
     this.on('input', async function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
       done = done || function(error) { node.error.call(node, error, msg) };
 
-      const template = MessageTemplate(msg, node);
+      const debug = extractValue('boolean', 'debug', node, msg, false);
+      const name = extractValue('string', 'name', node, msg, false);
       // get params
       if (_.isEmpty(node.query)) {
         done('GraphQL query is empty');
@@ -32,8 +46,21 @@ module.exports = function(RED) {
       } else if (msg.payload != null && _.isObject(msg.payload.variables)) {
         variables = msg.payload.variables;
       }
+      // TODO only if valid message
+      let translatedQuery = node.query;
+      if (isValidMessage(msg)) {
+        const template = MessageTemplate(msg, node);
+        translatedQuery = await template(node.query);
+      }
+      if (debug) {
+        console.log(
+          lcd.green('GraphQL')
+          + ' (id: ' + lcd.grey(this.id)
+          + (!_.isEmpty(name) ? `, name: ${lcd.grey(name)}` : '')
+          + ')');
+        console.log(lcd.prettify(translatedQuery, { indent: 2 }))
+      }
 
-      const translatedQuery = await template(node.query);
       const mutate = isMutation(translatedQuery);
       const query = gql`${translatedQuery}`;
 
@@ -42,29 +69,21 @@ module.exports = function(RED) {
           await client.mutate({ mutation: query, variables }) :
           await client.query({ query, variables, fetchPolicy: 'network-only' });
 
-        send({
-          ...msg,
-          data: response.data,
-          payload: response.data,
-          previous: msg.payload
-        });
-        done();
-      } catch(error) {
-        // format error
-        // TODO: generalize query error
-        if (error != null && error.networkError != null && error.networkError.result != null && error.networkError.result.errors != null) {
-          let errors = error.networkError.result.errors.map(error => {
-            let errorMsg = error.message;
-            if (error.locations != null) {
-              errorMsg += ` (line: ${error.locations[0].line})`;
-            }
-            return errorMsg;
-          });
-          lcd.dump(errors, `GraphQL Error (id: ${node.id})`);
+        if (!isEmptyResponse(response)) {
+          send([{
+            ...msg,
+            //data: response.data,
+            payload: response.data,
+            previous: msg.payload
+          }, null]);
+          done();
         } else {
-          lcd.dump('Unknown GraphQL error', `GraphQL Error (id: ${node.id})`);
-          console.log(error);
+          send([null, msg]);
+          done();
         }
+
+      } catch(error) {
+        lcd.graphQLError(error, node);
         done(error);
       }
     });

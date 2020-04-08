@@ -4,11 +4,10 @@ import { FlexboxGrid, Notification, Tag } from 'rsuite';
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import InfoPanel from '../../../src/components/info-panel';
-import withSocket from '../../../src/wrappers/with-socket';
 import ConfigurationForm from '../views/form';
 import useConfiguration from '../../../src/hooks/configuration';
 
-const ConfigurationPage = ({ sendMessage }) => {
+const ConfigurationPage = () => {
   const { loading, saving, error, data, update } = useConfiguration({
     namespace: 'welcome',
     onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' })
@@ -28,10 +27,7 @@ const ConfigurationPage = ({ sendMessage }) => {
             <ConfigurationForm
               disabled={saving}
               value={data}
-              onSubmit={formValue => {
-                sendMessage('mc.configuration', { namespace: 'welcome', ...formValue });
-                update(formValue);
-              }}
+              onSubmit={formValue => update(formValue)}
             />
           )}
         </FlexboxGrid.Item>
@@ -46,4 +42,4 @@ const ConfigurationPage = ({ sendMessage }) => {
   );
 };
 
-export default withSocket(ConfigurationPage);
+export default ConfigurationPage;

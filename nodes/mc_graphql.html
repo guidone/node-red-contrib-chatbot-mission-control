@@ -9,7 +9,7 @@
       query: {
         value: ''
       },
-      chain: {
+      debug: {
         value: false
       },
       noerr: {
@@ -21,8 +21,9 @@
       }
     },
     inputs: 1,
-    outputs: 1,
+    outputs: 2,
     paletteLabel: 'MC GraphQL',
+    outputLabels: ['Query result', 'Empty response'],
     icon: 'chatbot-command.png',
     label: function() {
       return 'MC GraphQL' + (this.name !== null && this.name !== '' ? ' (' + this.name + ')' : '');
@@ -75,6 +76,13 @@
   <div class="form-row">
     <input type="hidden" id="node-input-query" autofocus="autofocus">
     <div style="height: 250px; min-height:150px;margin-top: 25px;" class="node-text-editor" id="node-input-func-editor" ></div>
+  </div>
+  <div class="form-row">
+    <label for="node-input-debug">Debug</label>
+    <input type="checkbox" value="true" id="node-input-debug">
+    <span class="redbot-form-hint">
+      Show debug information on the GraphQL query
+    </span>
   </div>
 </script>
 

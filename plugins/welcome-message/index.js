@@ -1,7 +1,7 @@
 import { plug } from '../../lib/code-plug';
 
 import ConfigurationPage from './pages/configuration';
-
+console.log('Starting welcome plugin');
 plug('sidebar', null, {
   id: 'configuration',
   label: 'Configuration',

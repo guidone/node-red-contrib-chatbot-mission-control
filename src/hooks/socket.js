@@ -11,7 +11,11 @@ const useSocket = (reducer = () => {}, initialState = {}) => {
   }, []);
   const [state, dispatch] = useReducer(reducer, initialState);
 
-  return { state, dispatch };
+  return {
+    state,
+    dispatch,
+    sendMessage: (topic, payload) => socketListener.send(JSON.stringify({ topic, payload }))
+  };
 }
 
 export default useSocket;

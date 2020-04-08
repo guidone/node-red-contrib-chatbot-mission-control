@@ -38,6 +38,8 @@ function sendMessage(topic, payload) {
 }
 
 
+
+
 // webpack https://webpack.js.org/guides/getting-started/
 // from https://github.com/node-red/node-red-dashboard/blob/63da162998c421b43a6e5ebf447ed90e04040aa3/ui.js#L309
 
@@ -57,6 +59,8 @@ function sendMessage(topic, payload) {
 
 
 function bootstrap(server, app, log, redSettings) {
+
+
   // print version
   const jsonPackage = fs.readFileSync(__dirname + '/package.json');
   try {

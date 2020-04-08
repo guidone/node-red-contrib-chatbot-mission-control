@@ -6,7 +6,6 @@ import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import InfoPanel from '../../../src/components/info-panel';
 import ChatbotStatus from '../../../src/components/chatbot-status';
-import withSocket from '../../../src/wrappers/with-socket';
 import ConfigurationForm from '../views/form';
 import useConfiguration from '../../../src/hooks/configuration';
 
@@ -15,7 +14,7 @@ const BREADCRUMBS = [
   'Configuration'
 ];
 
-const ConfigurationPage = ({ sendMessage }) => {
+const ConfigurationPage = () => {
   const { loading, saving, error, data, update } = useConfiguration({
     namespace: 'faq',
     onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' })
@@ -35,10 +34,7 @@ const ConfigurationPage = ({ sendMessage }) => {
             <ConfigurationForm
               disabled={saving}
               value={data}
-              onSubmit={formValue => {
-                sendMessage('mc.configuration', { namespace: 'faq', ...formValue });
-                update(formValue);
-              }}
+              onSubmit={formValue => update(formValue)}
             />
           )}
         </FlexboxGrid.Item>
@@ -67,4 +63,4 @@ const ConfigurationPage = ({ sendMessage }) => {
 };
 
 
-export default withSocket(ConfigurationPage);
+export default ConfigurationPage;
