@@ -54,9 +54,9 @@ mutation($id: Int!, $user: NewUser!) {
   }
 }`;
 
-export default ({ limit, page, onCompleted = () => {}, filters = {} }) => {
+export default ({ limit, page, onCompleted = () => {}, filters = {} } = {}) => {
 
-  const { loading, error, data, refetch } = useQuery(USERS, {
+  /*const { loading, error, data, refetch } = useQuery(USERS, {
     fetchPolicy: 'network-only',
     variables: {
       limit,
@@ -67,7 +67,7 @@ export default ({ limit, page, onCompleted = () => {}, filters = {} }) => {
      },
      onCompleted: () => setBootstrapping(false)
   });
-  const [bootstrapping, setBootstrapping] = useState(true);
+  const [bootstrapping, setBootstrapping] = useState(true);*/
   const [
     deleteUser,
     { loading: mutationLoading, error: mutationError },
@@ -78,13 +78,13 @@ export default ({ limit, page, onCompleted = () => {}, filters = {} }) => {
   ] = useMutation(EDIT_USER, { onCompleted });
 
   return {
-    bootstrapping,
-    loading,
+    //bootstrapping,
+    //loading,
     saving: mutationLoading || mutationLoading,
-    error: error || mutationError || editError,
-    data,
+    error: mutationError || editError,
+
     deleteUser,
-    editUser: withoutParams(editUser, ['id', 'updatedAt', 'createdAt', '__typename', 'chatIds']),
-    refetch
+    editUser: withoutParams(editUser, ['id', 'updatedAt', 'createdAt', '__typename', 'chatIds'])
+
   };
 };

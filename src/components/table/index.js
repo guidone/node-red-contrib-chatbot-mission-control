@@ -38,7 +38,6 @@ const CustomTable = ({
     setCursor({ ...cursor, page: 1, limit: 10 });
   }, [filters, sortField, sortType ]);
 
-
   const {
     bootstrapping,
     loading,
@@ -84,7 +83,7 @@ const CustomTable = ({
       )}
       {!bootstrapping && (
         <Table
-          data={data.contents || []}
+          data={data.rows || []}
           loading={loading}
           sortColumn={sortField}
           sortType={sortType}
@@ -103,13 +102,13 @@ const CustomTable = ({
           onChangePage={page => setCursor({ ...cursor, page })}
           lengthMenu={[{ label: '10', value: 10 }, { label: '20', value: 20 }, { label: '30', value: 30 } ]}
           onChangeLength={limit => setCursor({ ...cursor, limit, page: 1 })}
-          total={data.counters.contents.count}
+          total={data.counters.rows.count}
       />
       )}
     </div>
   );
 }
-CustomTable.propTypes = {
+/*CustomTable.propTypes = {
   query: PropTypes.string,
   // the subset of content to display
   namespace: PropTypes.string,
@@ -129,6 +128,6 @@ CustomTable.propTypes = {
   ])),
   // callback when filters changes
   onFilters: PropTypes.func
-};
+};*/
 
 export default forwardRef(CustomTable);

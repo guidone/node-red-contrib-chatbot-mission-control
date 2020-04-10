@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import _ from 'lodash';
-import { Table, Icon, SelectPicker, Input, ButtonGroup, Button, FlexboxGrid } from 'rsuite';
+import { Table, Icon, SelectPicker, ButtonGroup, Button, FlexboxGrid } from 'rsuite';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -12,25 +12,15 @@ import SmartDate from '../../../../src/components/smart-date';
 import Language from '../../../../src/components/language';
 import CustomTable from '../../../../src/components/table';
 import LanguagePicker from '../../../../src/components/language-picker';
+import { Input } from '../../../../src/components/table-filters';
 
 import useContents from '../hooks/content';
 import ModalContent from '../views/modal-content';
 
-const FilterInput = ({ onChange, ...rest }) => (
-  <Input
-    {...rest}
-    onKeyUp={e => {
-      if (e.keyCode === 13) {
-        onChange(!_.isEmpty(e.target.value) ? e.target.value : undefined);
-      }
-    }}
-  />
-);
-
 const CONTENTS = gql`
 query($offset: Int, $limit: Int, $order: String, $categoryId: Int, $slug: String, $language: String, $namespace: String) {
   counters {
-    contents {
+    rows: contents {
      count(categoryId: $categoryId, slug: $slug, language: $language, namespace: $namespace)
     }
   }
@@ -38,7 +28,7 @@ query($offset: Int, $limit: Int, $order: String, $categoryId: Int, $slug: String
     id,
     name
   }
-  contents(offset: $offset, limit: $limit, order: $order, categoryId: $categoryId, slug: $slug, language: $language, namespace: $namespace) {
+  rows: contents(offset: $offset, limit: $limit, order: $order, categoryId: $categoryId, slug: $slug, language: $language, namespace: $namespace) {
     id,
     slug,
     title,
@@ -143,7 +133,7 @@ const Contents = ({
           {
             name: 'slug',
             label: 'Slug',
-            control: FilterInput
+            control: Input
           },
           {
             name: 'language',

@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 
 import './style.scss';
 
+import FilterInput from './components/input';
+
 const TableFilters = ({
   filters,
   schema,
@@ -10,8 +12,6 @@ const TableFilters = ({
   width = 150,
   onChange = () => {}
 }) => {
-
-
   return (
     <div className="ui-table-filters">
       {schema.map(({ name, label, control: Control, ...rest }) => {
@@ -33,6 +33,6 @@ const TableFilters = ({
 };
 TableFilters.propTypes = {
   disabled: PropTypes.bool
-}
+};
 
-export default TableFilters;
+export { TableFilters as default, FilterInput as Input };
