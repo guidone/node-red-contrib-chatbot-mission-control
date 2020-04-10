@@ -15,7 +15,6 @@ const TableFilters = ({
   return (
     <div className="ui-table-filters">
       {schema.map(({ name, label, control: Control, ...rest }) => {
-
         return (
           <div key={name} className="control" style={{ width: `${width}px` }}>
             <Control

@@ -99,16 +99,6 @@ const Contents = ({
           }}
         />
       )}
-      <div className="filters" style={{ marginBottom: '10px' }}>
-        <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>
-          <FlexboxGrid.Item colspan={18}>
-
-          </FlexboxGrid.Item>
-          <FlexboxGrid.Item colspan={6} align="right">
-
-          </FlexboxGrid.Item>
-        </FlexboxGrid>
-      </div>
       <CustomTable
         ref={table}
         query={CONTENTS}
@@ -121,13 +111,13 @@ const Contents = ({
           </Button>
         )}
         onFilters={setFilters}
-        filtersSchema={data => ([
+        filtersSchema={[
           {
             name: 'categoryId',
             placeholder: 'Filter by category',
             cleanable: true,
             block: true,
-            data: data.categories.map(category => ({ value: category.id, label: category.name })),
+            data: data => data.categories.map(category => ({ value: category.id, label: category.name })),
             control: SelectPicker
           },
           {
@@ -142,7 +132,7 @@ const Contents = ({
             block: true,
             cleanable: true
           }
-        ])}
+        ]}
         height={600}
         labels={{
           empty: labels.emptyContent

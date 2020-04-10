@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Table, Placeholder, Icon, ButtonGroup, Button } from 'rsuite';
+import { Table, Icon, ButtonGroup, Button } from 'rsuite';
 import gql from 'graphql-tag';
 
 const { Column, HeaderCell, Cell } = Table;
@@ -10,7 +10,6 @@ import Language from '../../../src/components/language';
 import SmartDate from '../../../src/components/smart-date';
 import CustomTable from '../../../src/components/table';
 import { Input } from '../../../src/components/table-filters';
-import useRouterQuery from '../../../src/hooks/router-query';
 
 import '../styles/users.scss';
 import useUsers from '../hooks/users';
@@ -46,7 +45,6 @@ query ($limit: Int, $offset: Int, $order: String, $username: String, $userId: St
 
 
 const Users = () => {
-  const { query: { userId: urlUserId, username: urlUsername }, setQuery } = useRouterQuery();
   const table = useRef();
   const [ user, setUser ] = useState(null);
   const { saving, error,  deleteUser, editUser } = useUsers();
@@ -68,7 +66,7 @@ const Users = () => {
           onSubmit={async user => {
             await editUser({ variables: { id: user.id, user }})
             setUser(null);
-            refetch();
+            table.current.refetch();
           }}
         />)}
       {mergeModal}
@@ -78,6 +76,11 @@ const Users = () => {
         height={600}
         initialSortField="createdAt"
         initialSortDirection="desc"
+        toolbar={(
+          <div>
+            <Button appearance="primary" onClick={() => table.current.refetch()}>Refresh</Button>
+          </div>
+        )}
         filtersSchema={[
           {
             name: 'userId',

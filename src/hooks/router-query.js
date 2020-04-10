@@ -7,7 +7,13 @@ const extractValues = location => {
   const query = new URLSearchParams(search);
   const values = {};
   for (const [key, value] of query.entries()) {
-    values[key] = !_.isEmpty(value) ? value : undefined;
+    if (!isNaN(parseInt(value, 10))) {
+      values[key] = parseInt(value, 10);
+    } else if (!_.isEmpty(value)) {
+      values[key] = value;
+    } else {
+      values[key] = undefined;
+    }
   }
   return values;
 }
@@ -17,21 +23,21 @@ export default ({ onChangeQuery = () => {} } = {}) => {
   const history = useHistory();
   useEffect(() => onChangeQuery(extractValues(location), location.key), [location]);
 
-  return { 
+  return {
     query: extractValues(location),
     key: location.key,
     setQuery(obj) {
       const { search } = location;
       const query = new URLSearchParams(search);
       Object.keys(obj).forEach(key => {
-        if (!_.isEmpty(obj[key])) {
+        if (obj[key] != null) {
           query.set(key, obj[key]);
         } else {
           query.delete(key);
         }
       });
       const queryString = query.toString();
-      history.push(history.location.pathname + (!_.isEmpty(queryString) ? `?${queryString}`: ''));  
+      history.push(history.location.pathname + (!_.isEmpty(queryString) ? `?${queryString}`: ''));
     }
   };
 };

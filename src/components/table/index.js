@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 const { Pagination } = Table;
 const { Grid } = Placeholder;
 
+import useRouterQuery from '../../../src/hooks/router-query';
 import TableFilters from '../table-filters';
 import useTable from './hooks/table';
 
@@ -19,12 +20,16 @@ const CustomTable = ({
   initialSortField = 'createdAt',
   initialSortDirection = 'desc',
   labels,
-  filtersSchema,
+  filtersSchema = [],
   toolbar,
   onFilters = () => {},
+  filterEvaluateParams = ['data'],
   ...rest
 }, ref) => {
-  const [ filters, setFilters ] = useState({});
+  let filterKeys = (filtersSchema || []).map(item => item.name);
+  const { query: urlQuery, setQuery } = useRouterQuery();
+
+  const [ filters, setFilters ] = useState(_.pick(urlQuery, filterKeys));
   const [ cursor, setCursor ] = useState({
     page: 1,
     limit: 10,
@@ -52,10 +57,20 @@ const CustomTable = ({
 
   labels = { ...LABELS, ...labels };
 
-  let schema;
-  if (!bootstrapping) {
-    schema = _.isFunction(filtersSchema) ? filtersSchema(data) : filtersSchema;
-  }
+  const schema = filtersSchema.map(filter => {
+    const evaluated = { ...filter };
+    // iterate over params to be evaluated
+    filterEvaluateParams.forEach(param => {
+      if (_.isFunction(evaluated[param])) {
+        if (bootstrapping) {
+          evaluated[param] = [];
+        } else {
+          evaluated[param] = evaluated[param](data);
+        }
+      }
+    });
+    return evaluated;
+  });
 
   return (
     <div className="ui-custom-table">
@@ -68,6 +83,7 @@ const CustomTable = ({
                 filters={filters}
                 onChange={filters => {
                   setFilters(filters);
+                  setQuery(filters);
                   onFilters(filters);
                 }}
                 schema={schema}
