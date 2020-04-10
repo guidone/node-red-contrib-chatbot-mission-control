@@ -7,12 +7,12 @@ module.exports = merge(common, {
   devServer: {
     contentBase: './dist',
     //publicPath: './src/images',
-    hot: true,
-    proxy: {
+    //hot: true,
+    /*proxy: {
       '*.png': {
         target: 'http://localhost:[port]/',
         //pathRewrite: { '^/some/sub-path': '' },
       }
-    }
+    }*/
   }
 });

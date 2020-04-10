@@ -1,4 +1,6 @@
 import React, { useState, Fragment, useRef } from 'react';
+import gql from 'graphql-tag';
+import { useQuery } from 'react-apollo';
 import PropTypes from 'prop-types';
 import {
   Modal,
@@ -12,6 +14,7 @@ import {
   HelpBlock,
   Nav
 } from 'rsuite';
+
 
 import FieldsEditor from '../../../../src/components/fields-editor';
 import MarkdownEditor from '../../../../src/components/markdown-editor';
@@ -29,6 +32,15 @@ const LABELS = {
   deleteContent: 'Delete'
 };
 
+const CATEGORIES = gql`
+query($namespace: String) {
+  categories(namespace: $namespace) {
+    id,
+    name
+  }
+}
+`;
+
 const ModalContent = ({
   content,
   onCancel = () => {},
@@ -36,11 +48,11 @@ const ModalContent = ({
   onDelete = () => {},
   disabled = false,
   hasDelete = false,
-  categories,
   error,
   labels = {},
   disabledLanguages,
-  customFieldsSchema
+  customFieldsSchema,
+  namespace
 }) => {
   const { isChanged, setIsChanged, handleCancel } = useCanCloseModal({ onCancel });
   const [formValue, setFormValue] = useState(content);
@@ -49,12 +61,17 @@ const ModalContent = ({
     json: !_.isEmpty(content.payload) ? JSON.stringify(content.payload, null, 2) : ''
   });
   const [tab, setTab] = useState('content');
+  const { loading, error: errorCategory, data } = useQuery(CATEGORIES, {
+    fetchPolicy: 'network-only',
+    variables: { namespace }
+  });
+
+  const categories = !loading ? data.categories : [];
   const form = useRef(null);
 
   const isNew = content.id == null;
-
+console.log('error', error)
   labels = { ...LABELS, ...labels };
-
 
   return (
     <Modal backdrop show onHide={handleCancel} className="modal-content" overflow={false} size="md">

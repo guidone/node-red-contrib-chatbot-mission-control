@@ -1,0 +1,14 @@
+.ui-table-filters {
+  .control {
+    display: inline-block;
+    margin-left: 6px;
+
+    &:first-child {
+      margin-left: 0px;
+    }
+
+    .rs-picker-select {
+      margin-top: -3px;
+    }
+  }
+}
