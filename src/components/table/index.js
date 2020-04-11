@@ -8,6 +8,7 @@ const { Grid } = Placeholder;
 import useRouterQuery from '../../../src/hooks/router-query';
 import TableFilters from '../table-filters';
 import useTable from './hooks/table';
+import './style.scss';
 
 const LABELS = {
   empty: 'No Content'
@@ -76,25 +77,25 @@ const CustomTable = ({
     <div className="ui-custom-table">
       {bootstrapping && <Grid columns={9} rows={3} />}
       {!bootstrapping && schema != null && (
-        <div className="filters" style={{ marginBottom: '10px' }}>
-          <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>
-            <FlexboxGrid.Item colspan={18}>
-              <TableFilters
-                filters={filters}
-                onChange={filters => {
-                  setFilters(filters);
-                  setQuery(filters);
-                  onFilters(filters);
-                }}
-                schema={schema}
-              />
-            </FlexboxGrid.Item>
-            {toolbar != null &&(
+        <div className="header">
+          <div className="filters">
+            <TableFilters
+              filters={filters}
+              onChange={filters => {
+                setFilters(filters);
+                setQuery(filters);
+                onFilters(filters);
+              }}
+              schema={schema}
+            />
+          </div>
+          {toolbar != null &&(
+            <div className="toolbar">
               <FlexboxGrid.Item colspan={6} align="right">
                 {toolbar}
               </FlexboxGrid.Item>
-            )}
-          </FlexboxGrid>
+            </div>
+          )}
         </div>
       )}
       {!bootstrapping && (

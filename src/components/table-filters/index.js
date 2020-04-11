@@ -21,7 +21,7 @@ const TableFilters = ({
               defaultValue={filters[name]}
               disabled={disabled}
               placeholder={label}
-              onChange={value => onChange({ ...filters, [name]: value })}
+              onChange={value => onChange({ ...filters, [name]: value === null ? undefined : value })}
               {...rest}
             />
           </div>

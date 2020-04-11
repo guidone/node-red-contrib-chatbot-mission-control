@@ -1,12 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import gql from 'graphql-tag';
-import { useQuery } from 'react-apollo';
 import classNames from 'classnames';
 import _ from 'lodash';
-import { Table, Icon, SelectPicker, Placeholder, Input } from 'rsuite';
+import { Table, Icon, SelectPicker, Button } from 'rsuite';
 
-const { Column, HeaderCell, Cell, Pagination } = Table;
-const { Grid } = Placeholder
+const { Column, HeaderCell, Cell } = Table;
 
 import withMessageTypes from '../../../src/wrappers/with-message-types';
 import withPlatforms from '../../../src/wrappers/with-platforms';
@@ -15,17 +13,19 @@ import MessageType from '../../../src/components/message-type';
 import Transport from '../../../src/components/transport';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmartDate from '../../../src/components/smart-date';
-import useRouterQuery from '../../../src/hooks/router-query';
+import { Input } from '../../../src/components/table-filters';
+
+import CustomTable from '../../../src/components/table';
 
 import '../styles/message-logs.scss';
 
 const MESSAGES = gql`
 query ($limit: Int, $offset: Int, $order: String, $inbound: Boolean, $type: String, $transport: String, $messageId: String, $chatId: String, $userId: String, $flag: String) {
   counters {
-    messages {
+    rows: messages {
       count(
-        inbound: $inbound,          
-        type: $type, 
+        inbound: $inbound,
+        type: $type,
         transport: $transport,
         chatId: $chatId,
         messageId: $messageId,
@@ -34,12 +34,12 @@ query ($limit: Int, $offset: Int, $order: String, $inbound: Boolean, $type: Stri
       )
     }
   }
-  messages(
-    limit: $limit, 
-    offset: $offset, 
-    inbound: $inbound, 
-    order: $order, 
-    type: $type, 
+  rows: messages(
+    limit: $limit,
+    offset: $offset,
+    inbound: $inbound,
+    order: $order,
+    type: $type,
     transport: $transport,
     chatId: $chatId,
     messageId: $messageId,
@@ -68,239 +68,142 @@ const SelectInbound = [
 ]
 
 const MessageLogs = ({ messageTypes, platforms }) => {
-  const { 
-    query,
-    setQuery,
-    key: initialKey
-  } = useRouterQuery({
-    onChangeQuery: (values, key) => {
-      setFilters({ chatId: null, messageId: null, userId: null, flag: null, ...values })
-      setKey(key);
-    }
-  });
-  const [ cursor, setCursor ] = useState({ page: 1, limit: 10 });
-  const [ key, setKey] = useState(initialKey);
-  const [ filters, setFilters ] = useState(_.pick(query, ['chatId', 'userId', 'messageId', 'flag']));
-  const { messageType, transport, inbound, chatId, userId, messageId, flag } = filters;
-  const { limit, page } = cursor;
-
-  const { loading, error, data, refetch } = useQuery(MESSAGES, {
-    fetchPolicy: 'network-only',
-    variables: { 
-      limit, 
-      offset: (page - 1) * limit, 
-      type: messageType,
-      order: 'reverse:createdAt',
-      inbound, 
-      transport,
-      flag: !_.isEmpty(flag) ? flag : undefined,
-      chatId: !_.isEmpty(chatId) ? chatId : undefined,
-      userId: !_.isEmpty(userId) ? userId : undefined,
-      messageId: !_.isEmpty(messageId) ? messageId : undefined
-    }
-  });
+  const table = useRef();
 
   return (
     <PageContainer className="page-message-logs">
       <Breadcrumbs pages={['Messages Log']}/>
-      <div className="filters" style={{ marginBottom: '10px' }}>
-        <SelectPicker 
-          value={transport}
-          data={platforms.map(transport => ({ value: transport.id, label: transport.name }))} 
-          onChange={transport => {
-            setFilters({ ...filters, transport });
-            setCursor({ ...cursor, page: 1 });
-            refetch({ transport });
-          }} 
-          onClean={() => setFilters({ ...filters, transport: undefined })} 
-          cleanable
-          searchable={false}          
-          placeholder="Transport" 
-          size="md"
-        />
-        &nbsp;
-        <SelectPicker 
-          value={inbound}
-          data={SelectInbound} 
-          onChange={inbound => {
-            setFilters({ ...filters, inbound });
-            setCursor({ ...cursor, page: 1 });
-            refetch({ inbound });
-          }} 
-          onClean={() => setFilters({ ...filters, inbound: undefined })} 
-          cleanable
-          searchable={false}          
-          placeholder="Inbound or Inbound" 
-          size="md"
-        />
-        &nbsp;
-        <SelectPicker 
-          value={messageType}
-          data={messageTypes.map(type => ({ value: type.value, label: type.label }))} 
-          onChange={messageType => {
-            setFilters({ ...filters, messageType });
-            setCursor({ ...cursor, page: 1 });
-            refetch({ type: messageType });
-          }} 
-          onClean={() => setFilters({ ...filters, messageType: undefined })} 
-          cleanable
-          searchable={false}
-          key={`type_${key}`}          
-          placeholder="Message type" 
-          size="md"
-        />
-        &nbsp;
-        <Input
-          defaultValue={messageId}
-          style={{ width: '150px', display: 'inline-block' }}
-          placeholder="messageId"
-          key={`messageId_${key}`}
-          onKeyUp={e => {
-            if (e.keyCode === 13) {
-              setFilters({ ...filters, messageId: e.target.value });
-              setCursor({ ...cursor, page: 1 });
-              setQuery({ messageId: e.target.value })
-              refetch({ messageId: e.target.value });  
-            }
-          }}
-        />
-        &nbsp;
-        <Input
-          defaultValue={chatId}
-          style={{ width: '150px', display: 'inline-block' }}
-          placeholder="chatId"
-          key={`chatId_${key}`}
-          onKeyUp={e => {
-            if (e.keyCode === 13) {
-              setFilters({ ...filters, chatId: e.target.value });
-              setCursor({ ...cursor, page: 1 });
-              setQuery({ chatId: e.target.value });
-              refetch({ chatId: e.target.value });  
-            }
-          }}
-        />
-        &nbsp;
-        <Input
-          defaultValue={userId}
-          style={{ width: '150px', display: 'inline-block' }}
-          placeholder="userId"
-          key={`userId_${key}`}
-          onKeyUp={e => {
-            if (e.keyCode === 13) {
-              setFilters({ ...filters, userId: e.target.value });
-              setCursor({ ...cursor, page: 1 });
-              setQuery({ userId: e.target.value});
-              refetch({ userId: e.target.value });  
-            }
-          }}
-        />
-        &nbsp;
-        <Input
-          defaultValue={flag}
-          key={`flag_${key}`}
-          style={{ width: '150px', display: 'inline-block' }}
-          placeholder="flag"
-          onKeyUp={e => {
-            if (e.keyCode === 13) {
-              setFilters({ ...filters, flag: e.target.value });
-              setCursor({ ...cursor, page: 1 });
-              setQuery({ flag: e.target.value});
-              refetch({ flag: e.target.value });  
-            }
-          }}
-        />        
-      </div>
+      <CustomTable
+        ref={table}
+        query={MESSAGES}
+        initialSortField="createdAt"
+        initialSortDirection="desc"
+        toolbar={(
+          <Button
+            appearance="primary"
+            onClick={() => table.current.refetch()}>Reload
+          </Button>
+        )}
+        filtersSchema={[
+          {
+            searchable: false,
+            placeholder: 'Transport',
+            name: 'transport',
+            cleanable: true,
+            block: true,
+            data: platforms.map(transport => ({ value: transport.id, label: transport.name })),
+            control: SelectPicker
+          },
+          {
+            searchable: false,
+            placeholder: 'Inbound or Outbound',
+            name: 'inbound',
+            cleanable: true,
+            block: true,
+            data: SelectInbound,
+            control: SelectPicker
+          },
+          {
+            searchable: false,
+            placeholder: 'Message type',
+            name: 'type',
+            cleanable: true,
+            block: true,
+            data: messageTypes.map(type => ({ value: type.value, label: type.label })),
+            control: SelectPicker
+          },
+          {
+            name: 'messageId',
+            placeholder: 'messageId',
+            control: Input
+          },
+          {
+            name: 'chatId',
+            placeholder: 'chatId',
+            control: Input
+          },
+          {
+            name: 'userId',
+            placeholder: 'userId',
+            control: Input
+          },
+          {
+            name: 'flag',
+            placeholder: 'flag',
+            control: Input
+          }
+        ]}
+        height={600}
+        autoHeight
+      >
+        <Column width={60} align="center">
+          <HeaderCell>Id</HeaderCell>
+          <Cell dataKey="id" />
+        </Column>
 
-      {loading && <Grid columns={9} rows={3} />}
-      {error && <div>error</div>}
-      {!error && !loading && (
-        <Table
-          height={600}
-          data={data.messages}
-          loading={loading}
-          renderEmpty={() => <div style={{ textAlign: 'center', padding: 80}}>No Messages</div>}
-          autoHeight
-        >
-          <Column width={60} align="center">
-            <HeaderCell>Id</HeaderCell>
-            <Cell dataKey="id" />
-          </Column>
+        <Column width={140} resizable>
+          <HeaderCell>Date</HeaderCell>
+          <Cell>
+            {({ createdAt }) => <SmartDate date={createdAt} />}
+          </Cell>
+        </Column>
 
-          <Column width={140} resizable>
-            <HeaderCell>Date</HeaderCell>            
-            <Cell>
-              {({ createdAt }) => <SmartDate date={createdAt} />}
-            </Cell>
-          </Column>
+        <Column width={40} resizable>
+          <HeaderCell>I/O</HeaderCell>
+          <Cell>
+            {({ inbound }) => (
+              <div className={classNames('cell-inbound', { inbound, outbound: !inbound})}>
+                <Icon icon={inbound ? 'arrow-circle-o-right' : 'arrow-circle-o-left'}/>
+              </div>
+            )}
+          </Cell>
+        </Column>
 
-          <Column width={40} resizable>
-            <HeaderCell>I/O</HeaderCell>            
-            <Cell>
-              {({ inbound }) => (
-                <div className={classNames('cell-inbound', { inbound, outbound: !inbound})}>
-                  <Icon icon={inbound ? 'arrow-circle-o-right' : 'arrow-circle-o-left'}/>
-                </div>
-              )}
-            </Cell>
-          </Column>  
+        <Column width={100} resizable>
+          <HeaderCell>chatId</HeaderCell>
+          <Cell>{({ chatId }) => <span className="cell-type-id">{chatId}</span>}</Cell>
+        </Column>
 
-          <Column width={100} resizable>
-            <HeaderCell>chatId</HeaderCell>
-            <Cell>{({ chatId }) => <span className="cell-type-id">{chatId}</span>}</Cell>
-          </Column>
+        <Column width={100} resizable>
+          <HeaderCell>Transport</HeaderCell>
+          <Cell>
+            {({ transport }) => <Transport transport={transport}/>}
+          </Cell>
+        </Column>
 
-          <Column width={100} resizable>
-            <HeaderCell>Transport</HeaderCell>
-            <Cell>
-              {({ transport }) => <Transport transport={transport}/>}
-            </Cell>
-          </Column>
+        <Column width={100} resizable>
+          <HeaderCell>Type</HeaderCell>
+          <Cell dataKey="type">
+            {data => <MessageType type={data.type}/>}
+          </Cell>
+        </Column>
 
-          <Column width={100} resizable>
-            <HeaderCell>Type</HeaderCell>
-            <Cell dataKey="type">
-              {data => <MessageType type={data.type}/>}
-            </Cell>
-          </Column>
+        <Column width={100} resizable>
+          <HeaderCell>messageId</HeaderCell>
+          <Cell>{({ messageId }) => <span className="cell-type-id">{messageId}</span>}</Cell>
+        </Column>
 
-          <Column width={100} resizable>
-            <HeaderCell>messageId</HeaderCell>
-            <Cell>{({ messageId }) => <span className="cell-type-id">{messageId}</span>}</Cell>
-          </Column>
+        <Column width={100} resizable>
+          <HeaderCell>userId</HeaderCell>
+          <Cell>{({ userId }) => <span className="cell-type-id">{userId}</span>}</Cell>
+        </Column>
 
-          <Column width={100} resizable>
-            <HeaderCell>userId</HeaderCell>
-            <Cell>{({ userId }) => <span className="cell-type-id">{userId}</span>}</Cell>
-          </Column>
+        <Column width={100} resizable>
+          <HeaderCell>Flag</HeaderCell>
+          <Cell>{({ flag }) => <span>{flag}</span>}</Cell>
+        </Column>
 
-          <Column width={100} resizable>
-            <HeaderCell>Flag</HeaderCell>
-            <Cell>{({ flag }) => <span>{flag}</span>}</Cell>
-          </Column>
-
-          <Column width={300} flexGrow={1}>
-            <HeaderCell>Content</HeaderCell>
-            <Cell dataKey="content">
-              {({ content }) => {
-                return `"${content}"`;
-              }}
-            </Cell>
-          </Column>
-        </Table>
-      )}
-      {!error && !loading && (
-        <Pagination
-          activePage={page}
-          displayLength={limit}
-          onChangePage={page => setCursor({ ...cursor, page })}
-          lengthMenu={[{ label: '10', value: 10 }, { label: '20', value: 20 }, { label: '30', value: 30 } ]}
-          onChangeLength={limit => setCursor({ limit, page: 1 })}
-          total={data.counters.messages.count}
-      />
-      )}
+        <Column width={300} flexGrow={1}>
+          <HeaderCell>Content</HeaderCell>
+          <Cell dataKey="content">
+            {({ content }) => {
+              return `"${content}"`;
+            }}
+          </Cell>
+        </Column>
+      </CustomTable>
     </PageContainer>
   );
 };
 
 export default withPlatforms(withMessageTypes(MessageLogs));
-
