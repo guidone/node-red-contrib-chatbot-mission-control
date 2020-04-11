@@ -107,7 +107,7 @@ module.exports = function(RED) {
       } else if (_.isString(query) && !_.isEmpty(query)) {
         variables = { slug: query, limit: LIMIT };
       } else {
-        done('Invalid or empty slug/id, unable to retrieve content with this query: ' + query.toString());
+        done('Invalid or empty slug/id, unable to retrieve content with this query: ' + (query != null ? query.toString() : 'null'));
         return;
       }
 

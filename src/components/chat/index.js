@@ -8,15 +8,8 @@ import { IconButton, Icon } from 'rsuite';
 
 import './chat.scss';
 
-const Message = ({ children, inbound = true, className }) => {
+import { Message, Content, Metadata, MessageDate, MessageUser, UserStatus } from './views/generic';
 
-  return (
-    <li className={classNames('ui-chat-message', className, { clearfix: inbound, inbound, outbound: !inbound })}>
-      {children}
-    </li>
-  );
-
-};
 
 const Messages = ({ children }) => {
   const messagesEndRef = useRef(null);
@@ -35,38 +28,7 @@ const Messages = ({ children }) => {
 };
 
 
-const Content = ({ 
-  children, 
-  firstOfGroup = false,
-  position, 
-  text = null 
-}) => {
-  if (!_.isEmpty(text)) {    
-    return (
-      <div 
-        className={classNames("ui-chat-content message", { 'first-of-group': firstOfGroup, [position]: true })}
-        dangerouslySetInnerHTML={{
-          __html: text.replace(/\n/g, '<br/>')
-        }}
-      />
-    );
-  }
-  return (
-    <div className={classNames("ui-chat-content message", { 'first-of-group': firstOfGroup, [position]: true })}>{children}</div>
-  );
-};
-Content.propTypes = {
-  text: PropTypes.string,
-  position: PropTypes.oneOf(['first',  'middle', 'last'])
-};
 
-const Metadata = ({ children }) => {
-  return (
-    <div className="ui-chat-metadata">
-      {children}
-    </div>
-  );
-}
 
 const ChatWindow = ({ children, width = '100%', style }) => {
 
@@ -90,7 +52,7 @@ const MessageComposer = ({ onSend = () => {} }) => {
   return (
     <div className="ui-chat-message-composer">
       <div className="editor">
-        <textarea 
+        <textarea
           name="message-to-send"
           value={message}
           onChange={e => setMessage(e.target.value)}
@@ -98,52 +60,41 @@ const MessageComposer = ({ onSend = () => {} }) => {
             if (event.shiftKey && event.keyCode === 13) {
               sendMessage();
             }
-          }} 
+          }}
           id="message-to-send" placeholder ="Type your message" rows="3"></textarea>
       </div>
       <div className="buttons">
-        <IconButton 
-          icon={<Icon icon="send" />}  
+        <IconButton
+          icon={<Icon icon="send" />}
           appearance="primary"
           size="sm"
-          onClick={sendMessage} 
+          onClick={sendMessage}
         />
       </div>
     </div>
   );
 }
 
-const MessageDate = ({ children, date }) => {
-
-  return (
-    <span className="ui-chat-message-date">
-      {date != null && date.format('HH:mm')}
-      {children}
-    </span>
-  );
-}
-
-const MessageUser = ({ children }) => {
-  return (
-    <div className="ui-chat-message-user">{children}</div>
-  );
-}
-
-const UserStatus = ({ online = true }) => {
-  return (
-    <Icon icon="circle" className={classNames('ui-chat-status', { online, offline: !online })} />
-  )
-}
 
 
-const MessageText = ({ message, ...props }) => {
+
+import Showdown from 'showdown';
+
+const MessageText = ({ message, markdown = false, ...props }) => {
+
+  let html = message.content;
+  if (markdown) {
+    const converter = new Showdown.Converter({ openLinksInNewWindow: true });
+    html = converter.makeHtml(message.content);
+  }
+
   return (
     <Message {...props}>
       <Metadata>
         <MessageDate date={message.ts}/> &nbsp; &nbsp;
-        <MessageUser>{message.username}</MessageUser> <UserStatus />                
+        <MessageUser>{message.username}</MessageUser> <UserStatus />
       </Metadata>
-      <Content text={message.content}/>
+      <Content text={html}/>
     </Message>
   );
 };
@@ -165,7 +116,7 @@ const MessageGroup = ({ messages, ...props }) => {
     <Message {...props} inbound={false}>
       <Metadata>
         <MessageDate date={message.ts}/> &nbsp; &nbsp;
-        <MessageUser>{message.username}</MessageUser> <UserStatus />                
+        <MessageUser>{message.username}</MessageUser> <UserStatus />
       </Metadata>
       {messages.map((message, idx) => {
         let position = 'middle';
@@ -174,8 +125,8 @@ const MessageGroup = ({ messages, ...props }) => {
         } else if (idx === (messages.length - 1)) {
           position = 'last';
         }
-        switch (message.type) {          
-          case 'message':            
+        switch (message.type) {
+          case 'message':
             return (
               <Content position={position} text={message.content} />
             );
@@ -204,56 +155,10 @@ MessageGroup.propTypes = {
 
 
 
-const Buttons = ({ children, layout = 'quick-replies' }) => {
-
-  return (
-    <div className={classNames(
-      'ui-chat-buttons', 
-      { 
-        'quick-replies': layout === 'quick-replies',
-        'inline': layout === 'inline',
-        'card': layout === 'card' 
-      }
-    )}
-    >
-      {children}
-    </div>
-  );
-};
-
-const Button = ({ value, children }) => {
-
-  return (
-    <div className="ui-chat-button">{children}</div>
-  );
-
-};
 
 
-const MessageButtons = ({ message, ...props }) => {
-  // TODO username
-  return (
-    <Message {...props}>
-      <Metadata>
-        <MessageDate date={moment()}/> &nbsp; &nbsp;
-        <MessageUser>{message.username}</MessageUser> <UserStatus />                
-      </Metadata>
-      <Content position="first">
-        {message.content}
-      </Content>
-      {message.buttons != null && message.buttons.length !== 0 && (
-        <Buttons layout="card">
-          {message.buttons.map(button => (
-            <Button {...button} key={`${button.value}-${button.label}`}>{button.label}</Button>
-          ))}
-        </Buttons>
-      )}
-    </Message>
-  );
-};
-MessageButtons.propTypes = {
-  layout: PropTypes.oneOf(['quick-replies', 'inline',  'card'])
-};
+
+
 
 class MessagePhoto extends React.Component {
   // TODO username
@@ -271,7 +176,7 @@ class MessagePhoto extends React.Component {
       <Message {...this.props} className="ui-chat-message-photo">
         <Metadata>
           <MessageDate date={moment()}/> &nbsp; &nbsp;
-          <MessageUser>{message.username}</MessageUser> <UserStatus />                
+          <MessageUser>{message.username}</MessageUser> <UserStatus />
         </Metadata>
         <Content>
           <img src={imageUrl}/>
@@ -281,45 +186,25 @@ class MessagePhoto extends React.Component {
   }
 };
 
-const GenericMessage = ({ message = {} }) => {
-  // if array messages must be grouped 
-  if (_.isArray(message)) {
-    return (
-      <MessageGroup messages={message} />
-    );
-  }
-  
-  switch (message.type) {
-    case 'message':
-      return <MessageText message={message} inbound={message.inbound} />;
-    case 'photo':
-      return <MessagePhoto message={message} inbound={message.inbound} />;
-    case 'inline-buttons':
-      return <MessageButtons message={message} inbound={message.inbound} />; 
-    default:
-      return <div>Unsupported message type</div>;
-  }
-};
+
+
+import MessageButtons from './views/message-buttons';
 
 
 
-export { 
-  Message, 
-  Messages, 
-  Content, 
-  Metadata, 
-  ChatWindow, 
-  MessageComposer, 
-  MessageDate, 
-  MessageUser, 
+export {
+  Message,
+  Messages,
+  Content,
+  Metadata,
+  ChatWindow,
+  MessageComposer,
+  MessageDate,
+  MessageUser,
   MessageGroup,
   UserStatus,
 
   MessageText,
   MessageButtons,
-  MessagePhoto,
-  
-  GenericMessage
+  MessagePhoto
 };
-
-

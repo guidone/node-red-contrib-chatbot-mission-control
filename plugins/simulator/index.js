@@ -8,101 +8,132 @@ import withActiveChatbots from '../../src/wrappers/with-active-chatbots';
 import withState from '../../src/wrappers/with-state';
 import useSocket from '../../src/hooks/socket';
 
+import {
 
-import { 
-  Message, 
-  Messages, 
-  Content, 
-  Metadata, 
-  ChatWindow, 
-  MessageComposer, 
-  MessageDate, 
-  MessageUser, 
-  UserStatus, 
+  Messages,
+  Content,
+  Metadata,
+  ChatWindow,
+  MessageComposer,
+  MessageDate,
+  MessageUser,
+  UserStatus,
   MessageText,
   MessageButtons,
   MessagePhoto,
-  GenericMessage 
+  GenericMessage
 } from '../../src/components/chat';
+
+
+
+import Message from './views/message';
 
 import './simulator.scss';
 import PanelMenu from './views/panel-menu';
 import handleMessages from './reducer';
 
-const SimulatorWidget = ({ sendMessage, activeChatbots, user }) => {
-  const { state, dispatch } = useSocket(handleMessages, { 
+import SimulatorContext from './context';
+
+const useSimulator = ({ activeChatbots }) => {
+
+  const { state, dispatch, sendMessage } = useSocket(handleMessages, {
     messages: {},
     transport: !_.isEmpty(activeChatbots) ? activeChatbots[0].transport : null,
     nodeId: !_.isEmpty(activeChatbots) ? activeChatbots[0].nodeId : null,
     globals: null,
     language: 'en',
-    user: null 
+    user: null
   });
-  const { messages, transport, nodeId, language, user: impersonatedUser } = state; 
+
+  return {
+    state,
+    dispatch,
+    sendMessage: text => {
+      const { transport, nodeId, language, user: impersonatedUser } = state;
+      sendMessage('simulator', {
+        transport,
+        nodeId,
+        language,
+        userId: impersonatedUser != null ? impersonatedUser.id : 42,
+        username: impersonatedUser != null ? impersonatedUser.username : 'testUser',
+        firstName: impersonatedUser != null ? impersonatedUser.first_name : null,
+        lastName: impersonatedUser != null ? impersonatedUser.last_name : null,
+        payload: {
+          content: text,
+          type: 'message'
+        }
+      });
+    }
+  };
+
+}
+
+
+
+const SimulatorWidget = ({ activeChatbots, user }) => {
+  const { state, dispatch, sendMessage } = useSimulator({ activeChatbots });
+  const { messages, transport, nodeId, language, user: impersonatedUser } = state;
   const loading = activeChatbots == null;
+
+  const clickHandler = (obj) => {
+    if (_.isObject(obj) && obj.type === 'postback') {
+      sendMessage(obj.value);
+    }
+
+  }
 
   console.log('messages', messages)
   return (
-    <Panel 
-      title="Chat Simulator" 
+    <Panel
+      title="Chat Simulator"
       className="chat-simulator"
       menu={!loading && <PanelMenu
         user={impersonatedUser}
-        language={language} 
+        language={language}
         nodeId={nodeId}
         transport={transport}
-        dispatch={dispatch} 
-        activeChatbots={activeChatbots}        
+        dispatch={dispatch}
+        activeChatbots={activeChatbots}
         onChange={chatBot => dispatch({ type: 'chatBot', chatBot })}
       />}
-    > 
+    >
       {!loading && (
+        <SimulatorContext.Provider value={state}>
         <ChatWindow>
           <Messages>
             {messages[transport] != null && messages[transport].map(message => {
               if (_.isArray(message)) {
                 // multiple messages are always inbound
                 return (
-                  <GenericMessage 
-                    key={message.messageId} 
-                    message={message.map(message => ({ ...message, username: 'chatbot' }))} 
+                  <Message
+                    onClick={clickHandler}
+                    key={message.messageId}
+                    message={message.map(message => ({ ...message, username: 'chatbot' }))}
                   />
                 );
               } else {
                 return (
-                  <GenericMessage 
-                    key={message.messageId} 
-                    message={!message.inbound ? { ...message, username: 'chatbot' } : message } 
+                  <Message
+                    onClick={clickHandler}
+                    key={message.messageId}
+                    message={!message.inbound ? { ...message, username: 'chatbot' } : message }
                   />
                 );
               }
             })}
           </Messages>
           <MessageComposer
-            onSend={message => {
-              sendMessage('simulator', { 
-                transport, 
-                nodeId,
-                language,
-                userId: impersonatedUser != null ? impersonatedUser.id : 42,
-                username: impersonatedUser != null ? impersonatedUser.username : 'testUser',
-                firstName: impersonatedUser != null ? impersonatedUser.first_name : null,
-                lastName: impersonatedUser != null ? impersonatedUser.last_name : null,
-                payload: {
-                  content: message, 
-                  type: 'message'
-                }
-              });
-            }}
-          /> 
+            onSend={message => sendMessage(message)}
+          />
         </ChatWindow>
+        </SimulatorContext.Provider>
       )}
     </Panel>
   );
 };
 
 plug(
-  'widgets', 
-  withState(withActiveChatbots(withSocket(SimulatorWidget)), 'user'), 
+  'widgets',
+  withState(withActiveChatbots(SimulatorWidget), 'user'),
   { x: 0, y: 0, w: 2, h: 8, isResizable: true, id: 'simulator-widget' }
 );

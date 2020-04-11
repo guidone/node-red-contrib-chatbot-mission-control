@@ -9,7 +9,7 @@ $gray: #92959E;
   background: #F2F5F8;
   border-top-right-radius: 5px;
   border-bottom-right-radius: 5px;
-  
+
   color: #434651;
 
   display: flex;
@@ -58,8 +58,8 @@ $gray: #92959E;
       padding: 10px 10px;
       margin-bottom: 5px;
       border-radius: 5px;
-      resize: none;  
-      outline: none;    
+      resize: none;
+      outline: none;
     }
   }
 
@@ -86,6 +86,7 @@ $gray: #92959E;
     .ui-chat-content {
       background: $blue;
       float: right;
+
       &:after {
         border-bottom-color: $blue !important;
         left: 93% !important;
@@ -100,11 +101,17 @@ $gray: #92959E;
   &.outbound {
     .ui-chat-content {
       background: $green;
+
+      a {
+        font-weight: bold;
+        color: #bbffbb;
+        text-decoration: underline;
+      }
     }
     .ui-chat-status {
-      
+
       color: $green !important;
-      
+
     }
   }
 }
@@ -130,7 +137,7 @@ $gray: #92959E;
       line-height: 22px;
       vertical-align: middle;
       background-color: #ffffff;
-    
+
       &:hover {
         background-color: #999999;
         color: #ffffff;
@@ -160,7 +167,7 @@ $gray: #92959E;
       white-space: nowrap;
       text-overflow: ellipsis;
       overflow: hidden;
-    
+
       &:hover {
         background-color: #999999;
         color: #ffffff;
@@ -182,7 +189,7 @@ $gray: #92959E;
       line-height: 22px;
       background-color: #ffffff;
       margin-top: 3px;
-    
+
       &:first-child {
         //border-top-left-radius: 7px;
         //border-top-right-radius: 7px;
@@ -214,7 +221,7 @@ $gray: #92959E;
   margin-bottom: 5px;
   width: 90%;
   position: relative;
-  
+
   &:after {
     bottom: 100%;
     left: 7%;
@@ -228,7 +235,7 @@ $gray: #92959E;
     border-width: 10px;
     margin-left: -10px;
   }
-  
+
   &.first-of-group, &.first {
     border-bottom-left-radius: 0px;
     border-bottom-right-radius: 0px;
@@ -248,7 +255,7 @@ $gray: #92959E;
     border-top-right-radius: 0px;
     &:after {
       display: none;
-    } 
+    }
   }
 }
 
@@ -269,7 +276,7 @@ $gray: #92959E;
   &.online {
     color: $blue;
   }
-    
+
   &.offline {
     color: $orange;
   }

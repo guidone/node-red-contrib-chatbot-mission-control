@@ -63,7 +63,6 @@ module.exports = function(RED) {
         username,
         language
       } = await when(chat.get('firstName', 'lastName', 'username', 'language', 'userId'));
-
       // if the message is outbound and the user has already resolved by a mc_store upstream, then skip
       // the user sincronization is already been made, in order to optimize queries skip.
       // Of course always sync user for inbound messages
@@ -95,7 +94,6 @@ module.exports = function(RED) {
             mutation: useSimplifiedQuery ? CREATE_MESSAGE_LIGHT : CREATE_MESSAGE,
             variables
           });
-
         const user = result != null && result.data != null && result.data.message != null && result.data.message.user != null
           ? result.data.message.user : null;
         // if user data sent back, then syncronize the data present in chat context
