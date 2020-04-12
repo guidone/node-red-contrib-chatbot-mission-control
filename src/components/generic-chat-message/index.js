@@ -12,12 +12,13 @@ import {
   UserStatus,
   MessageText,
   MessageButtons,
-  MessagePhoto
+  MessagePhoto,
+  MessageGroup,
+  MessageQuickReplies
 } from '../chat';
 
 
 
-// TODO this is platform specific and should stay in simulator
 const GenericMessage = ({ message = {}, onClick = () => {} }) => {
   // if array messages must be grouped
   if (_.isArray(message)) {
@@ -40,6 +41,14 @@ const GenericMessage = ({ message = {}, onClick = () => {} }) => {
     case 'inline-buttons':
       return (
         <MessageButtons
+          message={message}
+          inbound={message.inbound}
+          onClick={onClick}
+        />
+      );
+    case 'quick-replies':
+      return (
+        <MessageQuickReplies
           message={message}
           inbound={message.inbound}
           onClick={onClick}

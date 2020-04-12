@@ -39,7 +39,6 @@ const useSimulator = ({ activeChatbots }) => {
     state,
     dispatch,
     sendMessage: (text, { echo = true} = {}) => {
-      console.log('send with echo', echo)
       const { transport, nodeId, language, user: impersonatedUser } = state;
       sendMessage('simulator', {
         transport,
@@ -70,7 +69,7 @@ const SimulatorWidget = ({ activeChatbots, user }) => {
   const loading = activeChatbots == null;
 
   const clickHandler = (obj) => {
-    if (_.isObject(obj) && obj.type === 'postback') {
+    if (_.isObject(obj) && (obj.type === 'postback' || obj.type === 'quick-reply')) {
       // don't show on simulator the value sent by the button
       sendMessage(obj.value, { echo: false });
     }
@@ -100,7 +99,7 @@ const SimulatorWidget = ({ activeChatbots, user }) => {
                 return (
                   <Message
                     onClick={clickHandler}
-                    key={message.messageId}
+                    key={message.map(message => message.messageId).join()}
                     message={message.map(message => ({ ...message, username: 'chatbot' }))}
                   />
                 );

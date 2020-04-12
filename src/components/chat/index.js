@@ -10,6 +10,7 @@ import './chat.scss';
 
 import { Message, Content, Metadata, MessageDate, MessageUser, UserStatus } from './views/generic';
 import MessageComposer from './views/message-composer';
+import MessageGroup from './views/message-group';
 
 const Messages = ({ children }) => {
   const messagesEndRef = useRef(null);
@@ -73,51 +74,7 @@ MessageText.propTypes = {
   })
 };
 
-const MessageGroup = ({ messages, ...props }) => {
-  if (_.isEmpty(messages)) {
-    return;
-  }
-  const message = messages[0];
-  return (
-    <Message {...props} inbound={false}>
-      <Metadata>
-        <MessageDate date={message.ts}/> &nbsp; &nbsp;
-        <MessageUser>{message.username}</MessageUser> <UserStatus />
-      </Metadata>
-      {messages.map((message, idx) => {
-        let position = 'middle';
-        if (idx === 0) {
-          position = 'first';
-        } else if (idx === (messages.length - 1)) {
-          position = 'last';
-        }
-        switch (message.type) {
-          case 'message':
-            return (
-              <Content position={position} text={message.content} />
-            );
-          /*case 'photo':
-            return <MessagePhoto message={message} inbound={message.inbound} />;
-          case 'inline-buttons':
-            return <MessageButtons message={message} inbound={message.inbound} />; */
-          default:
-            return <div>Unsupported message type</div>;
-        }
 
-      })}
-    </Message>
-  );
-};
-MessageGroup.propTypes = {
-  messages: PropTypes.arrayOf(
-    PropTypes.shape({
-      content: PropTypes.string,
-      userId: PropTypes.string,
-      username: PropTypes.string,
-      ts: PropTypes.momentPropTypes
-    })
-  )
-};
 
 
 
@@ -155,6 +112,7 @@ class MessagePhoto extends React.Component {
 
 
 import MessageButtons from './views/message-buttons';
+import MessageQuickReplies from './views/message-quick-replies';
 
 
 
@@ -169,8 +127,8 @@ export {
   MessageUser,
   MessageGroup,
   UserStatus,
-
   MessageText,
   MessageButtons,
-  MessagePhoto
+  MessagePhoto,
+  MessageQuickReplies
 };

@@ -8,9 +8,9 @@ import LanguagePicker from '../../../src/components/language-picker';
 import UserAutocomplete from '../../../src/components/user-autocomplete';
 
 const TransportValue = (value, item) => (
-  <div className="picker-item-transport">    
+  <div className="picker-item-transport">
     <Transport transport={item.transport}/>
-    &nbsp;<b>{item.name}</b>    
+    &nbsp;<b>{item.name}</b>
   </div>
 );
 
@@ -20,24 +20,24 @@ const MenuItem = (label, item) => (
     <Transport transport={item.transport}/>
     &nbsp;<em>(id: {item.nodeId})</em>
   </div>
-); 
+);
 
 // TODO default user in user autocomplete
 
-const SimulatorParamsModal = ({ 
+const SimulatorParamsModal = ({
   params,
   onCancel = () => {},
   onSubmit = () => {},
   disabled = false,
-  activeChatbots 
+  activeChatbots
 }) => {
   const [formValue, setFormValue] = useState(params);
 
   return (
-    <Modal 
-      backdrop 
-      show 
-      onHide={onCancel} 
+    <Modal
+      backdrop
+      show
+      onHide={onCancel}
       keyboard={false}
       className="modal-simulator">
       <Modal.Header>
@@ -49,7 +49,7 @@ const SimulatorParamsModal = ({
           onChange={newFormValue => {
             const values = {...newFormValue};
             // if user changed and has a predefined language, then set the language
-            if (newFormValue.user != null && (formValue.user == null || formValue.user.id !== newFormValue.user.id) 
+            if (newFormValue.user != null && (formValue.user == null || formValue.user.id !== newFormValue.user.id)
               && newFormValue.user.language) {
               values.language = newFormValue.user.language;
             }
@@ -59,33 +59,33 @@ const SimulatorParamsModal = ({
         >
         <FormGroup>
           <ControlLabel>Impersonated User</ControlLabel>
-          <FormControl 
+          <FormControl
             accepter={UserAutocomplete}
             name="user"
             placeholder="Test User"
             style={{ width: '100%' }}
-            onChange2={user => {              
+            onChange2={user => {
               if (user != null && user.language != null) {
                 setFormValue({ ...formValue, language: user.language })
               }
             }}
-          />              
+          />
         </FormGroup>
-        <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>      
+        <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>
           <FlexboxGrid.Item colspan={11}>
             <FormGroup>
               <ControlLabel>Language</ControlLabel>
-              <FormControl 
+              <FormControl
                 accepter={LanguagePicker}
                 name="language"
                 block
-              />            
-          </FormGroup>  
-          </FlexboxGrid.Item>            
+              />
+          </FormGroup>
+          </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={11}>
             <FormGroup>
               <ControlLabel>Transport</ControlLabel>
-              <FormControl 
+              <FormControl
                 accepter={SelectPicker}
                 name="nodeId"
                 renderValue={TransportValue}
@@ -93,28 +93,28 @@ const SimulatorParamsModal = ({
                 searchable={false}
                 block
                 size="sm"
-                cleanable={false}            
+                cleanable={false}
                 data={activeChatbots.map(chatbot => ({ value: chatbot.nodeId, label: chatbot.transport, ...chatbot }))}
-              />            
-            </FormGroup>  
+              />
+            </FormGroup>
           </FlexboxGrid.Item>
-        </FlexboxGrid>                
+        </FlexboxGrid>
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button 
+        <Button onClick={onCancel} appearance="subtle">
+          Cancel
+        </Button>
+        <Button
           appearance="primary"
-          disabled={disabled} 
-          appearance="primary" 
-          onClick={() => onSubmit({ 
+          disabled={disabled}
+          appearance="primary"
+          onClick={() => onSubmit({
             ...formValue,
             chatBot: activeChatbots.find(chatbot => chatbot.nodeId === formValue.nodeId)
           })}
         >
           Save configuration
-        </Button>
-        <Button onClick={onCancel} appearance="subtle">
-          Cancel
         </Button>
       </Modal.Footer>
     </Modal>
@@ -129,7 +129,7 @@ SimulatorParamsModal.propTypes = {
       username: PropTypes.string,
       language: PropTypes.string
     }),
-    nodeId: PropTypes.string  
+    nodeId: PropTypes.string
   }),
   disabled: PropTypes.bool,
   onCancel: PropTypes.func,
