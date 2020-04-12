@@ -10,7 +10,7 @@ const handleMessages = (state, action) => {
       if (topic !== 'simulator') {
         return state;
       }
-      console.log('receiving:', payload)
+console.log('ricevo', payload)
       const current = _.isArray(state.messages[payload.transport]) ? state.messages[payload.transport] : [];
 
       let toAdd;
@@ -29,6 +29,10 @@ const handleMessages = (state, action) => {
         ]
       }
       return { ...state, messages };
+
+    case 'clear':
+      console.log('pulisco', action)
+      return { ...state, messages: { ...state.messages, [action.transport]: [] }};
 
     case 'globals':
       // set globals

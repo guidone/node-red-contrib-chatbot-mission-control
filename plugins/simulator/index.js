@@ -9,24 +9,14 @@ import withState from '../../src/wrappers/with-state';
 import useSocket from '../../src/hooks/socket';
 
 import {
-
   Messages,
-  Content,
-  Metadata,
   ChatWindow,
-  MessageComposer,
-  MessageDate,
-  MessageUser,
-  UserStatus,
-  MessageText,
-  MessageButtons,
-  MessagePhoto,
-  GenericMessage
+  MessageComposer
 } from '../../src/components/chat';
 
 
 
-import Message from './views/message';
+import Message from '../../src/components/generic-chat-message';
 
 import './simulator.scss';
 import PanelMenu from './views/panel-menu';
@@ -84,10 +74,8 @@ const SimulatorWidget = ({ activeChatbots, user }) => {
       // don't show on simulator the value sent by the button
       sendMessage(obj.value, { echo: false });
     }
-
   }
 
-  console.log('messages', messages)
   return (
     <Panel
       title="Chat Simulator"
@@ -129,6 +117,7 @@ const SimulatorWidget = ({ activeChatbots, user }) => {
           </Messages>
           <MessageComposer
             onSend={message => sendMessage(message)}
+            onClear={() => dispatch({ type: 'clear', transport })}
           />
         </ChatWindow>
         </SimulatorContext.Provider>

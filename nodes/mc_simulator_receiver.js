@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { when } = require('../lib/utils')
+const { when, isCommand } = require('../lib/utils')
 
 module.exports = function(RED) {
 
@@ -32,11 +32,11 @@ module.exports = function(RED) {
           node.error(`Unable to find a RedBot chat node with id ${message.nodeId}`);
           return;
         }
-        console.log('--->', message)
+        console.log('SIM--->', message)
 
         // get simulator options from payload
         const { echo = true } = message.simulatorOptions || {};
-        console.log('ecoho', echo)
+        //console.log('ecoho', echo)
         const chatServer = serverNode.chat;
         const chatId = 'sim42'; // TODO: fix chat id with something meaningful
         const userId = String(message.userId); // TODO: select right userid
@@ -44,7 +44,7 @@ module.exports = function(RED) {
         const language = message.language;
         const firstName = message.firstName;
         const lastName = message.lastName;
-        const messageId = _.uniqueId('msg_');;
+        const messageId = _.uniqueId('msg_');
         const msg = await chatServer.createMessage(chatId, userId, messageId, {});
         const context = msg.chat();
 
@@ -62,7 +62,17 @@ module.exports = function(RED) {
           userId: userId,
           username: username
         }
-        await context.set({ username, userId, language, firstName, lastName });
+
+        // store the message in context, also prepara arguments of command if any
+        let text;
+        if (_.isString(msg.payload.content) && !_.isEmpty(msg.payload.content)) {
+          text = msg.payload.content;
+          if (isCommand(msg.payload.content)) {
+            msg.payload.arguments = msg.payload.content.split(' ').slice(1);
+          }
+        }
+
+        await context.set({ username, userId, language, firstName, lastName, message: text });
         // send back the evaluated message so also originated messages are visible in the simulator
         if (echo) {
           sendMessage('simulator', {

@@ -20,13 +20,16 @@ const MessageButtons = ({ message, onClick = () => {}, ...props }) => {
       </Content>
       {message.buttons != null && message.buttons.length !== 0 && (
         <Buttons layout="card">
-          {message.buttons.map(button => (
-            <Button
-              {...button}
-              onClick={() => onClick(button)}
-              key={`${button.value}-${button.label}`}
-            >{button.label}</Button>
-          ))}
+          {message.buttons
+            .filter(button => button.type !== 'newline')
+            .map(button => (
+              <Button
+                {...button}
+                onClick={() => onClick(button)}
+                key={`${button.value}-${button.label}`}
+              >{button.label}</Button>
+            ))
+          }
         </Buttons>
       )}
     </Message>
@@ -34,7 +37,7 @@ const MessageButtons = ({ message, onClick = () => {}, ...props }) => {
 };
 MessageButtons.propTypes = {
   onClick: PropTypes.func,
-  layout: PropTypes.oneOf(['quick-replies', 'inline',  'card']),
+  //layout: PropTypes.oneOf(['quick-replies', 'inline',  'card']),
   message: PropTypes.shape({
     username: PropTypes.string,
     content: PropTypes.string,

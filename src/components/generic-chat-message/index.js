@@ -13,7 +13,7 @@ import {
   MessageText,
   MessageButtons,
   MessagePhoto
-} from '../../../src/components/chat';
+} from '../chat';
 
 
 

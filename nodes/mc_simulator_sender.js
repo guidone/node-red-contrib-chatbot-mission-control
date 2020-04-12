@@ -48,16 +48,18 @@ module.exports = function(RED) {
 
 
       if (_.isArray(msg.payload)) {
+        const payload = msg.payload.map(payload => ({ ...payload, messageId: _.uniqueId('msg_') }));
         sendMessage('simulator', {
-          payload: msg.payload,
+          payload,
           inbound: false,
           userId: msg.originalMessage.userId,
           username: msg.originalMessage.username,
           transport: msg.originalMessage.transport
         });
       } else {
+        const payload = { ...msg.payload, messageId: _.uniqueId('msg_') };
         sendMessage('simulator', {
-          ...msg.payload,
+          ...payload,
           inbound: false,
           userId: msg.originalMessage.userId,
           username: msg.originalMessage.username,

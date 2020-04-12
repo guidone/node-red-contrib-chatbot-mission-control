@@ -9,7 +9,7 @@ import { IconButton, Icon } from 'rsuite';
 import './chat.scss';
 
 import { Message, Content, Metadata, MessageDate, MessageUser, UserStatus } from './views/generic';
-
+import MessageComposer from './views/message-composer';
 
 const Messages = ({ children }) => {
   const messagesEndRef = useRef(null);
@@ -39,42 +39,7 @@ const ChatWindow = ({ children, width = '100%', style }) => {
 }
 
 
-const MessageComposer = ({ onSend = () => {} }) => {
-  const [message, setMessage] = useState('');
-  const sendMessage = () => {
-    if (_.isEmpty(message)) {
-      return;
-    }
-    // remove trailing cr
-    onSend(message.replace(/\n$/, ''));
-    setMessage('');
-  };
 
-  return (
-    <div className="ui-chat-message-composer">
-      <div className="editor">
-        <textarea
-          name="message-to-send"
-          value={message}
-          onChange={e => setMessage(e.target.value)}
-          onKeyUp={event => {
-            if (event.shiftKey && event.keyCode === 13) {
-              sendMessage();
-            }
-          }}
-          id="message-to-send" placeholder ="Type your message" rows="3"></textarea>
-      </div>
-      <div className="buttons">
-        <IconButton
-          icon={<Icon icon="send" />}
-          appearance="primary"
-          size="sm"
-          onClick={sendMessage}
-        />
-      </div>
-    </div>
-  );
-}
 
 
 
