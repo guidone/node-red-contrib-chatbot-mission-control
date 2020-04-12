@@ -13,20 +13,29 @@ module.exports = function(RED) {
     this.track = config.track;
     this.passThrough = config.passThrough;
 
+
+    // relay message
+    const handleConversation = function(msg) {
+      node.send(msg);
+    };
+    RED.events.on('node:' + config.id, handleConversation);
+
+    // cleanup on close
+    this.on('close', function() {
+      RED.events.removeListener('node:' + config.id, handleConversation);
+    });
+
     this.on('input', async function(msg, send, done) {
       // send/done compatibility for node-red < 1.0
       send = send || function() { node.send.apply(node, arguments) };
       done = done || function(error) { node.error.call(node, error, msg) };
 
-
-
+      const context = msg.chat();
       // skip messages not from the simulator
       if (!msg.originalMessage.simulator) {
         done();
         return;
       }
-
-      const context = msg.chat();
       // check if this node has some wirings in the follow up pin, in that case
       // the next message should be redirected here
       if (context != null && node.track && !_.isEmpty(node.wires[0])) {
@@ -37,7 +46,7 @@ module.exports = function(RED) {
         }));
       }
 
-      // TODO: implement here continuation
+
       if (_.isArray(msg.payload)) {
         sendMessage('simulator', {
           payload: msg.payload,
@@ -56,7 +65,10 @@ module.exports = function(RED) {
         });
       }
 
-      send(msg);
+      // forward if pass thru
+      if (node.passThrough) {
+        send(msg);
+      }
       done();
     });
   }

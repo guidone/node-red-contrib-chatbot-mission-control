@@ -45,7 +45,8 @@ const MessageComposer = ({ onSend = () => {} }) => {
     if (_.isEmpty(message)) {
       return;
     }
-    onSend(message);
+    // remove trailing cr
+    onSend(message.replace(/\n$/, ''));
     setMessage('');
   };
 
