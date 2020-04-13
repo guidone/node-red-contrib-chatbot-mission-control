@@ -161,6 +161,18 @@ module.exports = mcSettings => {
     }*/
   });
 
+  const Context = sequelize.define('context', {
+    userId: { type: Sequelize.STRING, allowNull: false },
+    chatId: { type: Sequelize.STRING, allowNull: false },
+    payload: { type: Sequelize.STRING, allowNull: false }
+  }, {
+    indexes: [
+      { name: 'chatid_userid', using: 'BTREE', fields: ['userId'] },
+      { name: 'chatid_chatid', using: 'BTREE', fields: ['chatId'] }
+    ]
+  });
+
+
   const ChatId = sequelize.define('chatid', {
     userId: { type: Sequelize.STRING, allowNull: false },
     chatId: { type: Sequelize.STRING, allowNull: false },
@@ -190,6 +202,7 @@ module.exports = mcSettings => {
   if (!fs.existsSync(dbPath)) {
     sequelize.sync({ force: true })
       .then(() => {
+        // TODO move salt to config
         Admin.create({ username: 'guidone', password: 'mysalt$10$d5b9be8303d735591db5e83f2cc547dc' })
         console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
         + ' - [info] Initialized RedBot Mission Control database:')
@@ -201,7 +214,7 @@ module.exports = mcSettings => {
       + ' ' + lcd.grey(resolve(dbPath)));
   }
 
-  const graphQLServer = GraphQLServer({ Configuration, Message, User, ChatId, Event, Content, Category,Field, sequelize });
+  const graphQLServer = GraphQLServer({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, sequelize });
 
   exportCache = {
     Configuration,
@@ -213,7 +226,8 @@ module.exports = mcSettings => {
     Admin,
     Content,
     Category,
-    Field
+    Field,
+    Context
   };
 
   return exportCache;

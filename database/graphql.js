@@ -98,7 +98,7 @@ const PayloadType = new GraphQLScalarType({
 });
 
 
-module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, sequelize }) => {
+module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, sequelize }) => {
 
   const newUserType = new GraphQLInputObjectType({
     name: 'NewUser',
@@ -159,6 +159,29 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: userType,
         description: 'User related to this chatId',
         resolve: (chatId, args) => User.findOne({ where: { userId: chatId.userId }})
+      }
+    })
+  });
+
+  const contextType = new GraphQLObjectType({
+    name: 'Context',
+    description: 'tbd',
+    fields: () => ({
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The internal id of the chat context',
+      },
+      chatId: {
+        type: GraphQLString,
+        description: ''
+      },
+      userId: {
+        type: GraphQLString,
+        description: ''
+      },
+      payload: {
+        type: JSONType,
+        description: ''
       }
     })
   });
@@ -1093,6 +1116,16 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     query: new GraphQLObjectType({
       name: 'Queries',
       fields: {
+
+        contexts: {
+          type: new GraphQLList(contextType),
+          args: {
+            id: { type: GraphQLInt },
+            chatId: { type: GraphQLString },
+            userId: { type: GraphQLString }
+          },
+          resolve: resolver(Context)
+        },
 
         configurations: {
           type: new GraphQLList(configurationType),
