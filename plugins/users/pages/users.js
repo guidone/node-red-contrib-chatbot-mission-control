@@ -10,6 +10,7 @@ import Language from '../../../src/components/language';
 import SmartDate from '../../../src/components/smart-date';
 import CustomTable from '../../../src/components/table';
 import { Input } from '../../../src/components/table-filters';
+import ContextModal from '../../../src/components/context-modal';
 
 import '../styles/users.scss';
 import useUsers from '../hooks/users';
@@ -47,6 +48,7 @@ query ($limit: Int, $offset: Int, $order: String, $username: String, $userId: St
 const Users = () => {
   const table = useRef();
   const [ user, setUser ] = useState(null);
+  const [ context, setContext ] = useState(null);
   const { saving, error,  deleteUser, editUser } = useUsers();
   const { mergeModal, mergeUser } = useMergeUser({
     onComplete: () => {
@@ -69,6 +71,14 @@ const Users = () => {
             table.current.refetch();
           }}
         />)}
+      {context != null && (
+        <ContextModal
+          user={context}
+          onSubmit={() => setContext(null)}
+          onCancel={() => setContext(null)}
+        />
+
+      )}
       {mergeModal}
       <CustomTable
         ref={table}
@@ -139,7 +149,7 @@ const Users = () => {
           <Cell dataKey="email"/>
         </Column>
 
-        <Column width={120}>
+        <Column width={160}>
           <HeaderCell>Action</HeaderCell>
           <Cell>
             {user => (
@@ -155,6 +165,12 @@ const Users = () => {
                   }}
                 >
                   <Icon icon="trash" />
+                </Button>
+                <Button
+                  size="xs"
+                  onClick={() => setContext(user)}
+                >
+                  <Icon icon="database" />
                 </Button>
                 <Button
                   size="xs"

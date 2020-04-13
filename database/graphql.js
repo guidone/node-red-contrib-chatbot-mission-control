@@ -131,6 +131,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       payload: {
         type: JSONType,
         description: '',
+      },
+      context: {
+        type: JSONType,
+        description: 'The context to update',
       }
     }
   });
@@ -224,6 +228,14 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       payload: {
         type: JSONType,
         description: '',
+      },
+      context: {
+        type: JSONType,
+        description: 'The chat context associated with the user',
+        resolve: async user => {
+          const context = await Context.findOne({ where: { userId: user.userId }});
+          return context != null ? context.payload : null;
+        }
       },
       chatIds: {
         type: new GraphQLList(chatIdType),
@@ -999,13 +1011,20 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             user: { type: new GraphQLNonNull(newUserType) }
           },
           async resolve(root, { id, userId, user: value }) {
+            console.log('saving user', value.context)
             let where;
             if (id != null) {
-              where= { id };
+              where = { id };
             } else if (userId != null) {
               where = { userId };
             } else {
               throw 'Missing both id and userId';
+            }
+            // if context is present, update using userId
+            if (value.context) {
+              const user = await User.findOne({ where });
+              await Context.update({ payload: value.context }, { where: { userId: user.userId }});
+              delete value.context;
             }
             await User.update(value, { where })
             return await User.findOne({ where });
@@ -1174,7 +1193,8 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         user: {
           type: userType,
           args: {
-            userId: { type: GraphQLString }
+            userId: { type: GraphQLString },
+            id: { type: GraphQLInt }
           },
           resolve: resolver(User)
         },
