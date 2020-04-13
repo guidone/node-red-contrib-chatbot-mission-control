@@ -1,6 +1,7 @@
 import React from 'react';
 import { Icon, IconStack } from 'rsuite';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 import './style.scss';
 
@@ -22,12 +23,13 @@ const WarningBox = ({
   title,
   icon = 'exclamation-circle',
   children,
-  hover
+  hover,
+  className
 }) => {
 
   // ban, circle, check, close, question2, refresh2, circle-o-notch, exclamation, square-o, sun-o, times-circle-o
   return (
-    <div className="ui-warning-box">
+    <div className={classNames('ui-warning-box', className)}>
       <div className="icon">
         <IconStack size="2x">
           <Icon icon={icon} stack="1x" />

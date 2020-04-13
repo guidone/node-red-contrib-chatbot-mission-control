@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Button, Loader } from 'rsuite';
+import { Modal, Button } from 'rsuite';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from 'react-apollo'
 import ReactJson from 'react-json-view'
@@ -7,6 +7,7 @@ import ReactJson from 'react-json-view'
 import WarningBox from '../../components/warning-box';
 import useCanCloseModal from '../../../src/hooks/modal-can-close';
 import LoaderModal from '../../../src/components/loader-modal';
+import ShowError from '../show-error';
 
 import './style.scss';
 
@@ -31,7 +32,7 @@ mutation($id: Int!, $user: NewUser!) {
 const ContextModal = ({ user, onSubmit = () => {}, onCancel = () => {} }) => {
   const { handleCancel, isChanged, setIsChanged } = useCanCloseModal({ onCancel });
   const [context, setContext] = useState();
-  const { loading, error, data, refetch } = useQuery(USER, {
+  const { loading, error: loadingError, data, refetch } = useQuery(USER, {
     fetchPolicy: 'network-only',
     variables: { id: user.id },
     onCompleted: data => {
@@ -48,7 +49,7 @@ const ContextModal = ({ user, onSubmit = () => {}, onCancel = () => {} }) => {
     setContext(json);
     setIsChanged(true);
   }
-
+  const error = loadingError || updateError;
   const disabled = loading || saving;
   return (
     <Modal backdrop show onHide={() => handleCancel()} size="md" overflow={false} className="modal-context">
@@ -57,7 +58,8 @@ const ContextModal = ({ user, onSubmit = () => {}, onCancel = () => {} }) => {
       </Modal.Header>
       <Modal.Body>
         {loading && <LoaderModal/>}
-        {!loading && context == null && (
+        {error && <ShowError error={error} />}
+        {!loading && !error && context == null && (
           <WarningBox
             icon="database"
             title="No Context"

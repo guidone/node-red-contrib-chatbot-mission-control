@@ -1,24 +1,49 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Message } from 'rsuite';
+import _ from 'lodash';
+
+
+import WarningBox from '../warning-box';
 
 import './index.scss';
 
-const ShowError = ({ error }) => {
+const ShowError = ({
+  error = 'Something went wrong on the server, please try again.',
+  title = 'Server error',
+  subtitle = 'Something went really wrong on the server.'
+}) => {
+  console.log('ERROR', error)
   // TODO try to extract error message
-  const message = 'Something went wrong on the server, please try again.';
+
+  let message;
+  if (_.isString(error)) {
+    message = error;
+  } else if (error.networkError != null && error.networkError.result != null && error.networkError.result.errors != null) {
+    const errors = error.networkError.result.errors;
+    message = (
+      <span>
+        {errors.map(item => <span key={item.message}>{item.message}. </span>)}
+      </span>
+    );
+  }
+
   return (
-    <div className="ui-show-error">
-      <Message
-        type="error"
-        title="Error"
-        description={message}
-      />
-    </div>
+    <WarningBox
+      className="ui-show-error"
+      icon="exclamation-triangle"
+      title={title}
+    >
+      {!_.isEmpty(subtitle) && <span>{subtitle}<br/></span>}
+      {message}
+    </WarningBox>
   );
 };
 ShowError.propTypes = {
-  error: PropTypes.object
+  error: PropTypes.object,
+  // the title of the box, generelly server error
+  title: PropTypes.string,
+  // something that explains better the error, it's above the automatic render of the server
+  subtitle: PropTypes.string,
 };
 
 export default ShowError;
