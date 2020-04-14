@@ -32,7 +32,7 @@ mutation($id: Int!, $user: NewUser!) {
 const ContextModal = ({ user, onSubmit = () => {}, onCancel = () => {} }) => {
   const { handleCancel, isChanged, setIsChanged } = useCanCloseModal({ onCancel });
   const [context, setContext] = useState();
-  const { loading, error: loadingError, data, refetch } = useQuery(USER, {
+  const { loading, error: loadingError } = useQuery(USER, {
     fetchPolicy: 'network-only',
     variables: { id: user.id },
     onCompleted: data => {

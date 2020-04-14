@@ -44,7 +44,7 @@ const useSimulator = ({ activeChatbots }) => {
         transport,
         nodeId,
         language,
-        userId: impersonatedUser != null ? impersonatedUser.id : 42,
+        userId: impersonatedUser != null ? impersonatedUser.userId : 42,
         username: impersonatedUser != null ? impersonatedUser.username : 'testUser',
         firstName: impersonatedUser != null ? impersonatedUser.first_name : null,
         lastName: impersonatedUser != null ? impersonatedUser.last_name : null,
