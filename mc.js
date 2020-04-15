@@ -77,7 +77,7 @@ function bootstrap(server, app, log, redSettings) {
 
 
   // get mission control configurations
-  console.log(lcd.timestamp() + 'Red Bot Mission Control configuration:')
+  console.log(lcd.timestamp() + 'Red Bot Mission Control configuration:');
   const mcSettings = redSettings.missionControl || {};
   if (process.env.DEV != null) {
     mcSettings.environment = 'development';

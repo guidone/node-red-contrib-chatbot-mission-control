@@ -125,7 +125,7 @@ const LastMessageWidget = () => {
 
   const { state, dispatch } = useSocket(handleMessages, { lastMessage: null });
   const { lastMessage } = state;
-  console.log('lastMes', lastMessage)
+
   return (
     <Panel
       title="Last Message"

@@ -98,7 +98,7 @@ const PayloadType = new GraphQLScalarType({
 });
 
 
-module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, sequelize }) => {
+module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, Admin, sequelize }) => {
 
   const newUserType = new GraphQLInputObjectType({
     name: 'NewUser',
@@ -271,6 +271,52 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             order
           });
         }
+      }
+    })
+  });
+
+  const adminType = new GraphQLObjectType({
+    name: 'Admin',
+    description: 'tbd',
+    fields: () => ({
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The internal id of the user',
+      },
+      email: {
+        type: GraphQLString,
+        description: '',
+      },
+      first_name: {
+        type: GraphQLString,
+        description: '',
+      },
+      last_name: {
+        type: GraphQLString,
+        description: '',
+      },
+      avatar: {
+        type: GraphQLString,
+        description: '',
+      },
+      username: {
+        type: GraphQLString,
+        description: '',
+      },
+      password: {
+        type: GraphQLString,
+        description: '',
+      },
+      permissions: {
+        type: GraphQLString,
+        description: '',
+      },
+      createdAt: {
+        type: DateType
+      },
+      payload: {
+        type: JSONType,
+        description: '',
       }
     })
   });
@@ -742,6 +788,25 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     }
   });
 
+  const adminCounterType = new GraphQLObjectType({
+    name: 'AdminCounters',
+    description: 'User Counters',
+    fields: {
+      count: {
+        type: GraphQLInt,
+        description: 'Total admins',
+        args: {
+          username: { type: GraphQLString }
+        },
+        resolve: (root, { username }) => Admin.count({
+          where: compactObject({
+            username: username != null ? { [Op.like]: `%${username}%` } : null
+          })
+        })
+      }
+    }
+  });
+
   const categoryCounterType = new GraphQLObjectType({
     name: 'CategoryCounters',
     description: 'Category Counters',
@@ -799,6 +864,13 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       },
       users: {
         type: userCounterType,
+        description: 'Counters for users',
+        resolve: (root, args) => {
+          return {};
+        }
+      },
+      admins: {
+        type: adminCounterType,
         description: 'Counters for users',
         resolve: (root, args) => {
           return {};
@@ -1011,7 +1083,6 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             user: { type: new GraphQLNonNull(newUserType) }
           },
           async resolve(root, { id, userId, user: value }) {
-            console.log('saving user', value.context)
             let where;
             if (id != null) {
               where = { id };
@@ -1182,6 +1253,37 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
               ]
             }
             return User.findAll({
+              limit,
+              offset,
+              order: splitOrder(order),
+              where: whereParams
+            });
+          }
+        },
+
+        admins: {
+          type: new GraphQLList(adminType),
+          args: {
+            offset: { type: GraphQLInt },
+            limit: { type: GraphQLInt },
+            id: { type: GraphQLInt },
+            order: { type: GraphQLString },
+            username: { type: GraphQLString },
+            search: { type: GraphQLString }
+          },
+          resolve(root, { order, offset = 0, limit = 10, username, id, search }) {
+            const whereParams = compactObject({
+              id,
+              username: username != null ? { [Op.like]: `%${username}%` } : null,
+            });
+            if (search != null) {
+              whereParams[Op.or] = [
+                { username: { [Op.like]: `%${search}%` } },
+                { first_name: { [Op.like]: `%${search}%` } },
+                { last_name: { [Op.like]: `%${search}%` } }
+              ]
+            }
+            return Admin.findAll({
               limit,
               offset,
               order: splitOrder(order),

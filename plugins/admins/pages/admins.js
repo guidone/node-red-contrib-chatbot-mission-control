@@ -6,81 +6,61 @@ const { Column, HeaderCell, Cell } = Table;
 
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
-import Language from '../../../src/components/language';
 import SmartDate from '../../../src/components/smart-date';
 import CustomTable from '../../../src/components/table';
 import { Input } from '../../../src/components/table-filters';
-import ContextModal from '../../../src/components/context-modal';
 
-import '../styles/users.scss';
-import useUsers from '../hooks/users';
-import useMergeUser from '../hooks/merge-user';
-import ModalUser from '../views/modal-user';
+import '../styles/admins.scss';
+import useAdmins from '../hooks/admins';
+import ModalAdmin from '../views/modal-admin';
 
-const USERS = gql`
-query ($limit: Int, $offset: Int, $order: String, $username: String, $userId: String) {
+const ADMINS = gql`
+query ($limit: Int, $offset: Int, $order: String, $username: String) {
   counters {
-    rows: users {
-     count(username: $username, userId: $userId)
+    rows: admins {
+     count(username: $username)
     }
   }
-  rows: users(limit: $limit, offset: $offset, order: $order, username: $username, userId: $userId) {
+  rows: admins(limit: $limit, offset: $offset, order: $order, username: $username) {
     id,
     username,
-    userId,
+    password,
     first_name,
     last_name,
     username,
-    language,
     payload,
     createdAt,
     email,
-    chatIds {
-      id,
-      transport,
-      chatId
-    }
+    permissions
   }
 }
 `;
 
 
-const Users = () => {
+const Admins = () => {
   const table = useRef();
-  const [ user, setUser ] = useState(null);
-  const [ context, setContext ] = useState(null);
-  const { saving, error,  deleteUser, editUser } = useUsers();
-  const { mergeModal, mergeUser } = useMergeUser({
-    onComplete: () => table.current.refetch()
-  });
+  const [ admin, setAdmin ] = useState(null);
+  const { saving, error,  deleteAdmin, editAdmin } = useAdmins();
+
 
   return (
     <PageContainer className="page-users">
-      <Breadcrumbs pages={['Users']}/>
-      {user != null && (
-        <ModalUser
-          user={user}
+      <Breadcrumbs pages={['Admins']}/>
+      {admin != null && (
+        <ModalAdmin
+          admin={admin}
           error={error}
           disabled={saving}
-          onCancel={() => setUser(null)}
+          onCancel={() => setAdmin(null)}
           onSubmit={async user => {
-            await editUser({ variables: { id: user.id, user }})
-            setUser(null);
+            await editAdmin({ variables: { id: user.id, user }})
+            setAdmin(null);
             table.current.refetch();
           }}
         />)}
-      {context != null && (
-        <ContextModal
-          user={context}
-          onSubmit={() => setContext(null)}
-          onCancel={() => setContext(null)}
-        />
-
-      )}
-      {mergeModal}
       <CustomTable
         ref={table}
-        query={USERS}
+        query={ADMINS}
         height={600}
         initialSortField="createdAt"
         initialSortDirection="desc"
@@ -90,11 +70,6 @@ const Users = () => {
           </div>
         )}
         filtersSchema={[
-          {
-            name: 'userId',
-            label: 'userId',
-            control: Input
-          },
           {
             name: 'username',
             label: 'Username',
@@ -106,11 +81,6 @@ const Users = () => {
         <Column width={60} align="center">
           <HeaderCell>Id</HeaderCell>
           <Cell dataKey="id" />
-        </Column>
-
-        <Column width={100} resizable>
-          <HeaderCell>userId</HeaderCell>
-          <Cell>{({ userId }) => <span className="cell-type-id">{userId}</span>}</Cell>
         </Column>
 
         <Column width={140} resizable>
@@ -135,29 +105,22 @@ const Users = () => {
           <Cell dataKey="last_name"/>
         </Column>
 
-        <Column width={50} resizable>
-          <HeaderCell>Language</HeaderCell>
-          <Cell>
-            {({ language }) => <Language>{language}</Language>}
-          </Cell>
-        </Column>
-
         <Column width={300} flexGrow={1}>
           <HeaderCell>Email</HeaderCell>
           <Cell dataKey="email"/>
         </Column>
 
-        <Column width={160}>
+        <Column width={80}>
           <HeaderCell>Action</HeaderCell>
           <Cell>
-            {user => (
+            {admin => (
               <ButtonGroup>
                 <Button
                   size="xs"
                   onClick={() => {
-                    const name = [user.first_name, user.last_name].join(' ');
-                    if (confirm(`Delete user${!_.isEmpty(name.trim()) ? ` "${name}"` : ''} (${user.userId})?`)) {
-                      deleteUser({ variables: { id: user.id }})
+                    const name = [admin.first_name, admin.last_name].join(' ');
+                    if (confirm(`Delete admin${!_.isEmpty(name.trim()) ? ` "${name}"` : ''} (${admin.userId})?`)) {
+                      deleteAdmin({ variables: { id: user.id }})
                         .then(table.current.refetch);
                     }
                   }}
@@ -166,24 +129,10 @@ const Users = () => {
                 </Button>
                 <Button
                   size="xs"
-                  onClick={() => setContext(user)}
-                >
-                  <Icon icon="database" />
-                </Button>
-                <Button
-                  size="xs"
-                  onClick={() => setUser(user)}
+                  onClick={() => setAdmin(admin)}
                 >
                   <Icon icon="edit2" />
                 </Button>
-                {user.chatIds.length !== 0 && (
-                  <Button
-                    size="xs"
-                    onClick={() => mergeUser(user)}
-                  >
-                    <Icon icon="user-plus"/>
-                  </Button>
-                )}
             </ButtonGroup>
             )}
           </Cell>
@@ -193,4 +142,4 @@ const Users = () => {
   );
 };
 
-export default Users;
+export default Admins;

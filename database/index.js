@@ -106,7 +106,9 @@ module.exports = mcSettings => {
     first_name: Sequelize.STRING,
     last_name: Sequelize.STRING,
     avatar: Sequelize.STRING,
-    email: Sequelize.STRING
+    email: Sequelize.STRING,
+    payload: Sequelize.STRING,
+    permissions: Sequelize.STRING
   }, {
     indexes: [
       { name: 'admin_username', using: 'BTREE', fields: ['username'] },
@@ -214,7 +216,7 @@ module.exports = mcSettings => {
       + ' ' + lcd.grey(resolve(dbPath)));
   }
 
-  const graphQLServer = GraphQLServer({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, sequelize });
+  const graphQLServer = GraphQLServer({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, Admin, sequelize });
 
   exportCache = {
     Configuration,

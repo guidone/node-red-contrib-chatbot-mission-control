@@ -130,3 +130,14 @@ plug(
   withState(withActiveChatbots(SimulatorWidget), 'user'),
   { x: 0, y: 0, w: 2, h: 8, isResizable: true, id: 'simulator-widget' }
 );
+
+plug(
+  'permissions',
+  null,
+  {
+    permission: 'simulator',
+    name: 'Chat Simulator',
+    description: 'Access to chat simulator',
+    group: 'UI'
+  }
+);

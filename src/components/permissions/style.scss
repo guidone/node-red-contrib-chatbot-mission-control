@@ -1,0 +1,59 @@
+.ui-permissions {
+
+  .selector {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: flex-start;
+
+    .picker {
+      flex: 1 0;
+    }
+
+    .button {
+      flex: 0 0 auto;
+      margin-left: 15px;
+    }
+  }
+
+  .permissions {
+    margin-top: 10px;
+  }
+
+  .permission {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: stretch;
+    align-items: center;
+    padding: 5px;
+    border-bottom: 1px solid #dddddd;
+
+    &:hover {
+      background-color: #eeeeee;
+    }
+
+    .meta {
+      flex: 1 0;
+
+      strong {
+        display: block;
+        color: #336699;
+      }
+      .description {
+        font-size: 13px;
+        color: #888888;
+      }
+    }
+
+    .button {
+      flex: 0 0 auto;
+      margin-left: 15px;
+      margin-bottom: 5px;
+      margin-top: 5px;
+    }
+  }
+}
