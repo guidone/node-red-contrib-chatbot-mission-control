@@ -4,19 +4,17 @@ import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid,
 
 import JSONEditor from '../../../src/components/json-editor';
 import Permissions from '../../../src/components/permissions';
-import ChatIdsManager from '../../../src/components/chat-ids-manager';
+import PasswordInput from '../../../src/components/password-input';
 import useCanCloseModal from '../../../src/hooks/modal-can-close';
 
 const ModalAdmin = ({ admin, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
   const { handleCancel, isChanged, setIsChanged } = useCanCloseModal({ onCancel });
-  const [formValue, setFormValue] = useState({ ...admin });
+  const [formValue, setFormValue] = useState({ ...admin, password: undefined });
   const [jsonValue, setJsonValue] = useState({
     json: !_.isEmpty(admin.payload) ? JSON.stringify(admin.payload, null, 2) : ''
   });
   const [formError, setFormError] = useState(null);
   const [tab, setTab] = useState('admin-details');
-
-
 
   return (
     <Modal backdrop show onHide={() => handleCancel()} size="md" overflow={false} className="modal-admin">
@@ -49,6 +47,7 @@ const ModalAdmin = ({ admin, onCancel = () => {}, onSubmit = () => {}, disabled 
             formError={formError}
             onChange={formValue => {
               setIsChanged(true);
+              console.log('change', formValue)
               setFormValue(formValue);
               setFormError(null);
             }}
@@ -58,13 +57,18 @@ const ModalAdmin = ({ admin, onCancel = () => {}, onSubmit = () => {}, disabled 
               <FlexboxGrid.Item colspan={11}>
                 <FormGroup>
                   <ControlLabel>Username</ControlLabel>
-                  <FormControl readOnly={disabled} name="username" />
+                  <FormControl
+                    disabled={disabled}
+                    name="username" />
                 </FormGroup>
               </FlexboxGrid.Item>
               <FlexboxGrid.Item colspan={11}>
                 <FormGroup>
                   <ControlLabel>Password</ControlLabel>
-                  <FormControl readOnly={disabled} name="password" />
+                  <FormControl
+                    disabled={disabled}
+                    accepter={PasswordInput}
+                    name="password" />
                 </FormGroup>
               </FlexboxGrid.Item>
             </FlexboxGrid>
@@ -72,25 +76,25 @@ const ModalAdmin = ({ admin, onCancel = () => {}, onSubmit = () => {}, disabled 
               <FlexboxGrid.Item colspan={11}>
                 <FormGroup>
                   <ControlLabel>First Name</ControlLabel>
-                  <FormControl autoComplete="off" readOnly={disabled} name="first_name" />
+                  <FormControl autoComplete="off" disabled={disabled} name="first_name" />
                 </FormGroup>
               </FlexboxGrid.Item>
               <FlexboxGrid.Item colspan={11}>
                 <FormGroup>
                   <ControlLabel>Last Name</ControlLabel>
-                  <FormControl readOnly={disabled} name="last_name" />
+                  <FormControl disabled={disabled} name="last_name" />
                 </FormGroup>
               </FlexboxGrid.Item>
             </FlexboxGrid>
             <FormGroup>
               <ControlLabel>Email</ControlLabel>
-              <FormControl readOnly={disabled} name="email" />
+              <FormControl disabled={disabled} name="email" />
             </FormGroup>
             <FormGroup>
               <ControlLabel>Permissions</ControlLabel>
               <FormControl
-                readOnly={disabled}
-                name="permissionss"
+                disabled={disabled}
+                name="permissions"
                 accepter={Permissions}
               />
             </FormGroup>
@@ -105,7 +109,7 @@ const ModalAdmin = ({ admin, onCancel = () => {}, onSubmit = () => {}, disabled 
             <FormGroup>
               <ControlLabel>Payload</ControlLabel>
               <FormControl
-                readOnly={disabled}
+                disabled={disabled}
                 name="json"
                 accepter={JSONEditor}
                 onChange={json => {

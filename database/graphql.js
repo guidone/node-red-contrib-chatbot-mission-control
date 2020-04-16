@@ -6,7 +6,7 @@ const Sequelize = require('sequelize');
 
 const Op = Sequelize.Op;
 
-const { when } = require('../lib/utils');
+const { when, hash } = require('../lib/utils');
 
 const isCircularPaths = require('../lib/get-circular-paths');
 
@@ -98,7 +98,7 @@ const PayloadType = new GraphQLScalarType({
 });
 
 
-module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, Admin, sequelize }) => {
+module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, Admin, sequelize, mcSettings }) => {
 
   const newUserType = new GraphQLInputObjectType({
     name: 'NewUser',
@@ -283,6 +283,48 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: new GraphQLNonNull(GraphQLInt),
         description: 'The internal id of the user',
       },
+      email: {
+        type: GraphQLString,
+        description: '',
+      },
+      first_name: {
+        type: GraphQLString,
+        description: '',
+      },
+      last_name: {
+        type: GraphQLString,
+        description: '',
+      },
+      avatar: {
+        type: GraphQLString,
+        description: '',
+      },
+      username: {
+        type: GraphQLString,
+        description: '',
+      },
+      password: {
+        type: GraphQLString,
+        description: '',
+      },
+      permissions: {
+        type: GraphQLString,
+        description: '',
+      },
+      createdAt: {
+        type: DateType
+      },
+      payload: {
+        type: JSONType,
+        description: '',
+      }
+    })
+  });
+
+  const newAdminType = new GraphQLInputObjectType({
+    name: 'NewAdmin',
+    description: 'tbd',
+    fields: () => ({
       email: {
         type: GraphQLString,
         description: '',
@@ -997,6 +1039,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           }
         },
 
+        createAdmin: {
+          type: adminType,
+          args: {
+            admin: { type: new GraphQLNonNull(newAdminType)}
+          },
+          resolve: function(root, { admin }) {
+
+
+            return Admin.create(admin);
+          }
+        },
+
         editCategory: {
           type: categoryType,
           args: {
@@ -1072,6 +1126,22 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
               await content.destroy();
             }
             return content;
+          }
+        },
+
+        editAdmin: {
+          type: adminType,
+          args: {
+            id: { type: GraphQLInt},
+            admin: { type: new GraphQLNonNull(newAdminType) }
+          },
+          async resolve(root, { id, admin }) {
+            console.log('aggiorno', admin, id)
+            if (!_.isEmpty(admin.password)) {
+              admin.password = hash(admin.password, { salt: mcSettings.salt });
+            }
+            await Admin.update(admin, { where: { id } })
+            return await Admin.findOne({ where: { id } });
           }
         },
 

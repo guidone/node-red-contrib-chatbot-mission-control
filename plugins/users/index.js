@@ -9,6 +9,16 @@ plug(
   'permissions',
   null,
   {
+    permission: '*',
+    name: 'All',
+    description: 'All permissions',
+    group: 'General'
+  }
+);
+plug(
+  'permissions',
+  null,
+  {
     permission: 'users.edit',
     name: 'Edit users',
     description: 'Edit or delete a user',

@@ -130,8 +130,6 @@ function bootstrap(server, app, log, redSettings) {
         done(null, false);
       } else {
         const hashedPassword = hash(password, { salt: mcSettings.salt });
-        console.log('Hashed password: ', hashedPassword);
-        //console.log('DB password', user.password);
         if (user.password === hashedPassword) {
           done(null, {
             id: user.id,
@@ -139,7 +137,8 @@ function bootstrap(server, app, log, redSettings) {
             firstName: user.first_name,
             lastName: user.last_name,
             avatar: user.avatar,
-            email: user.email
+            email: user.email,
+            permissions: !_.isEmpty(user.permissions) ? user.permissions.split(',') : []
           });
         } else {
           done(null, false);

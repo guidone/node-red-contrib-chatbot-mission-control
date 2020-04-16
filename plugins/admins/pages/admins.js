@@ -24,10 +24,8 @@ query ($limit: Int, $offset: Int, $order: String, $username: String) {
   rows: admins(limit: $limit, offset: $offset, order: $order, username: $username) {
     id,
     username,
-    password,
     first_name,
     last_name,
-    username,
     payload,
     createdAt,
     email,
@@ -40,7 +38,7 @@ query ($limit: Int, $offset: Int, $order: String, $username: String) {
 const Admins = () => {
   const table = useRef();
   const [ admin, setAdmin ] = useState(null);
-  const { saving, error,  deleteAdmin, editAdmin } = useAdmins();
+  const { saving, error,  deleteAdmin, editAdmin, createAdmin } = useAdmins();
 
 
   return (
@@ -52,8 +50,12 @@ const Admins = () => {
           error={error}
           disabled={saving}
           onCancel={() => setAdmin(null)}
-          onSubmit={async user => {
-            await editAdmin({ variables: { id: user.id, user }})
+          onSubmit={async admin => {
+            if (admin.id != null) {
+              await editAdmin({ variables: { id: admin.id, admin }});
+            } else {
+              await createAdmin({ variables: { admin }});
+            }
             setAdmin(null);
             table.current.refetch();
           }}
@@ -66,7 +68,9 @@ const Admins = () => {
         initialSortDirection="desc"
         toolbar={(
           <div>
-            <Button appearance="primary" onClick={() => table.current.refetch()}>Refresh</Button>
+            <Button appearance="primary" onClick={() => {
+              setAdmin({});
+            }}>Create admin</Button>
           </div>
         )}
         filtersSchema={[

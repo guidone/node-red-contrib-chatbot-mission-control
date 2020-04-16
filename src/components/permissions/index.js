@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { CheckPicker, Button, IconButton, Icon } from 'rsuite';
 import _ from 'lodash';
+//import { alert, confirm, prompt  } from '@rsuite/interactions';
+
+import confirm from '../prompt';
 
 import { useCodePlug } from '../../../lib/code-plug';
 
@@ -31,30 +34,37 @@ const Permissions = ({ value, onChange = () => {} }) => {
 
   console.log('permissions', permission  )
 
-  const current = _.isString(value) ? value.split(',') : [];
+  const current = _.isString(value) && !_.isEmpty(value) ? value.split(',') : [];
+  const hasAll = current.includes('*');
   const data = permissions
     .filter(item => !current.includes(item.permission))
     .map(item => ({
       value: item.permission,
       label: item.name,
-
       ...item
   }));
 
-  console.log('data', current)
   return (
     <div className="ui-permissions">
       <div className="selector">
         <div className="picker">
           <CheckPicker
             value={permission}
+            size="medium  "
             placement="auto"
             placeholder="Select permission..."
             groupBy="group"
-            disabled={_.isEmpty(data)}
+            disabled={_.isEmpty(data) || hasAll}
             data={data}
             onSelect={value => setPermission(value)}
-            preventOverflow={false}
+            preventOverflow={true}
+            renderMenuItem={(label, item) => (
+              <div className="check-picker-item-permission">
+                <span className="name">{label}</span>
+                &nbsp;
+                <span className="description">{item.description}</span>
+              </div>
+            )}
             block
             />
         </div>
@@ -62,11 +72,22 @@ const Permissions = ({ value, onChange = () => {} }) => {
           <Button
             disabled={permission == null}
             appearance="primary"
-            onClick={() => {
-              let newValue = _.isString(value) && !_.isEmpty(value) ? value.split(',') : [];
-              console.log('mando', [...newValue, permission])
-              onChange([...newValue, ...permission].join(','));
-              setPermission(null);
+            onClick={async () => {
+              const includeAll = permission.includes('*');
+              if (includeAll) {
+                const msg = (
+                  <div>Add <b>all</b> permission and remove all other permissions?'</div>
+                );
+                if (await confirm(msg, { okLabel: 'Ok, add "*" permission'})) {
+                  onChange('*');
+                  setPermission(null);
+                }
+              } else {
+                let newValue = _.isString(value) && !_.isEmpty(value) ? value.split(',') : [];
+                console.log('mando', [...newValue, permission])
+                onChange([...newValue, ...permission].join(','));
+                setPermission(null);
+              }
             }}
           >
             Add permission{!_.isEmpty(permission) && permission.length > 1 ? 's' : ''}

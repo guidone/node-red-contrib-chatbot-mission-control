@@ -216,7 +216,20 @@ module.exports = mcSettings => {
       + ' ' + lcd.grey(resolve(dbPath)));
   }
 
-  const graphQLServer = GraphQLServer({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, Admin, sequelize });
+  const graphQLServer = GraphQLServer({
+    Configuration,
+    Message,
+    User,
+    ChatId,
+    Event,
+    Content,
+    Category,
+    Field,
+    Context,
+    Admin,
+    sequelize,
+    mcSettings
+  });
 
   exportCache = {
     Configuration,
