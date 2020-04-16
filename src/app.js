@@ -12,20 +12,21 @@ import {
   Link,
 } from 'react-router-dom';
 
-import { CodePlug } from '../lib/code-plug';
+import { CodePlug, useCodePlug } from '../lib/code-plug';
 
 import compose from './helpers/compose-reducers';
-import withState from './wrappers/with-state';
 import AppContext from './common/app-context';
 import Sidebar from './layout/sidebar';
 import Header from './layout/header';
 import HomePage from './pages/home';
 import WebSocket from './common/web-socket';
+import useCurrentUser from './hooks/current-user';
 
 
 // Import plugins
 import './permissions';
 import '../plugins';
+
 
 const cache = new InMemoryCache(); // where current data is stored
 const apolloLink = createHttpLink({ uri: '/graphql' });
@@ -105,6 +106,8 @@ const usePrefetchedData = () => {
 
 
 const AppRouter = ({ codePlug, bootstrap }) => {
+
+  const { items } = useCodePlug('pages', { permission: { '$in': bootstrap.user.permissions }})
   const { platforms, eventTypes, messageTypes, activeChatbots, loading } = usePrefetchedData();
 
   const reducers = useMemo(() => compose(...codePlug.getItems('reducers').map(item => item.view )));
@@ -130,13 +133,11 @@ const AppRouter = ({ codePlug, bootstrap }) => {
                   <Header/>
                   <Content className="mc-inner-content">
                     <Switch>
-                      {codePlug
-                        .getItems('pages')
-                        .map(({ view: View, props }) => (
-                          <Route key={props.url} path={props.url} children={<View {...props} dispatch={dispatch}/>}>
+                      {items.map(({ view: View, props }) => (
+                        <Route key={props.url} path={props.url} children={<View {...props} dispatch={dispatch}/>}>
 
-                          </Route>
-                        ))}
+                        </Route>
+                      ))}
                       <Route path="/" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}>
                       </Route>
                     </Switch>

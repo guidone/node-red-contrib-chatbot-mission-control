@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { CheckPicker, Button, IconButton, Icon } from 'rsuite';
 import _ from 'lodash';
+import PropTypes from 'prop-types';
 
 import { useCodePlug } from '../../../lib/code-plug';
 import confirm from '../prompt';
@@ -8,7 +9,6 @@ import confirm from '../prompt';
 import './style.scss';
 
 const Permission = ({ permission, onRemove = () => {} }) => {
-
   return (
     <div className="permission">
       <div className="meta">
@@ -25,12 +25,17 @@ const Permission = ({ permission, onRemove = () => {} }) => {
     </div>
   );
 }
+Permission.propTypes = {
+  permission: PropTypes.shape({
+    name: PropTypes.string,
+    description: PropTypes.string,
+  }),
+  onRemove: PropTypes.func
+};
 
 const Permissions = ({ value, onChange = () => {} }) => {
   const [permission, setPermission] = useState();
   const { props: permissions } = useCodePlug('permissions');
-
-  console.log('permissions', permission  )
 
   const current = _.isString(value) && !_.isEmpty(value) ? value.split(',') : [];
   const hasAll = current.includes('*');
@@ -73,6 +78,8 @@ const Permissions = ({ value, onChange = () => {} }) => {
             onClick={async () => {
               const includeAll = permission.includes('*');
               if (includeAll) {
+                // include all is selected, then ask and remove all other permissions
+                // non necessary
                 const msg = (
                   <div>Add <b>all</b> permission and remove all other permissions?'</div>
                 );
@@ -81,9 +88,19 @@ const Permissions = ({ value, onChange = () => {} }) => {
                   setPermission(null);
                 }
               } else {
-                let newValue = _.isString(value) && !_.isEmpty(value) ? value.split(',') : [];
-                console.log('mando', [...newValue, permission])
-                onChange([...newValue, ...permission].join(','));
+                // array of new permissions
+                let currentPermissions = _.isString(value) && !_.isEmpty(value) ? value.split(',') : [];
+                // scan all permission to add
+                let dependencies = [];
+                permission.forEach(toAdd => {
+                  // find the permission definition and check if there are related permissions
+                  const definition = permissions.find(item => item.permission === toAdd);
+                  if (definition.dependsOn != null) {
+                    dependencies = _.uniq([...dependencies, ...definition.dependsOn]);
+                  }
+                });
+                // finally merge all
+                onChange([...currentPermissions, ...permission, ...dependencies].join(','));
                 setPermission(null);
               }
             }}
@@ -106,6 +123,10 @@ const Permissions = ({ value, onChange = () => {} }) => {
       </div>
     </div>
   );
+};
+Permissions.propTypes = {
+  value: PropTypes.string,
+  onChange: PropTypes.func
 };
 
 export default Permissions;

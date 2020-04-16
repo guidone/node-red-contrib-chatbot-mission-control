@@ -1,13 +1,15 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useRef } from 'react';
 import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, HelpBlock, Nav } from 'rsuite';
-
 
 import JSONEditor from '../../../src/components/json-editor';
 import Permissions from '../../../src/components/permissions';
 import PasswordInput from '../../../src/components/password-input';
 import useCanCloseModal from '../../../src/hooks/modal-can-close';
 
+import adminModel from '../model';
+
 const ModalAdmin = ({ admin, onCancel = () => {}, onSubmit = () => {}, disabled = false }) => {
+  const form = useRef();
   const { handleCancel, isChanged, setIsChanged } = useCanCloseModal({ onCancel });
   const [formValue, setFormValue] = useState({ ...admin, password: undefined });
   const [jsonValue, setJsonValue] = useState({
@@ -43,11 +45,19 @@ const ModalAdmin = ({ admin, onCancel = () => {}, onSubmit = () => {}, disabled 
         </Nav>
         {tab === 'admin-details' && (
           <Form
+            ref={form}
+            checkTrigger="none"
+            model={adminModel}
             formValue={formValue}
             formError={formError}
+            onCheck={errors => {
+              if (formValue.id == null && _.isEmpty(formValue.password)) {
+                errors = { ...errors, password: 'Password is required' };
+              }
+              setFormError(errors);
+            }}
             onChange={formValue => {
               setIsChanged(true);
-              console.log('change', formValue)
               setFormValue(formValue);
               setFormError(null);
             }}
@@ -139,7 +149,12 @@ const ModalAdmin = ({ admin, onCancel = () => {}, onSubmit = () => {}, disabled 
           appearance="primary"
           disabled={disabled || !isChanged}
           appearance="primary"
-          onClick={() => onSubmit(formValue)}
+          onClick={() => {
+            if (!form.current.check()) {
+              return;
+            }
+            onSubmit(formValue)
+          }}
         >
           Save admin
         </Button>

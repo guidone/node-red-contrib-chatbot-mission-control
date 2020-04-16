@@ -70,7 +70,7 @@ const ModalContent = ({
   const form = useRef(null);
 
   const isNew = content.id == null;
-console.log('error', error)
+
   labels = { ...LABELS, ...labels };
 
   return (
