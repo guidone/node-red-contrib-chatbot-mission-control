@@ -1,7 +1,7 @@
 // Plugins
 import './plugins/send-message';
 import './plugins/configuration-openings';
-import './plugins/configuration-test';
+//import './plugins/configuration-test';
 
 import './plugins/messages-log';
 import './plugins/messages';

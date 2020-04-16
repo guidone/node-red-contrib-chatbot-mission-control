@@ -3,6 +3,7 @@ import { plug } from '../../lib/code-plug';
 import ConfigurationPage from './pages/configuration';
 console.log('Starting welcome plugin');
 plug('sidebar', null, {
+  permission: 'configure',
   id: 'configuration',
   label: 'Configuration',
   icon: 'cog',
@@ -15,6 +16,7 @@ plug('sidebar', null, {
   ]
 });
 plug('pages', ConfigurationPage, {
+  permission: 'configure',
   url: '/welcome',
   title: 'Welcome Message',
   id: 'page-welcome-message'

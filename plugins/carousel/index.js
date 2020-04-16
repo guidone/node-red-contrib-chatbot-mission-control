@@ -5,6 +5,7 @@ import ConfigurationPage from './pages/configuration';
 plug('sidebar', null, {
   id: 'configuration',
   label: 'Configuration',
+  permission: 'configure',
   icon: 'cog',
   options: [
     {
@@ -15,6 +16,7 @@ plug('sidebar', null, {
   ]
 });
 plug('pages', ConfigurationPage, {
+  permission: 'configure',
   url: '/configuration-carousel',
   title: 'Carousel',
   id: 'configuration-carousel'

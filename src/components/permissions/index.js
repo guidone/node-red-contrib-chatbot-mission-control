@@ -1,11 +1,9 @@
 import React, { useState } from 'react';
 import { CheckPicker, Button, IconButton, Icon } from 'rsuite';
 import _ from 'lodash';
-//import { alert, confirm, prompt  } from '@rsuite/interactions';
-
-import confirm from '../prompt';
 
 import { useCodePlug } from '../../../lib/code-plug';
+import confirm from '../prompt';
 
 import './style.scss';
 

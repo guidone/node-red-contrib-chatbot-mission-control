@@ -2,17 +2,17 @@ import { plug } from '../../lib/code-plug';
 
 import Users from './pages/users';
 
-plug('sidebar', null, { id: 'users', label: 'Users', url: '/users', icon: 'group' })
-plug('pages', Users, { url: '/users', title: 'Users', id: 'users' });
+plug('sidebar', null, { id: 'users', label: 'Users', url: '/users', icon: 'group', permission: 'users.list' })
+plug('pages', Users, { url: '/users', title: 'Users', id: 'users', permission: 'users.list' });
 
 plug(
   'permissions',
   null,
   {
-    permission: '*',
-    name: 'All',
-    description: 'All permissions',
-    group: 'General'
+    permission: 'users.list',
+    name: 'List users',
+    description: 'View the list of users',
+    group: 'Users'
   }
 );
 plug(
@@ -22,7 +22,8 @@ plug(
     permission: 'users.edit',
     name: 'Edit users',
     description: 'Edit or delete a user',
-    group: 'Users'
+    group: 'Users',
+    dependsOn: ['users.list']
   }
 );
 plug(
@@ -32,17 +33,8 @@ plug(
     permission: 'users.context.edit',
     name: 'Edit context',
     description: 'Edit persisted user context',
-    group: 'Users'
-  }
-);
-plug(
-  'permissions',
-  null,
-  {
-    permission: 'users.context.view',
-    name: 'View context',
-    description: 'View persisted user context',
-    group: 'Users'
+    group: 'Users',
+    dependsOn: ['users.list']
   }
 );
 plug(
@@ -52,6 +44,7 @@ plug(
     permission: 'users.merge',
     name: 'Merge user',
     description: 'Merge a user into another (mergings chatIds and contexts)',
-    group: 'Users'
+    group: 'Users',
+    dependsOn: ['users.list']
   }
 );

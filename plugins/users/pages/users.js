@@ -11,6 +11,7 @@ import SmartDate from '../../../src/components/smart-date';
 import CustomTable from '../../../src/components/table';
 import { Input } from '../../../src/components/table-filters';
 import ContextModal from '../../../src/components/context-modal';
+import useCurrentUser from '../../../src/hooks/current-user';
 
 import '../styles/users.scss';
 import useUsers from '../hooks/users';
@@ -50,6 +51,7 @@ const Users = () => {
   const [ user, setUser ] = useState(null);
   const [ context, setContext ] = useState(null);
   const { saving, error,  deleteUser, editUser } = useUsers();
+  const { can } = useCurrentUser();
   const { mergeModal, mergeUser } = useMergeUser({
     onComplete: () => table.current.refetch()
   });
@@ -152,31 +154,37 @@ const Users = () => {
           <Cell>
             {user => (
               <ButtonGroup>
-                <Button
-                  size="xs"
-                  onClick={() => {
-                    const name = [user.first_name, user.last_name].join(' ');
-                    if (confirm(`Delete user${!_.isEmpty(name.trim()) ? ` "${name}"` : ''} (${user.userId})?`)) {
-                      deleteUser({ variables: { id: user.id }})
-                        .then(table.current.refetch);
-                    }
-                  }}
-                >
-                  <Icon icon="trash" />
-                </Button>
-                <Button
-                  size="xs"
-                  onClick={() => setContext(user)}
-                >
-                  <Icon icon="database" />
-                </Button>
-                <Button
-                  size="xs"
-                  onClick={() => setUser(user)}
-                >
-                  <Icon icon="edit2" />
-                </Button>
-                {user.chatIds.length !== 0 && (
+                {can('users.edit') && (
+                  <Button
+                    size="xs"
+                    onClick={() => {
+                      const name = [user.first_name, user.last_name].join(' ');
+                      if (confirm(`Delete user${!_.isEmpty(name.trim()) ? ` "${name}"` : ''} (${user.userId})?`)) {
+                        deleteUser({ variables: { id: user.id }})
+                          .then(table.current.refetch);
+                      }
+                    }}
+                  >
+                    <Icon icon="trash" />
+                  </Button>
+                )}
+                {can('users.context.edit') && (
+                  <Button
+                    size="xs"
+                    onClick={() => setContext(user)}
+                  >
+                    <Icon icon="database" />
+                  </Button>
+                )}
+                {can('users.edit') && (
+                  <Button
+                    size="xs"
+                    onClick={() => setUser(user)}
+                  >
+                    <Icon icon="edit2" />
+                  </Button>
+                )}
+                {user.chatIds.length !== 0 && can('users.merge') && (
                   <Button
                     size="xs"
                     onClick={() => mergeUser(user)}

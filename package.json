@@ -30,7 +30,6 @@
   "dependencies": {
     "@babel/plugin-syntax-dynamic-import": "^7.8.3",
     "@nivo/sankey": "^0.61.1",
-    "@rsuite/interactions": "^1.0.2",
     "ace-builds": "^1.4.7",
     "apollo-boost": "^0.4.7",
     "apollo-cache-inmemory": "^1.6.5",

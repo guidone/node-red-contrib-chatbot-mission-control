@@ -4,14 +4,19 @@ import { Link } from 'react-router-dom';
 import { Dropdown, Nav, Icon, Sidebar, Sidenav } from 'rsuite';
 
 import Logo from '../components/logo';
-import { withCodePlug } from '../../lib/code-plug';
+import { useCodePlug } from '../../lib/code-plug';
+import useCurrentUser from '../hooks/current-user';
 
 const NavLink = props => <Dropdown.Item componentClass={Link} {...props} />;
 
-const AppSidebar = ({ codePlug }) => {
+
+const AppSidebar = () => {
+  const { permissionQuery } = useCurrentUser();
+  const { props } = useCodePlug('sidebar', permissionQuery);
+
   // collect items and merge options with the same id
-  const items = codePlug.getItems('sidebar')
-    .map(({ props }) => props)
+  const items = props//codePlug.getItems('sidebar')
+    //.map(({ props }) => props)
     .reduce((acc, item) => {
       const found = acc.find(current => current.id === item.id);
       if (found == null) {
@@ -23,13 +28,12 @@ const AppSidebar = ({ codePlug }) => {
               return current;
             } else {
               let options = current.options || [];
-              options = options.concat(item.options)              
+              options = options.concat(item.options)
               return {
                 ...current,
                 options
               };
-
-            } 
+            }
           }
           );
       }
@@ -53,7 +57,7 @@ const AppSidebar = ({ codePlug }) => {
           </div>
         </Sidenav.Header>
         <Sidenav.Body className="mc-sidebar-body">
-          <Nav>            
+          <Nav>
             {items.map(({ label, onClick = () => {}, url, icon, options, id }) => {
               if (_.isArray(options)) {
                 return (
@@ -66,28 +70,28 @@ const AppSidebar = ({ codePlug }) => {
                     placement="rightStart"
                   >
                     {options.map(option => (
-                      <NavLink 
-                        eventKey="3-1" 
+                      <NavLink
+                        eventKey="3-1"
                         to={option.url}
-                        key={option.id}                          
+                        key={option.id}
                       >{option.label}</NavLink>
                     ))}
                   </Dropdown>
                 );
               } else {
                 return (
-                  <Nav.Item 
+                  <Nav.Item
                     key={label}
                     eventKey="1"
-                    key={id} 
-                    onSelect={onClick} 
-                    href={url} 
+                    key={id}
+                    onSelect={onClick}
+                    href={url}
                     renderItem={children => (
                       <Link className="rs-nav-item-content" to={url}>{icon != null ? <Icon icon={icon} /> : null}{label}</Link>
                     )}
                   >
                     {label}
-                  </Nav.Item>    
+                  </Nav.Item>
                 );
               }
             })}
@@ -98,4 +102,4 @@ const AppSidebar = ({ codePlug }) => {
   );
 };
 
-export default withCodePlug(AppSidebar);
+export default AppSidebar;

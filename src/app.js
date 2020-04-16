@@ -22,7 +22,9 @@ import Header from './layout/header';
 import HomePage from './pages/home';
 import WebSocket from './common/web-socket';
 
+
 // Import plugins
+import './permissions';
 import '../plugins';
 
 const cache = new InMemoryCache(); // where current data is stored
@@ -63,8 +65,8 @@ function reducer2(state, action) {
 function SocketReducers(state, action) {
   switch(action.type) {
     case 'socket.open':
-      
-       
+
+
       return state;
     default:
       return state;
@@ -121,21 +123,21 @@ const AppRouter = ({ codePlug, bootstrap }) => {
       <AppContext.Provider value={{ state, dispatch, client, platforms, eventTypes, messageTypes, activeChatbots }}>
         <WebSocket dispatch={dispatch}>
           <Router basename="/mc/">
-            <div className="mission-control-app">        
-              <Container className="mc-main-container">          
+            <div className="mission-control-app">
+              <Container className="mc-main-container">
                 <Sidebar/>
-                <Container className="mc-inner-container">            
+                <Container className="mc-inner-container">
                   <Header/>
                   <Content className="mc-inner-content">
-                    <Switch>                              
+                    <Switch>
                       {codePlug
                         .getItems('pages')
                         .map(({ view: View, props }) => (
                           <Route key={props.url} path={props.url} children={<View {...props} dispatch={dispatch}/>}>
-                            
+
                           </Route>
                         ))}
-                      <Route path="/" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}>                        
+                      <Route path="/" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}>
                       </Route>
                     </Switch>
                   </Content>
@@ -152,7 +154,7 @@ const AppRouter = ({ codePlug, bootstrap }) => {
 
 const App = ({ bootstrap }) => (
   <CodePlug>
-    {codePlug => <AppRouter codePlug={codePlug} bootstrap={bootstrap}/>}        
+    {codePlug => <AppRouter codePlug={codePlug} bootstrap={bootstrap}/>}
   </CodePlug>
 );
 
