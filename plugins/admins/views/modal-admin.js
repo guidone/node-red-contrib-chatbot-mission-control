@@ -18,6 +18,8 @@ const ModalAdmin = ({ admin, onCancel = () => {}, onSubmit = () => {}, disabled 
   const [formError, setFormError] = useState(null);
   const [tab, setTab] = useState('admin-details');
 
+  const isNew = admin.id == null;
+
   return (
     <Modal backdrop show onHide={() => handleCancel()} size="md" overflow={false} className="modal-admin">
       <Modal.Header>
@@ -78,6 +80,7 @@ const ModalAdmin = ({ admin, onCancel = () => {}, onSubmit = () => {}, disabled 
                   <FormControl
                     disabled={disabled}
                     accepter={PasswordInput}
+                    placeholder={!isNew ? 'something' : null}
                     name="password" />
                 </FormGroup>
               </FlexboxGrid.Item>

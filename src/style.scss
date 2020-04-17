@@ -36,7 +36,7 @@ $sidebar-icon: #aaaaaa;
 .rs-control-label {
   .rs-help-block {
     margin-top: 0px;
-    margin-left: 5px;    
+    margin-left: 5px;
     height: 10px;
     line-height: 12px;
     display: inline-block;
@@ -61,6 +61,31 @@ $sidebar-icon: #aaaaaa;
 }
 
 .mc-sidebar {
+  position: relative;
+
+  .bottom {
+    position: absolute;
+    bottom: 0px;
+    padding: 5px;
+    font-size: 11px;
+
+    .name {
+      color: #ffffff;
+    }
+
+    .version {
+      color: #dddddd;
+    }
+    a {
+      color: #ffffff;
+    }
+    strong {
+      color: #ffffff;
+    }
+    .tag-line {
+      color: #dddddd;
+    }
+  }
 
   .mc-sidebar-body {
     margin-top: 20px;
@@ -79,30 +104,30 @@ $sidebar-icon: #aaaaaa;
   .rs-nav .rs-dropdown .rs-dropdown-menu-active ~ .rs-dropdown-toggle {
     color: $sidebar-color;
   }
-   
-  .rs-nav .rs-dropdown .rs-dropdown-menu-active ~ .rs-dropdown-toggle:hover, 
-  .rs-nav .rs-nav-item-active > .rs-nav-item-content:hover, 
-  .rs-nav .rs-dropdown .rs-dropdown-menu-active ~ .rs-dropdown-toggle:focus, 
-  .rs-nav .rs-nav-item-active > .rs-nav-item-content:focus, 
-  .rs-nav .rs-dropdown .rs-dropdown-menu-active ~ .rs-dropdown-toggle:active, 
+
+  .rs-nav .rs-dropdown .rs-dropdown-menu-active ~ .rs-dropdown-toggle:hover,
+  .rs-nav .rs-nav-item-active > .rs-nav-item-content:hover,
+  .rs-nav .rs-dropdown .rs-dropdown-menu-active ~ .rs-dropdown-toggle:focus,
+  .rs-nav .rs-nav-item-active > .rs-nav-item-content:focus,
+  .rs-nav .rs-dropdown .rs-dropdown-menu-active ~ .rs-dropdown-toggle:active,
   .rs-nav .rs-nav-item-active > .rs-nav-item-content:active {
     background-color: $sidebag-hover-background;
     color: $sidebar-color;
     .rs-icon {
       color: $sidebar-icon-hover !important;
-    }    
+    }
   }
 
-  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content, 
-  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-menu > li > .rs-dropdown-item-content, 
-  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-item-content > .rs-dropdown-menu-toggle, 
+  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content,
+  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-menu > li > .rs-dropdown-item-content,
+  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-item-content > .rs-dropdown-menu-toggle,
   .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-item-content > .rs-dropdown-menu-toggle {
     color: $sidebar-color;
   }
-  
-  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content:hover, 
-  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-menu > li > .rs-dropdown-item-content:hover, 
-  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-item-content > .rs-dropdown-menu-toggle:hover, 
+
+  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content:hover,
+  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-menu > li > .rs-dropdown-item-content:hover,
+  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-item-content > .rs-dropdown-menu-toggle:hover,
   .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-item-content > .rs-dropdown-menu-toggle:hover {
     background-color: $sidebag-hover-background;
     .rs-icon {
@@ -110,8 +135,8 @@ $sidebar-icon: #aaaaaa;
     }
   }
 
-  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content:focus, 
-  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-menu > li > .rs-dropdown-item-content:focus, 
+  .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-menu > li > .rs-dropdown-item-content:focus,
+  .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-menu > li > .rs-dropdown-item-content:focus,
   .rs-sidenav-subtle.rs-sidenav-collapse-in .rs-dropdown-item-content > .rs-dropdown-menu-toggle:focus,
   .rs-sidenav-subtle.rs-sidenav-collapsing .rs-dropdown-item-content > .rs-dropdown-menu-toggle:focus {
     background-color: $sidebag-hover-background;
@@ -120,8 +145,8 @@ $sidebar-icon: #aaaaaa;
       color: $sidebar-icon-hover !important;
     }
   }
-  
-  .rs-nav-default .rs-nav-item:not(.rs-nav-item-active):not(.rs-nav-item-disabled) > .rs-nav-item-content:hover, 
+
+  .rs-nav-default .rs-nav-item:not(.rs-nav-item-active):not(.rs-nav-item-disabled) > .rs-nav-item-content:hover,
   .rs-nav-default .rs-nav-item:not(.rs-nav-item-active):not(.rs-nav-item-disabled) > .rs-nav-item-content:focus {
     background-color: $sidebag-hover-background;
     color: $sidebar-color;
@@ -145,7 +170,7 @@ $sidebar-icon: #aaaaaa;
   }
 
   .rs-dropdown {
-    .rs-btn {    
+    .rs-btn {
       .rs-icon {
         color: $sidebar-icon;
       }
@@ -209,6 +234,11 @@ $sidebar-icon: #aaaaaa;
   height: 100%;
   background-color: rgb(241, 244, 246);
 
+  .loading {
+    min-height: 400px;
+    text-align: center;
+    padding: 150px;
+  }
 
   .react-grid-item {
     background-color: #fff;
@@ -219,8 +249,3 @@ $sidebar-icon: #aaaaaa;
   }
 
 }
-
-
-
-
-

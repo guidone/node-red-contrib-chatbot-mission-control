@@ -128,7 +128,7 @@ const SimulatorWidget = ({ activeChatbots, user }) => {
 plug(
   'widgets',
   withState(withActiveChatbots(SimulatorWidget), 'user'),
-  { x: 0, y: 0, w: 2, h: 8, isResizable: true, id: 'simulator-widget' }
+  { x: 0, y: 0, w: 2, h: 8, isResizable: true, id: 'simulator-widget', permission: 'simulator' }
 );
 
 plug(
@@ -138,6 +138,6 @@ plug(
     permission: 'simulator',
     name: 'Chat Simulator',
     description: 'Access to chat simulator',
-    group: 'UI'
+    group: 'General'
   }
 );

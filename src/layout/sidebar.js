@@ -6,17 +6,18 @@ import { Dropdown, Nav, Icon, Sidebar, Sidenav } from 'rsuite';
 import Logo from '../components/logo';
 import { useCodePlug } from '../../lib/code-plug';
 import useCurrentUser from '../hooks/current-user';
+import useSettings from '../hooks/settings';
 
 const NavLink = props => <Dropdown.Item componentClass={Link} {...props} />;
 
 
 const AppSidebar = () => {
+  const { version } = useSettings();
   const { permissionQuery } = useCurrentUser();
   const { props } = useCodePlug('sidebar', permissionQuery);
 
   // collect items and merge options with the same id
-  const items = props//codePlug.getItems('sidebar')
-    //.map(({ props }) => props)
+  const items = props
     .reduce((acc, item) => {
       const found = acc.find(current => current.id === item.id);
       if (found == null) {
@@ -96,7 +97,20 @@ const AppSidebar = () => {
               }
             })}
           </Nav>
+
         </Sidenav.Body>
+        <div className="bottom">
+          <div className="name">
+            <strong>RedBot</strong> <span className="version">v{version}</span>
+            &nbsp;&nbsp;
+            <a href="https://github.com/guidone/node-red-contrib-chatbot" target="_blank"><Icon icon="github"/></a>
+            &nbsp;
+            <a href="http://red-bot.io/" target="_blank"><Icon icon="globe2"/></a>
+          </div>
+          <div className="tag-line">
+            Coded with ❤️ in 🇮🇹
+          </div>
+        </div>
       </Sidenav>
     </Sidebar>
   );

@@ -1129,6 +1129,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           }
         },
 
+        deleteAdmin: {
+          type: adminType,
+          args: {
+            id: { type: new GraphQLNonNull(GraphQLInt)}
+          },
+          resolve: async function(root, { id }) {
+            const admin = await Admin.findByPk(id);
+            await Admin.destroy({ where: { id }});
+            return admin;
+          }
+        },
+
         editAdmin: {
           type: adminType,
           args: {
@@ -1136,7 +1148,6 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             admin: { type: new GraphQLNonNull(newAdminType) }
           },
           async resolve(root, { id, admin }) {
-            console.log('aggiorno', admin, id)
             if (!_.isEmpty(admin.password)) {
               admin.password = hash(admin.password, { salt: mcSettings.salt });
             }

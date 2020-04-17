@@ -9,6 +9,7 @@ import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmartDate from '../../../src/components/smart-date';
 import CustomTable from '../../../src/components/table';
 import { Input } from '../../../src/components/table-filters';
+import confirm from '../../../src/components/confirm';
 
 import '../styles/admins.scss';
 import useAdmins from '../hooks/admins';
@@ -121,10 +122,13 @@ const Admins = () => {
               <ButtonGroup>
                 <Button
                   size="xs"
-                  onClick={() => {
+                  onClick={async () => {
                     const name = [admin.first_name, admin.last_name].join(' ');
-                    if (confirm(`Delete admin${!_.isEmpty(name.trim()) ? ` "${name}"` : ''} (${admin.userId})?`)) {
-                      deleteAdmin({ variables: { id: user.id }})
+                    if (await confirm(
+                      <div>Delete admin <strong>{name}</strong> (id: {admin.id})?</div>,
+                      { okLabel: 'Yes, delete' }
+                    )) {
+                      deleteAdmin({ variables: { id: admin.id }})
                         .then(table.current.refetch);
                     }
                   }}

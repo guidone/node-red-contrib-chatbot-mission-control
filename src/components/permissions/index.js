@@ -4,7 +4,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 import { useCodePlug } from '../../../lib/code-plug';
-import confirm from '../prompt';
+import confirm from '../confirm';
 
 import './style.scss';
 
@@ -18,6 +18,7 @@ const Permission = ({ permission, onRemove = () => {} }) => {
       <div className="button">
         <IconButton
           size="xs"
+          appearance="primary"
           icon={<Icon icon="trash"/>}
           onClick={() => onRemove(permission)}
         />
@@ -46,6 +47,15 @@ const Permissions = ({ value, onChange = () => {} }) => {
       label: item.name,
       ...item
   }));
+
+  const permissionsGroups = _(current)
+    .map(permission => permissions.find(item => item.permission === permission))
+    .compact()
+    .sortBy(permission => permission.name)
+    .groupBy(permission => permission.group)
+    .value();
+
+  console.log('groupås', permissionsGroups)
 
   return (
     <div className="ui-permissions">
@@ -100,7 +110,7 @@ const Permissions = ({ value, onChange = () => {} }) => {
                   }
                 });
                 // finally merge all
-                onChange([...currentPermissions, ...permission, ...dependencies].join(','));
+                onChange(_.uniq([...currentPermissions, ...permission, ...dependencies]).join(','));
                 setPermission(null);
               }
             }}
@@ -110,15 +120,22 @@ const Permissions = ({ value, onChange = () => {} }) => {
         </div>
       </div>
       <div className="permissions">
-        {current.map(permission => (
-          <Permission
-            key={permission}
-            permission={permissions.find(item => item.permission === permission)}
-            onRemove={item => {
-              const newValue = value.split(',').filter(permission => permission !== item.permission);
-              onChange(newValue.join(','));
-            }}
-          />
+        {Object.keys(permissionsGroups).sort().map(group => (
+          <div key={group} className="group">
+            <div className="group-name">{group}</div>
+            {permissionsGroups[group]
+              .sort(permission => permission.name)
+              .map(permission => (
+                <Permission
+                  key={permission.name}
+                  permission={permission}
+                  onRemove={item => {
+                    const newValue = value.split(',').filter(permission => permission !== item.permission);
+                    onChange(newValue.join(','));
+                  }}
+                />
+            ))}
+          </div>
         ))}
       </div>
     </div>

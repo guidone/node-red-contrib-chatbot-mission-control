@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Notification } from 'rsuite';
+import { Notification } from 'rsuite';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 
-import { Views, plug } from '../../lib/code-plug';
-import withState from '../wrappers/with-state';
-import withSocket from '../wrappers/with-socket';
-import withDispatch from '../wrappers/with-dispatch';
-import Panel from '../components/grid-panel';
-import useConfiguration from '../hooks/configuration';
 
+import withState from '../wrappers/with-state';
+import useConfiguration from '../hooks/configuration';
+import { useCodePlug } from '../../lib/code-plug';
+import useCurrentUser from '../hooks/current-user';
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -39,21 +37,24 @@ plug('reducers', (state, action) => {
   }
 });*/
 
-const HomePage = ({ codePlug, count, dispatch, user }) => {
+const HomePage = ({ count, dispatch, user }) => {
+  const { permissionQuery } = useCurrentUser();
 
-  const { loading, saving, error, data, update } = useConfiguration({ 
+  const { items } = useCodePlug('widgets', permissionQuery);
+  const { loading, saving, error, data, update } = useConfiguration({
     namespace: 'dashboard',
-    onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' }) 
-  });  
+    onCompleted: () => Notification.success({ title: 'Configuration', description: 'Configuration saved successful' })
+  });
   const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
     setTimeout(() => setIsLoaded(true), 1000);
-  }, []); 
+  }, []);
 
-  const items = codePlug.getItems('widgets');
-  
+
   if (loading) {
-    return <div>loading</div>;
+    return (
+      <div className="loading"></div>
+    );
   }
 
 
@@ -78,11 +79,11 @@ const HomePage = ({ codePlug, count, dispatch, user }) => {
               <View {...props}/>
             </div>
           );
-        })}  
-      </ResponsiveReactGridLayout>      
+        })}
+      </ResponsiveReactGridLayout>
     </div>
   );
-  
+
 }
 
 export default withState(HomePage, ['count']);

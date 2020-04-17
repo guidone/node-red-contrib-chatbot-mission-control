@@ -63,8 +63,9 @@ function bootstrap(server, app, log, redSettings) {
 
   // print version
   const jsonPackage = fs.readFileSync(__dirname + '/package.json');
+  let package;
   try {
-    const package = JSON.parse(jsonPackage.toString());
+    package = JSON.parse(jsonPackage.toString());
     // eslint-disable-next-line no-console
     console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
       + ' - [info] RedBot Mission Control version:')
@@ -79,6 +80,7 @@ function bootstrap(server, app, log, redSettings) {
   // get mission control configurations
   console.log(lcd.timestamp() + 'Red Bot Mission Control configuration:');
   const mcSettings = redSettings.missionControl || {};
+  mcSettings.version = package.version;
   if (process.env.DEV != null) {
     mcSettings.environment = 'development';
   } else {
