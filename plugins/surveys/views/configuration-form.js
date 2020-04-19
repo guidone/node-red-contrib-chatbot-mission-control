@@ -88,7 +88,7 @@ export default ({
         ]
       },
       {
-        id: "q4",
+        id: "q21",
         parent: 'q2',
         tag: 'Q2.1',
         title: 'Che problema hai?',
@@ -100,7 +100,7 @@ export default ({
         ]
       },
       {
-        id: "q343",
+        id: "q22",
         parent: 'q2',
         tag: 'Q2.2',
         title: 'Ma sei a posto?',
@@ -112,8 +112,8 @@ export default ({
         ]
       },
       {
-        id: "q343231232",
-        parent: 'q343',
+        id: "q221",
+        parent: 'q22',
         tag: 'Q2.2.1',
         title: 'Si ma quando?',
         type: 'multiple',
@@ -135,7 +135,7 @@ export default ({
         ]
       },
       {
-        id: "q545",
+        id: "q4",
         tag: 'Q4',
         title: 'Fa una foto alle tue scarpe',
         type: 'image'

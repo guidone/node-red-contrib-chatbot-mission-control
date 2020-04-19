@@ -23,6 +23,10 @@ const findParent = (questions, question) => {
   return question.parent != null ? questions.find(item => item.id === question.parent) : null
 }
 
+const hasChildren = (questions, question) => {
+  return questions.some(item => item.parent === question.id)
+}
+
 const remove = (questions, question) => {
   // if we are removing a question with children, move all questions up
   const parent = findParent(questions, question);
@@ -119,15 +123,7 @@ const retag = questions => {
 
   return questions.map(question => ({ ...question, tag: getLabel(question) }));
 
-  /*result.forEach(question => {
-    //if (question.parent == null) {
-      //counters.root += 1;
-      question.tag = getLabel(question);
-    //} else
-  })
 
-
-  return result;*/
 }
 
 
@@ -148,31 +144,45 @@ const SurveyEditor = ({ value: questions, onChange = () => {} }) => {
 
     console.log('from, to', oldIndex, newIndex)
 
-    // TODO: get the previous element and inheriths it's parent e children scalano
-
-    /*const newQuestions = _(questions)
-      .chain()
-      .map((item, idx) => {
-        if (idx === (newIndex + 1)) {
-          return [questions[oldIndex], item];
-        } else if (idx === oldIndex) {
-          return null;
-        }
-        return item;
-      })
-      .compact()
-      .flatten()
-      .value();*/
-
+    // do not move into itself
+    if (oldIndex === newIndex) {
+      return;
+    }
 
     const newQuestions = [...questions];
-
     const to = newIndex;
     const from = oldIndex
 
     const startIndex = to < 0 ? newQuestions.length + to : to;
 	  const item = newQuestions.splice(from, 1)[0];
 	  newQuestions.splice(startIndex, 0, item);
+
+
+    const movedQuestion = newQuestions[newIndex];
+    const previous = newIndex > 0 ? newQuestions[newIndex - 1] : null;
+    const hasSubQuestions = hasChildren(questions, movedQuestion);
+    const parent = findParent(questions, movedQuestion);
+
+    console.log('movedQuestion', movedQuestion)
+    console.log('previous', previous)
+    console.log('hasSubQuestions', hasSubQuestions)
+    console.log('parent', parent)
+    // if the previous article has some children, then the moved question becomes
+    // its children too
+    if (previous != null && hasChildren(questions, previous)) {
+      newQuestions[newIndex].parent = previous.id;
+    } else {
+      newQuestions[newIndex].parent = null;
+    }
+    // if the moved question has children, then move up one level
+    if (hasSubQuestions) {
+      questions.forEach(item => {
+        if (item.parent === movedQuestion.id) {
+          item.parent = parent != null ? parent.id : null;
+        }
+      });
+    }
+
 
 
     onChange(retag(newQuestions));
@@ -182,17 +192,13 @@ const SurveyEditor = ({ value: questions, onChange = () => {} }) => {
 
 
   const activeQuestion = questions.find(question => question.id === active);
+  // get levels, in order to know for every parent what's the indent level
   const levels = getLevels(questions);
-
-
 
   return (
     <SurveyEditorContext.Provider value={{ questions }}>
       <div className="ui-survey-editor">
-
-
-
-        <SortableContainer onSortEnd={onSortEnd} useDragHandle>
+        <SortableContainer onSortEnd={onSortEnd} helperClass="sorting" useDragHandle>
           {questions.map((question, index) => (
             <Question
               key={question.id}
@@ -204,8 +210,6 @@ const SurveyEditor = ({ value: questions, onChange = () => {} }) => {
             />
           ))}
         </SortableContainer>
-
-
         <div className="question-detail">
           {activeQuestion != null && (
             <QuestionDetail
@@ -223,7 +227,6 @@ const SurveyEditor = ({ value: questions, onChange = () => {} }) => {
       </div>
     </SurveyEditorContext.Provider>
   );
-
 }
 
 export default SurveyEditor;

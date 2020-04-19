@@ -50,7 +50,7 @@ const Question = ({
 
 
   return (
-    <div className={classNames('question', { active })}>
+    <div className={classNames('ui-survey-question', { active })}>
       {level != null && (
         <div className="indent" style={{ flex: `0 0 ${INDENT_SIZE * level}px`}}/>
       )}

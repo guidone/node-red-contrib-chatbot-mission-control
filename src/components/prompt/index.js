@@ -52,30 +52,7 @@ function InteractionModal({
   );
 }
 
-/*function PromptModal({ message, defaultResult = '', onOk, ...props }) {
-
-  const [result, setResult] = useState(defaultResult);
-
-  const handleOk = useCallback(() => {
-    onOk(result);
-  }, [onOk, result]);
-
-  return (
-    <InteractionModal {...props} onOk={handleOk}>
-      {message}
-      <Input
-        autoFocus
-        value={result}
-        onChange={value => setResult(value)}
-        style={{ marginTop: 10 }}
-      />
-    </InteractionModal>
-  );
-}*/
-
 const prompt = (Form, value, { okLabel = 'Ok', cancelLabel = 'Cancel' } = { }) => {
-  //const [formValue, setFormValue] = useState({})
-
   let currentValue = { ...value }
 
   return new Promise(resolve => {

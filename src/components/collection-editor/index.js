@@ -25,11 +25,9 @@ const CollectionEditor = ({
     <Button
       size="sm"
       disabled={disabled || disableAdd}
-      onClick={() => {
-        console.log(_.uniqueId())
-        onChange([...value, { id: uniqueId('c') }]);
-      }}>
-        {labelAdd}
+      onClick={() => onChange([...value, { id: uniqueId('c') }])}
+    >
+      {labelAdd}
     </Button>
   );
 
