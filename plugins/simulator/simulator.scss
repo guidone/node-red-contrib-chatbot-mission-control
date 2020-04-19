@@ -1,10 +1,10 @@
 .simulator-transport-menu {
 
-  .rs-picker-subtle .rs-btn:focus, 
-  .rs-picker-subtle .rs-picker-toggle:focus, 
-  .rs-picker-subtle .rs-btn.rs-btn-focus, 
-  .rs-picker-subtle .rs-picker-toggle.rs-btn-focus, 
-  .rs-picker-subtle .rs-btn:hover, 
+  .rs-picker-subtle .rs-btn:focus,
+  .rs-picker-subtle .rs-picker-toggle:focus,
+  .rs-picker-subtle .rs-btn.rs-btn-focus,
+  .rs-picker-subtle .rs-picker-toggle.rs-btn-focus,
+  .rs-picker-subtle .rs-btn:hover,
   .rs-picker-subtle .rs-picker-toggle:hover {
     background-color: #ffffff;
 
@@ -16,19 +16,23 @@
   }
 }
 
-.meta {
-  display: inline-block;
-  margin-right: 5px;
 
-  .user {
-    display: inline-block;
-    margin-right: 5px;
-    font-size: 14px;
-    font-weight: normal;
-  }
-}
 
 .chat-simulator {
+
+  .meta {
+    display: inline-block;
+    margin-right: 5px;
+
+    .user {
+      display: inline-block;
+      margin-right: 5px;
+      font-size: 14px;
+      font-weight: normal;
+    }
+  }
+
+
   .ui-grid-panel-content {
     margin: -5px -10px -10px -10px;
   }

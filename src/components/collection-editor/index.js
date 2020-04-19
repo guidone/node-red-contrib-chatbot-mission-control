@@ -8,9 +8,9 @@ import uniqueId from '../../helpers/unique-id';
 import Item from './views/item';
 import './style.scss';
 
-const CollectionEditor = ({ 
-  value = [], 
-  onChange = () => {},    
+const CollectionEditor = ({
+  value = [],
+  onChange = () => {},
   form,
   labelAdd = 'Add item',
   labelEmpty = 'No elements',
@@ -18,13 +18,13 @@ const CollectionEditor = ({
   style,
   disabled = false,
   disableAdd = false,
-  ...rest 
+  ...rest
 }) => {
 
   const addButton = (
     <Button
       size="sm"
-      disabled={disabled || disableAdd} 
+      disabled={disabled || disableAdd}
       onClick={() => {
         console.log(_.uniqueId())
         onChange([...value, { id: uniqueId('c') }]);
@@ -37,18 +37,19 @@ const CollectionEditor = ({
     <div className={classNames('ui-collection-editor', { disabled })} style={style}>
       {_.isEmpty(value) && (
         <div className="empty">
-          <div>{labelEmpty}</div>          
+          <div>{labelEmpty}</div>
           {addButton}
         </div>
       )}
       <div>
         {(value || []).map((item, idx) => (
-          <Item 
+          <Item
             key={item.id}
             value={item}
             form={form}
             disabled={disabled}
-            hideArrows={hideArrows} 
+            hideArrows={hideArrows}
+            index={idx}
             onRemove={() => {
               const cloned = [...value];
               cloned[idx] = null;
