@@ -1,14 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useApolloClient } from 'react-apollo';
+import gql from 'graphql-tag';
+import _ from 'lodash';
 
 import UserAutocomplete from '../../../../src/components/user-autocomplete';
 
+const GET_USER = gql`
+query($userId: String!) {
+  user(userId: $userId) {
+    id,
+    username,
+    first_name,
+    last_name,
+    userId
+  }
+}
+`;
 
-const FilterUserAutocomplete = ({ value, onChange, ...rest }) => {
-
+const FilterUserAutocomplete = ({ defaultValue, onChange, ...rest }) => {
+  const client = useApolloClient();
   const [user, setUser] = useState();
-  // TODO fix at startup
-  console.log('at startup', value)
 
+  // preload user detail if it's coming from url
+  useEffect(() => {
+    if (!_.isEmpty(defaultValue)) {
+      client.query({ query: GET_USER, fetchPolicy: 'network-only', variables: { userId: defaultValue } })
+        .then(response => {
+          if (response != null && response.data != null && response.data.user != null) {
+            setUser(response.data.user);
+          }
+        });
+    }
+  }, [])
 
   return (
     <UserAutocomplete

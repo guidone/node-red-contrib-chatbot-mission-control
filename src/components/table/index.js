@@ -86,7 +86,6 @@ const CustomTable = ({
             <TableFilters
               filters={filters}
               onChange={filters => {
-                console.log('filters?', filters)
                 setFilters(filters);
                 setQuery(filters);
                 onFilters(filters);

@@ -34,7 +34,7 @@ plug('sidebar', null, {
   url: '/surveys',
   icon: 'cog',
 });
-
+// register a page to configure the survey
 plug(
   'pages',
   withConfigurationPage(
@@ -49,14 +49,26 @@ plug(
     id: 'configuration-surveys'
   }
 );
-
+// register a page for user records of type survey
 plug('pages', UserRecords, {
   url: '/surveys',
   title: 'Surveys',
   id: 'surveys',
   type: 'survey',
-  breadcrumbs: ['Knowledge Base', 'Surveys'],
+  permission: 'surveys.view',
+  breadcrumbs: ['Surveys'],
   labels: {
     // saveContent: 'Save article'
   }
 });
+// register permissions
+plug(
+  'permissions',
+  null,
+  {
+    permission: 'surveys.view',
+    name: 'View surveys',
+    description: `View surveys answered by chatbot users`,
+    group: 'Surveys'
+  }
+);

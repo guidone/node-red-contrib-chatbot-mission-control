@@ -117,7 +117,7 @@ const UserRecords = ({
           <Cell>{({ userId }) => <span className="cell-type-id">{userId}</span>}</Cell>
         </Column>
 
-        <Column width={260} align="left" sortable resizable>
+        <Column flexGrow={1} align="left" sortable resizable>
           <HeaderCell>Title</HeaderCell>
           <Cell dataKey="title" />
         </Column>

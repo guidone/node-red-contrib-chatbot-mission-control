@@ -33,16 +33,21 @@ const TableFilters = ({
 };
 TableFilters.propTypes = {
   disabled: PropTypes.bool,
-  schema: PropTypes.arrayOf(PropTypes.shape({
-    // numeric keys will be parsed from query url
-    type: PropTypes.oneOf(['string', 'number']),
-    // the name of the filter (the key used for querying in GraphQL)
-    name: PropTypes.string,
-    // the react class, must honor value and onChange
-    control: PropTypes.any,
-    // size of control
-    width: PropTypes.number
-  }))
+  filtersSchema: PropTypes.arrayOf(PropTypes.oneOf([
+    PropTypes.func,
+    PropTypes.shape({
+      // the label for the filter, it's likely to be used as placeholder
+      label: PropTypes.string,
+      // numeric keys will be parsed from query url
+      type: PropTypes.oneOf(['string', 'number']),
+      // the name of the filter (the key used for querying in GraphQL)
+      name: PropTypes.string,
+      // the react class, must honor defaultValue, placeholder, disabled and onChange
+      control: PropTypes.any,
+      // size of control
+      width: PropTypes.number
+    })
+  ]))
 };
 
 export { TableFilters as default, FilterInput as Input, FilterUserAutocomplete as UserAutocomplete };
