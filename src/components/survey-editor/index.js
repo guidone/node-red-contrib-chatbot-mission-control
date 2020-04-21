@@ -2,6 +2,8 @@ import React, { useState, useCallback, useEffect } from 'react';
 import _ from 'lodash';
 import { sortableContainer } from 'react-sortable-hoc';
 
+import uniqueId from '../../helpers/unique-id';
+
 
 import './style.scss';
 import Question from './views/question';
@@ -27,6 +29,11 @@ const hasChildren = (questions, question) => {
   return questions.some(item => item.parent === question.id)
 }
 
+const findQuestion = (questions, question) => {
+  return questions.find(item => item.id === question.id);
+}
+
+
 const remove = (questions, question) => {
   // if we are removing a question with children, move all questions up
   const parent = findParent(questions, question);
@@ -45,16 +52,41 @@ const remove = (questions, question) => {
 
 const add = (questions, params) => {
   const newQuestion = {
-    id: _.uniqueId('q_'),
-    title: ''
+    id: uniqueId('q_'),
+    title: '',
+    type: 'multiple',
+    data: []
   };
 
+  let newQuestions;
 
-  return [...questions, newQuestion];
+  if (params.after != null) {
+    const question = findQuestion(questions, params.after);
+    if (hasChildren(questions, question)) {
+      // if the question I'm adding after has children, then the new question is it's first
+      // children too
+      newQuestion.parent = question.id;
+    } else {
+      // if no sub items, then it just inherits the same level (the same parent)
+      newQuestion.parent = question.parent;
+    }
+    newQuestions = _.flatten(questions.map(item => item.id === question.id ? [question, newQuestion] : item));
+  } else if (params.before != null) {
+    const question = findQuestion(questions, params.before);
+    newQuestion.parent = question.parent;
+    newQuestions = _.flatten(questions.map(item => item.id === question.id ? [newQuestion, question] : item));
+  } else if (params.nested != null) {
+    const question = findQuestion(questions, params.nested);
+    // set the previous question as father
+    newQuestion.parent = question.id;
+    newQuestions = _.flatten(questions.map(item => item.id === question.id ? [question, newQuestion] : item));
+  }
 
 
-
-
+  return {
+    question: newQuestion,
+    questions: retag(newQuestions)
+  };
 }
 
 
@@ -128,7 +160,7 @@ const retag = questions => {
 
 
 
-const SurveyEditor = ({ value: questions, onChange = () => {} }) => {
+const SurveyEditor = ({ value: questions = [{}], onChange = () => {} }) => {
 
   const [active, setActive] = useState();
 
@@ -220,7 +252,11 @@ const SurveyEditor = ({ value: questions, onChange = () => {} }) => {
                 setActive(null);
                 onChange(retag(remove(questions, question)))
               }}
-              onAdd={params => onChange(retag(add(questions, params)))}
+              onAdd={params => {
+                const { questions: newQuestions, question } = add(questions, params);
+                setActive(question.id);
+                onChange(newQuestions);
+              }}
             />
           )}
         </div>

@@ -83,7 +83,6 @@ const Contents = ({
       {content != null && (
         <ModalContent
           content={content}
-          namespace={namespace}
           error={error}
           disabled={saving}
           labels={labels}
@@ -102,6 +101,7 @@ const Contents = ({
       <CustomTable
         ref={table}
         query={CONTENTS}
+        variables={{ namespace }}
         initialSortField="createdAt"
         initialSortDirection="desc"
         toolbar={(
@@ -118,7 +118,8 @@ const Contents = ({
             cleanable: true,
             block: true,
             data: data => data.categories.map(category => ({ value: category.id, label: category.name })),
-            control: SelectPicker
+            control: SelectPicker,
+            type: 'number'
           },
           {
             name: 'slug',

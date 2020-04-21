@@ -51,7 +51,7 @@ mutation($content: NewContent!) {
 
 
 
-export default ({ onCompleted = () => {} } = {}) => {
+export default ({ onCompleted = () => {}, namespace } = {}) => {
   const [bootstrapping, setBootstrapping] = useState(true);
   const [
     deleteContent,

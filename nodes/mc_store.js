@@ -100,16 +100,16 @@ module.exports = function(RED) {
         if (user != null) {
           // the DB is the single source of truth
           const update = { };
-          if (firstName !== user.first_name) {
+          if (!_.isEmpty(user.firstName) && firstName !== user.first_name) {
             update.firstName = user.first_name;
           }
-          if (lastName !== user.last_name) {
+          if (!_.isEmpty(user.lastName) && lastName !== user.last_name) {
             update.lastName = user.last_name;
           }
-          if (language !== user.language) {
+          if (!_.isEmpty(user.language) && language !== user.language) {
             update.language = user.language;
           }
-          if (username !== user.username) {
+          if (!_.isEmpty(user.username) && username !== user.username) {
             update.username = user.username;
           }
           // avoid next mc store tries to resolve again the user

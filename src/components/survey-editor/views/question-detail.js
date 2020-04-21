@@ -58,7 +58,7 @@ const QuestionDetail = ({
             >
               <Dropdown.Item onSelect={() => onAdd({ after: question })}>Add question after</Dropdown.Item>
               <Dropdown.Item onSelect={() => onAdd({ before: question })}>Add question before</Dropdown.Item>
-              <Dropdown.Item onSelect={() => onAdd({ inset: question })}>Add nested question</Dropdown.Item>
+              <Dropdown.Item onSelect={() => onAdd({ nested: question })}>Add nested question</Dropdown.Item>
             </Dropdown>
             <IconButton
               onClick={async () => {

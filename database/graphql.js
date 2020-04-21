@@ -98,7 +98,7 @@ const PayloadType = new GraphQLScalarType({
 });
 
 
-module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, Admin, sequelize, mcSettings }) => {
+module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, Admin, Record, sequelize, mcSettings }) => {
 
   const newUserType = new GraphQLInputObjectType({
     name: 'NewUser',
@@ -186,6 +186,36 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       payload: {
         type: JSONType,
         description: ''
+      }
+    })
+  });
+
+  const recordType = new GraphQLObjectType({
+    name: 'Record',
+    description: 'tbd',
+    fields: () => ({
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: '',
+      },
+      type: {
+        type: GraphQLString,
+        description: ''
+      },
+      title: {
+        type: GraphQLString,
+        description: ''
+      },
+      userId: {
+        type: GraphQLString,
+        description: ''
+      },
+      payload: {
+        type: JSONType,
+        description: ''
+      },
+      createdAt: {
+        type: DateType
       }
     })
   });
@@ -858,10 +888,30 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         args: {
           namespace: { type: GraphQLString }
         },
-        description: 'Total categories', // TODO put also namespace
+        description: 'Total categories',
         resolve: (root, { namespace }) => Category.count({
           where: compactObject({
             namespace
+          })
+        })
+      }
+    }
+  });
+
+  const recordCounterType = new GraphQLObjectType({
+    name: 'RecordCounters',
+    description: 'Record Counters',
+    fields: {
+      count: {
+        type: GraphQLInt,
+        args: {
+          type: { type: GraphQLString },
+          userId: { type: GraphQLString }
+        },
+        description: 'Total records',
+        resolve: (root, { type, userId }) => Record.count({
+          where: compactObject({
+            type, userId
           })
         })
       }
@@ -935,6 +985,13 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       categories: {
         type: categoryCounterType,
         description: 'Counters for categories',
+        resolve: () => {
+          return {};
+        }
+      },
+      records: {
+        type: recordCounterType,
+        description: 'Counters for user records',
         resolve: () => {
           return {};
         }
@@ -1466,6 +1523,25 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             inbound: { type: GraphQLBoolean }
           },
           resolve: resolver(Message)
+        },
+
+        records: {
+          type: new GraphQLList(recordType),
+          args: {
+            order: { type: GraphQLString },
+            type: { type: GraphQLString },
+            userId: { type: GraphQLString },
+            offset: { type: GraphQLInt },
+            limit: { type: GraphQLInt }
+          },
+          resolve: (root, { order = 'createdAt', offset, limit, type, userId }) => {
+            return Record.findAll({
+              limit,
+              offset,
+              order: splitOrder(order),
+              where: compactObject({ type, userId })
+            });
+          }
         },
 
         categories: {

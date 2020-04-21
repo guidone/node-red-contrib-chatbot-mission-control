@@ -3,6 +3,7 @@ import { Tag } from 'rsuite';
 
 import { plug } from '../../lib/code-plug';
 import withConfigurationPage from '../../src/components/configuration-page';
+import { UserRecords } from '../../src/components/user-records/index.js'
 
 import ConfigurationForm from './views/configuration-form';
 
@@ -19,23 +20,43 @@ plug('sidebar', null, {
   icon: 'cog',
   options: [
     {
-      id: 'configuration-hours',
+      id: 'configuration-survey',
       label: 'Surveys',
       url: '/configuration-surveys',
     }
   ]
 });
+
+plug('sidebar', null, {
+  id: 'surveys',
+  label: 'Surveys',
+  //permission: 'configure',
+  url: '/surveys',
+  icon: 'cog',
+});
+
 plug(
   'pages',
   withConfigurationPage(
-    'openings',
+    'survey',
     ConfigurationForm,
     { Legend, title: 'Surveys' }
   ),
   {
     permission: 'configure',
     url: '/configuration-surveys',
-    title: 'Opening Hours',
-    id: 'configuration'
+    title: 'Survey',
+    id: 'configuration-surveys'
   }
 );
+
+plug('pages', UserRecords, {
+  url: '/surveys',
+  title: 'Surveys',
+  id: 'surveys',
+  type: 'survey',
+  breadcrumbs: ['Knowledge Base', 'Surveys'],
+  labels: {
+    // saveContent: 'Save article'
+  }
+});

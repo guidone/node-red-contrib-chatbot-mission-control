@@ -3,10 +3,10 @@ import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, Help
 
 
 import Dictionary from '../../../src/components/dictionary';
-
+import ContentAutocomplete from '../../../src/components/content-autocomplete';
 import SurveyEditor from '../../../src/components/survey-editor';
 
-//import { opening as openingModel } from '../models';
+
 
 
 // TODO check models and schema, start < end, no repetitions in range
@@ -14,44 +14,20 @@ import SurveyEditor from '../../../src/components/survey-editor';
 
 const dictionarySchema = [
   {
-    name: 'openings.openWhen',
-    description: 'Text shown before the list of opening hours'
+    name: 'survey.intro',
+    description: 'Text shown at the beginning of the survey if no content is provided'
   },
   {
-    name: 'openings.monday'
+    name: 'survey.end1',
+    description: 'End of the survey (version 1)'
   },
   {
-    name: 'openings.tuesday'
+    name: 'survey.end2',
+    description: 'End of the survey (version 2)'
   },
   {
-    name: 'openings.wednesday'
-  },
-  {
-    name: 'openings.friday'
-  },
-  {
-    name: 'openings.saturday'
-  },
-  {
-    name: 'openings.sunday'
-  },
-  {
-    name: 'openings.monfri'
-  },
-  {
-    name: 'openings.monsat'
-  },
-  {
-    name: 'openings.monsun'
-  },
-  {
-    name: 'openings.satsun'
-  },
-  {
-    name: 'openings.yes'
-  },
-  {
-    name: 'openings.no'
+    name: 'survey.end3',
+    description: 'End of the survey (version 3)'
   }
 ];
 
@@ -62,94 +38,15 @@ export default ({
   onSubmit = () => { },
   disabled = false
 }) => {
-  // const [formValue, setFormValue] = useState(value);
-
-  const [formValue, setFormValue] = useState({
-    questions: [
-      {
-        id: "q1",
-        tag: 'Q1',
-        title: 'Quanti mondiali ha vinto l Italia?',
-        type: 'multiple',
-        data: [
-          { answer: 'Uno' },
-          { answer: 'Quattro' },
-          { answer: 'Sedici' }
-        ]
-      },
-      {
-        id: "q2",
-        tag: 'Q2',
-        title: 'Sei normale?',
-        type: 'multiple',
-        data: [
-          { answer: 'Si' },
-          { answer: 'No' }
-        ]
-      },
-      {
-        id: "q21",
-        parent: 'q2',
-        tag: 'Q2.1',
-        title: 'Che problema hai?',
-        type: 'multiple',
-        data: [
-          { answer: 'Mangio troppo' },
-          { answer: 'Mangio poco' },
-          { answer: 'Mangio cosi cosi' }
-        ]
-      },
-      {
-        id: "q22",
-        parent: 'q2',
-        tag: 'Q2.2',
-        title: 'Ma sei a posto?',
-        type: 'multiple',
-        data: [
-          { answer: 'Si' },
-          { answer: 'No' },
-          { answer: 'Forse' }
-        ]
-      },
-      {
-        id: "q221",
-        parent: 'q22',
-        tag: 'Q2.2.1',
-        title: 'Si ma quando?',
-        type: 'multiple',
-        data: [
-          { answer: 'Ora' },
-          { answer: 'Dopo' },
-          { answer: 'Mai' }
-        ]
-      },
-      {
-        id: "q3",
-        tag: 'Q3',
-        title: 'Che sport fai?',
-        type: 'multiple',
-        data: [
-          { answer: 'Nessuno' },
-          { answer: 'Salto in basso' },
-          { answer: 'Cerco funghi' }
-        ]
-      },
-      {
-        id: "q4",
-        tag: 'Q4',
-        title: 'Fa una foto alle tue scarpe',
-        type: 'image'
-      }
-    ]
-  });
-
+  const [formValue, setFormValue] = useState(value);
   const [formError, setFormError] = useState(null);
-  const [tab, setTab] = useState('surveys');
+  const [tab, setTab] = useState('questions');
   const form = useRef(null);
 
   return (
     <div>
       <Nav appearance="tabs" activeKey={tab} onSelect={setTab} style={{ marginBottom: '25px' }}>
+      <Nav.Item eventKey="questions">Questions</Nav.Item>
         <Nav.Item eventKey="surveys">Survey</Nav.Item>
         <Nav.Item eventKey="translations">Translations</Nav.Item>
       </Nav>
@@ -183,6 +80,21 @@ export default ({
           </Fragment>
         )}
         {tab === 'surveys' && (
+          <Fragment>
+            <FormGroup>
+              <ControlLabel>Introduction Message
+                <HelpBlock tooltip>Select the content to show when the user starts the survey</HelpBlock>
+              </ControlLabel>
+              <FormControl
+                name="introduction"
+                accepter={ContentAutocomplete}
+                useSlug={true}
+                disabled={disabled}
+              />
+            </FormGroup>
+          </Fragment>
+        )}
+        {tab === 'questions' && (
           <Fragment>
             <FormGroup>
               <FormControl

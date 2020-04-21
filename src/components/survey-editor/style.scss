@@ -34,7 +34,6 @@
 
 .ui-icon-tooltip {
   display: inline-block;
-  float: right;
   background-color: #C9C9C9;
   padding: 0px 5px;
   border-radius: 2px;
@@ -51,6 +50,11 @@
     display: inline;
     margin-left: 3px;
     font-size: 12px;
+  }
+
+  &.orange {
+    background-color: #FFB049;
+    color: #000000;
   }
 }
 
@@ -69,6 +73,11 @@
   justify-content: flex-start;
   align-content: stretch;
   align-items: center;
+
+  .icons {
+    display: inline-block;
+    float: right;
+  }
 
   .grippy {
     content: '....';

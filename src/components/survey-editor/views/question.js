@@ -1,4 +1,4 @@
-import React, { useRef, Fragment } from 'react';
+import React, { useRef, Fragment, useContext } from 'react';
 
 import classNames from 'classnames';
 import { Icon, Whisper, Tooltip } from 'rsuite';
@@ -8,7 +8,7 @@ import { sortableHandle, sortableElement } from 'react-sortable-hoc';
 
 const DragHandle = sortableHandle(() => <div className="grippy"></div>);
 
-
+import SurveyEditorContext from '../context';
 import Tag from './tag';
 
 
@@ -16,12 +16,12 @@ const INDENT_SIZE = 8;
 
 
 
-const IconTooltip = ({ icon, text, tooltip }) => {
+const IconTooltip = ({ icon, text, tooltip, color }) => {
 
   const dom = (
-    <div className="ui-icon-tooltip">
+    <div className={classNames('ui-icon-tooltip', { [color]: true })}>
       <Icon icon={icon} />
-      {text != null && <span class="text">{text}</span>}
+      {text != null && <span className="text">{text}</span>}
     </div>
   );
 
@@ -46,7 +46,23 @@ const Question = ({
   level = null
 }) => {
 
+  const { questions } = useContext(SurveyEditorContext);
 
+  const forks = (_.isArray(question.data) ? question.data : [])
+    .filter(answer => answer.jump != null)
+    .map(answer => {
+      const jumpTo = questions.find(question => question.id === answer.jump);
+      if (jumpTo != null) {
+        return (
+          <IconTooltip
+            icon="code-fork"
+            text={jumpTo.tag}
+            color="orange"
+            tooltip={`Jump to ${jumpTo.tag} if user selects "${answer.answer}"`}
+          />
+        );
+      }
+    })
 
 
   return (
@@ -62,31 +78,34 @@ const Question = ({
         <div className="meta">
           <Tag>{question.tag}</Tag>
 
-          {question.type === 'multiple' && (
-            <IconTooltip
-              icon="list"
-              text={question.data.length}
-              tooltip="Multiple choice question"
-            />
-          )}
-          {question.type === 'text' && (
-            <IconTooltip
-              icon="font"
-              tooltip="Free text question"
-            />
-          )}
-          {question.type === 'number' && (
-            <IconTooltip
-              icon="percent"
-              tooltip="Numeric question"
-            />
-          )}
-          {question.type === 'image' && (
-            <IconTooltip
-              icon="image"
-              tooltip="Image   question"
-            />
-          )}
+          <div className="icons">
+            {forks}
+            {question.type === 'multiple' && (
+              <IconTooltip
+                icon="list"
+                text={question.data.length}
+                tooltip="Multiple choice question"
+              />
+            )}
+            {question.type === 'text' && (
+              <IconTooltip
+                icon="font"
+                tooltip="Free text question"
+              />
+            )}
+            {question.type === 'number' && (
+              <IconTooltip
+                icon="percent"
+                tooltip="Numeric question"
+              />
+            )}
+            {question.type === 'image' && (
+              <IconTooltip
+                icon="image"
+                tooltip="Image   question"
+              />
+            )}
+          </div>
 
         </div>
 

@@ -107,7 +107,7 @@ module.exports = mcSettings => {
     last_name: Sequelize.STRING,
     avatar: Sequelize.STRING,
     email: Sequelize.STRING,
-    payload: Sequelize.STRING,
+    payload: Sequelize.TEXT,
     permissions: Sequelize.STRING
   }, {
     indexes: [
@@ -166,7 +166,7 @@ module.exports = mcSettings => {
   const Context = sequelize.define('context', {
     userId: { type: Sequelize.STRING, allowNull: false },
     chatId: { type: Sequelize.STRING, allowNull: false },
-    payload: { type: Sequelize.STRING, allowNull: false }
+    payload: { type: Sequelize.TEXT, allowNull: false }
   }, {
     indexes: [
       { name: 'chatid_userid', using: 'BTREE', fields: ['userId'] },
@@ -174,6 +174,17 @@ module.exports = mcSettings => {
     ]
   });
 
+  const Record = sequelize.define('record', {
+    userId: { type: Sequelize.STRING, allowNull: false },
+    type: { type: Sequelize.STRING, allowNull: false },
+    payload: { type: Sequelize.TEXT, allowNull: false },
+    title: { type: Sequelize.STRING, allowNull: false }
+  }, {
+    indexes: [
+      { name: 'record_userid', using: 'BTREE', fields: ['userId'] },
+      { name: 'record_type', using: 'BTREE', fields: ['type'] }
+    ]
+  })
 
   const ChatId = sequelize.define('chatid', {
     userId: { type: Sequelize.STRING, allowNull: false },
@@ -227,6 +238,7 @@ module.exports = mcSettings => {
     Field,
     Context,
     Admin,
+    Record,
     sequelize,
     mcSettings
   });
@@ -242,7 +254,8 @@ module.exports = mcSettings => {
     Content,
     Category,
     Field,
-    Context
+    Context,
+    Record
   };
 
   return exportCache;

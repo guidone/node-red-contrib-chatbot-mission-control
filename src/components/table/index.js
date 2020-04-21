@@ -17,7 +17,7 @@ const LABELS = {
 const CustomTable = ({
   children,
   query,
-  namespace = 'content',
+  variables = {},
   initialSortField = 'createdAt',
   initialSortDirection = 'desc',
   labels,
@@ -28,7 +28,11 @@ const CustomTable = ({
   ...rest
 }, ref) => {
   let filterKeys = (filtersSchema || []).map(item => item.name);
-  const { query: urlQuery, setQuery } = useRouterQuery();
+  const numericKeys = (filtersSchema || [])
+    .filter(filter => filter.type === 'number')
+    .map(filter => filter.name);
+
+  const { query: urlQuery, setQuery } = useRouterQuery({ numericKeys });
 
   const [ filters, setFilters ] = useState(_.pick(urlQuery, filterKeys));
   const [ cursor, setCursor ] = useState({
@@ -50,7 +54,7 @@ const CustomTable = ({
     error,
     data,
     refetch
-  } = useTable({ query, limit, page, sortField, sortType, filters, namespace });
+  } = useTable({ query, limit, page, sortField, sortType, filters, variables });
 
   useImperativeHandle(ref, () => ({
     refetch: () => refetch()
@@ -82,6 +86,7 @@ const CustomTable = ({
             <TableFilters
               filters={filters}
               onChange={filters => {
+                console.log('filters?', filters)
                 setFilters(filters);
                 setQuery(filters);
                 onFilters(filters);

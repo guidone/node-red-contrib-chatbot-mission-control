@@ -33,6 +33,7 @@ query($id: Int,$slug: String, $ids: [Int], $slugs: [String]) {
 }`;
 
 const findContent = (contents, { language, contextLanguage, failbackLanguage }) => {
+  let content;
   // if not using id but the slug, then apply language logic, try to find the right one
   // matching the chat context language or the one defined in the configuration or the
   // failback language
@@ -74,7 +75,6 @@ module.exports = function(RED) {
 
       // if query (from the UI) is comma separated, then convert to array, trim it and try to convert
       if (isVariable(query)) {
-        console.log('variabile===?')
         query = await template.evaluate(query);
       }
       if (_.isString(query) && query.includes(',')) {
@@ -117,7 +117,7 @@ module.exports = function(RED) {
       try {
         const response = await client.query({ query: CONTENT, variables, fetchPolicy: 'network-only' });
         const { contents } = response.data;
-
+        console.log('contents', contents)
         let content;
         if (usingIds) {
           // sort the same order of ids
@@ -135,8 +135,10 @@ module.exports = function(RED) {
           content = !_.isEmpty(contents) ? contents[0] : null;
         } else {
           // from all content with the same slug, take the one with the right language
+          console.log('cerco', language, contextLanguage, failbackLanguage)
           content = findContent(contents, { language, contextLanguage, failbackLanguage });
         }
+        console.log('cerco--->', content)
         // error if still empty
         if (content == null) {
           send([null, msg]);

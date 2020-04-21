@@ -1,4 +1,7 @@
 .ui-table-filters {
+  display: flex;
+  align-items: flex-start;
+
   .control {
     display: inline-block;
     margin-left: 6px;
@@ -7,8 +10,5 @@
       margin-left: 0px;
     }
 
-    .rs-picker-select {
-      margin-top: -3px;
-    }
   }
 }
