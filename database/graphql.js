@@ -220,6 +220,32 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     })
   });
 
+  const newRecordType = new GraphQLInputObjectType({
+    name: 'NewRecord',
+    description: 'tbd',
+    fields: () => ({
+      type: {
+        type: GraphQLString,
+        description: ''
+      },
+      title: {
+        type: GraphQLString,
+        description: ''
+      },
+      userId: {
+        type: GraphQLString,
+        description: ''
+      },
+      payload: {
+        type: JSONType,
+        description: ''
+      },
+      createdAt: {
+        type: DateType
+      }
+    })
+  });
+
   const userType = new GraphQLObjectType({
     name: 'User',
     description: 'tbd',
@@ -301,7 +327,24 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             order
           });
         }
-      }
+      },
+      records: {
+        type: new GraphQLList(recordType),
+        args: {
+          order: { type: GraphQLString },
+          type: { type: GraphQLString },
+          offset: { type: GraphQLInt },
+          limit: { type: GraphQLInt }
+        },
+        resolve: (user, { order = 'createdAt', offset, limit, type }) => {
+          return Record.findAll({
+            limit,
+            offset,
+            order: splitOrder(order),
+            where: compactObject({ type, userId: user.userId })
+          });
+        }
+      },
     })
   });
 
@@ -1086,6 +1129,16 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           }
         },
 
+        createRecord: {
+          type: recordType,
+          args: {
+            record: { type: new GraphQLNonNull(newRecordType) }
+          },
+          resolve: function(root, { record }) {
+            return Record.create(record);
+          }
+        },
+
         createCategory: {
           type: categoryType,
           args: {
@@ -1183,6 +1236,21 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
               await content.destroy();
             }
             return content;
+          }
+        },
+
+        deleteRecord: {
+          type: recordType,
+          args: {
+            id: { type: new GraphQLNonNull(GraphQLInt)}
+          },
+          resolve: async function(root, { id }) {
+            const record = await Record.findByPk(id);
+            // destroy user and related chatIds
+            if (record != null) {
+              await record.destroy();
+            }
+            return record;
           }
         },
 

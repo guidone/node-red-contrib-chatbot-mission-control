@@ -13,9 +13,9 @@ import Language from '../../../../src/components/language';
 import CustomTable from '../../../../src/components/table';
 import LanguagePicker from '../../../../src/components/language-picker';
 import { Input, UserAutocomplete } from '../../../../src/components/table-filters';
+import confirm from '../../../../src/components/confirm';
 
-
-
+import useUserRecords from '../hooks/records';
 
 
 const USER_RECORDS = gql`
@@ -36,11 +36,6 @@ query($offset: Int, $limit: Int, $order: String, $type: String, $userId: String)
 }
 `;
 
-// TODO implement
-const useUserRecords = () => {
-
-  return {}
-}
 
 
 const LABELS = {
@@ -62,9 +57,9 @@ const UserRecords = ({
   const {
     error,
     saving,
-    deleteContent,
-    editContent,
-    createContent
+    deleteRecord,
+    //editContent,
+    //createContent
   } = useUserRecords();
 
   labels = { ...LABELS, ...labels };
@@ -130,23 +125,23 @@ const UserRecords = ({
                 <Button
                   disabled={saving}
                   size="xs"
-                  onClick={async () => {
-                    if (confirm(`Delete "${record.title}"?`)) {
-                      await deleteContent({ variables: { id: record.id }})
-                      refetch();
-                    }
-                  }}
-                >
-                  <Icon icon="trash" />
-                </Button>
-                <Button
-                  disabled={saving}
-                  size="xs"
                   onClick={() => {
                     setContent(content)
                   }}
                 >
                   <Icon icon="edit2" />
+                </Button>
+                <Button
+                  disabled={saving}
+                  size="xs"
+                  onClick={async () => {
+                    if (await confirm(<div>Delete record <em>"{record.title}"</em>?</div>, { okLabel: 'Yes, delete'})) {
+                      await deleteRecord({ variables: { id: record.id }})
+                      table.current.refetch();
+                    }
+                  }}
+                >
+                  <Icon icon="trash" />
                 </Button>
             </ButtonGroup>
             )}
