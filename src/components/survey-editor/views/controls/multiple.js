@@ -83,13 +83,12 @@ const AnswerValue = ({ formValue, onChange = () => {} }) => {
 
 
 
-const AnswerForm = ({ value, onChange, index }) => {
+const AnswerForm = ({ value, onChange, order }) => {
   const { questions } = useContext(SurveyEditorContext);
 
-
   return (
-    <div className="multiple-answer">
-      <div className="placeholder">{ALPHABET[index]}</div>
+    <div className="ui-survey-editor-multiple-answer">
+      <div className="placeholder">{ALPHABET[order]}</div>
       <div className="answer">
         <Input value={value.answer} onChange={answer => onChange({ ...value, answer })}/>
       </div>
@@ -115,19 +114,13 @@ const AnswerForm = ({ value, onChange, index }) => {
             }
           }}
         />
-
-
       </div>
     </div>
   )
-}
-
+};
 
 
 const Multiple = ({ data, onChange = () => {} }) => {
-
-
-
   return (
     <div className="control control-multiple">
       <CollectionEditor
@@ -139,8 +132,6 @@ const Multiple = ({ data, onChange = () => {} }) => {
       />
     </div>
   );
-
-
 };
 
 export default Multiple;

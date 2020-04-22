@@ -91,7 +91,7 @@ const add = (questions, params) => {
 
 
 
-const SortableContainer = sortableContainer(({children}) => {
+const SortableContainer = sortableContainer(({ children }) => {
   return <div className="questions">{children}</div>;
 });
 
@@ -219,8 +219,6 @@ const SurveyEditor = ({ value: questions = [{}], onChange = () => {} }) => {
 
     onChange(retag(newQuestions));
   };
-
-  console.log('questions---->', questions)
 
 
   const activeQuestion = questions.find(question => question.id === active);

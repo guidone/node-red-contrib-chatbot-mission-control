@@ -3,10 +3,17 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import classNames from 'classnames';
 import { Button } from 'rsuite';
+import { sortableContainer } from 'react-sortable-hoc';
+
 import uniqueId from '../../helpers/unique-id';
 
 import Item from './views/item';
 import './style.scss';
+
+const SortableContainer = sortableContainer(({ children }) => {
+  return <div>{children}</div>;
+});
+
 
 const CollectionEditor = ({
   value = [],
@@ -20,6 +27,19 @@ const CollectionEditor = ({
   disableAdd = false,
   ...rest
 }) => {
+
+
+  const onSortEnd = ({ oldIndex, newIndex }) => {
+    // do not move into itself
+    if (oldIndex === newIndex) {
+      return;
+    }
+    const newValue = [...value];
+    const startIndex = newIndex < 0 ? newValue.length + newIndex : newIndex;
+	  const item = newValue.splice(oldIndex, 1)[0];
+    newValue.splice(startIndex, 0, item);
+    onChange(newValue);
+  };
 
   const addButton = (
     <Button
@@ -39,7 +59,7 @@ const CollectionEditor = ({
           {addButton}
         </div>
       )}
-      <div>
+      <SortableContainer onSortEnd={onSortEnd} helperClass="sorting" useDragHandle>
         {(value || []).map((item, idx) => (
           <Item
             key={item.id}
@@ -48,6 +68,7 @@ const CollectionEditor = ({
             disabled={disabled}
             hideArrows={hideArrows}
             index={idx}
+            order={idx}
             onRemove={() => {
               const cloned = [...value];
               cloned[idx] = null;
@@ -79,7 +100,7 @@ const CollectionEditor = ({
             {...rest}
           />
         ))}
-      </div>
+      </SortableContainer>
       {!_.isEmpty(value) && (<div className="buttons">{addButton}</div>)}
     </div>
   );

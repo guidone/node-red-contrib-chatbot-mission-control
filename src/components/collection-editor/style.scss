@@ -69,20 +69,7 @@
 
   }
 
-  .item {
-    margin-top: 10px;
 
-    .rs-btn-icon {
-      height: 36px;
-      width: 36px;
-      i {
-        height: 36px;
-        width: 36px;
-        padding: 8px 0;
-      }
-    }
-
-  }
 
   &.disabled {
     .item {
@@ -91,4 +78,46 @@
       }
     }
   }
+}
+
+.ui-collection-item {
+  background-color: #ffffff;
+  margin-top: 10px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
+  align-content: flex-start;
+  align-items: flex-start;
+
+  .handle {
+    flex: 0 0 20px
+  }
+
+  .control-buttons {
+    flex: 0 0 auto;
+    margin-left: 10px;
+
+    .rs-icon-close {
+      padding: 8px 0px;
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  .form {
+    flex: 1 0;
+  }
+
+  .rs-btn-icon {
+    height: 36px;
+    width: 36px;
+    i {
+      height: 36px;
+      width: 36px;
+      padding: 8px 0;
+    }
+  }
+
+
 }
