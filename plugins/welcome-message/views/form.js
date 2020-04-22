@@ -2,16 +2,6 @@ import React, { useState, useRef, Fragment } from 'react';
 import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav } from 'rsuite';
 
 import ContentAutocomplete from '../../../src/components/content-autocomplete';
-import Dictionary from '../../../src/components/dictionary';
-
-import { welcomeMessage as welcomeMessageModel } from '../models';
-
-const dictionarySchema = [
-  {
-    name: 'carousel.intro',
-    description: 'Introduction text of the carousel'
-  }
-];
 
 export default ({
   value,
@@ -20,14 +10,11 @@ export default ({
 }) => {
   const [formValue, setFormValue] = useState(value);
   const [formError, setFormError] = useState(null);
-  const [tab, setTab] = useState('carousel');
   const form = useRef(null);
 
   return (
     <div>
-
       <Form
-        model={welcomeMessageModel}
         disabled={true}
         formValue={formValue}
         formError={formError}
