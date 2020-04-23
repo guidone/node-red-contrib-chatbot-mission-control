@@ -4,51 +4,18 @@ import classNames from 'classnames';
 import _ from 'lodash';
 
 import CollectionEditor from '../../../collection-editor';
+import prompt from '../../../prompt';
 
 import SurveyEditorContext from '../../context';
-import Tag from '../tag';
 import './style.scss';
+
+import GoToForm from './views/go-to';
+import QuestionDetailContext from '../../context-question-detail';
 
 const ALPHABET = 'ABCDEFGHILMNOPQRTSUVZ';
 
-import prompt from '../../../prompt';
 
 
-
-
-
-
-const GoToForm = ({ formValue, questions, onChange = () => {} }) => {
-  return (
-    <div>
-      <Form
-        formDefaultValue={formValue}
-        onChange={onChange}
-        fluid
-      >
-      <FormGroup>
-        <ControlLabel>Jump To Question</ControlLabel>
-        <FormControl
-          name="jump"
-          accepter={SelectPicker}
-          block={true}
-          data={questions.map(question => ({
-            value: question.id,
-            label: question.title,
-            ...question
-          }))}
-          renderMenuItem={(label, item) => (<div><Tag>{item.tag}</Tag> {item.title}</div>)}
-          renderValue={(label, item) => (<div><Tag>{item.tag}</Tag> {item.title}</div>)}
-          onClean={() => onChange({ ...formValue, jump: null })}
-        />
-        <HelpBlock>
-          Select the question to jump to if the user select this the answer <em>"{formValue.answer}"</em>
-        </HelpBlock>
-      </FormGroup>
-      </Form>
-    </div>
-  );
-};
 
 const AnswerValue = ({ formValue, onChange = () => {} }) => {
   return (
@@ -85,6 +52,7 @@ const AnswerValue = ({ formValue, onChange = () => {} }) => {
 
 const AnswerForm = ({ value, onChange, order }) => {
   const { questions } = useContext(SurveyEditorContext);
+  const { question } = useContext(QuestionDetailContext)
 
   return (
     <div className="ui-survey-editor-multiple-answer">
@@ -108,7 +76,7 @@ const AnswerForm = ({ value, onChange, order }) => {
           className={classNames({ 'not-used': value.jump == null })}
           icon={<Icon icon="arrow-circle-right" size="lg"/>}
           onClick={async () => {
-            const what = await prompt(props => <GoToForm {...props} questions={questions} />, value);
+            const what = await prompt(props => <GoToForm {...props} exclude={question.id} questions={questions} />, value);
             if (what != null) {
               onChange({ ...value, jump: what.jump });
             }
