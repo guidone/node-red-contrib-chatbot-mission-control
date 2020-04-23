@@ -1,4 +1,5 @@
 import React, { useRef, Fragment, useContext } from 'react';
+import PropTypes from 'prop-types';
 
 import classNames from 'classnames';
 import { Icon, Whisper, Tooltip } from 'rsuite';
@@ -34,7 +35,10 @@ const IconTooltip = ({ icon, text, tooltip, color }) => {
   } else {
     return dom;
   }
-}
+};
+IconTooltip.propTypes = {
+  color: PropTypes.oneOf(['red', 'orange'])
+};
 
 
 
@@ -55,6 +59,7 @@ const Question = ({
       if (jumpTo != null) {
         return (
           <IconTooltip
+            key={jumpTo.tag}
             icon="code-fork"
             text={jumpTo.tag}
             color="orange"
@@ -62,7 +67,33 @@ const Question = ({
           />
         );
       }
-    })
+    });
+
+  let warnings;
+  if (question.parent != null) {
+    // find at least a question which jumps to this question, since it's nested
+    // it will never be reached in the survey
+    const hasJump = _(questions).chain()
+      .filter(question => question.type === 'multiple')
+      .map(question => _.isArray(question.data) ? question.data : [])
+      .flatten()
+      .some(answer => answer.jump === question.id)
+      .value();
+
+    if (!hasJump) {
+    warnings = (
+      <IconTooltip
+        icon="exclamation-triangle"
+        key="jump-warning"
+        color="red"
+        tooltip={`No conditional jump to this question.
+        This is a nested question and can only be reached in the survey with a conditional answer in a multiple choice question`}
+      />
+    );
+    }
+  }
+
+
 
 
   return (
@@ -80,6 +111,7 @@ const Question = ({
 
           <div className="icons">
             {forks}
+            {warnings}
             {question.type === 'multiple' && (
               <IconTooltip
                 icon="list"
