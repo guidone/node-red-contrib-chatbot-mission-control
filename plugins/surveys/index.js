@@ -72,3 +72,15 @@ plug(
     group: 'Surveys'
   }
 );
+// register user record type
+plug(
+  'user-record-types',
+  null,
+  {
+    type: 'survey',
+    name: 'Survey',
+    list: `Surveys`,
+    description: 'Answer to surveys',
+    form: ({ record }) => <div>sono il form {record.title}</div>
+  }
+);

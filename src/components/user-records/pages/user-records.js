@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import _ from 'lodash';
 import { Table, Icon, SelectPicker, ButtonGroup, Button, FlexboxGrid } from 'rsuite';
+import { Link } from 'react-router-dom';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -114,7 +115,11 @@ const UserRecords = ({
 
         <Column flexGrow={1} align="left" sortable resizable>
           <HeaderCell>Title</HeaderCell>
-          <Cell dataKey="title" />
+          <Cell>
+            {({ title, id }) => (
+              <Link to={`/record/${id}`}>{title}</Link>
+            )}
+          </Cell>
         </Column>
 
         <Column width={80}>

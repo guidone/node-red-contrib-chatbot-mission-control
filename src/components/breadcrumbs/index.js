@@ -19,8 +19,15 @@ const Breadcrumbs = ({ pages = [], codePlug }) => {
       return <NavLink key={page} to={foundPage.props.url}>{foundPage.props.title}</NavLink>
     } else if (_.isString(page)) {
       return <Breadcrumb.Item key={page} active>{page}</Breadcrumb.Item>
-    } else if (_.isObject(page) && page.title != null) {
+    } else if (_.isObject(page) && page.title != null && page.url != null) {
       return <NavLink to={page.url} key={page.title}>{page.title}</NavLink>
+    } else if (_.isObject(page) && page.title != null && page.onClick != null) {
+      return (
+        <a href="#" key={page.title} onClick={e => {
+          e.preventDefault();
+          page.onClick();
+        }}>{page.title}</a>
+      );
     }
   });
 
@@ -36,7 +43,8 @@ Breadcrumbs.propTypes = {
     PropTypes.string, // the title of the page or the id of the page
     PropTypes.shape({
       title: PropTypes.string,
-      url: PropTypes.string
+      url: PropTypes.string,
+      onClick: PropTypes.func
     })
   ]))
 };

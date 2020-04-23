@@ -216,6 +216,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       },
       createdAt: {
         type: DateType
+      },
+      user: {
+        type: userType,
+        resolve: user => User.findOne({ where: { userId: user.userId }})
       }
     })
   });
@@ -1564,6 +1568,14 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             id: { type: GraphQLInt }
           },
           resolve: resolver(Content)
+        },
+
+        record: {
+          type: recordType,
+          args: {
+            id: { type: GraphQLInt }
+          },
+          resolve: resolver(Record)
         },
 
         chatIds: {

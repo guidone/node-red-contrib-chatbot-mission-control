@@ -126,10 +126,12 @@ module.exports = function(RED) {
           if (contextProvider.get(null, user.userId) == null) {
             contextProvider.assignToUser(user.userId, msg.chat());
           }
-          msg.chat = () => {
+
+          msg.chat = function() {
+            const { userId, transport, chatId } = this.originalMessage;
             // override the chat context with the one got using userId and not chatId
             const { contextProvider } = msg.api().getOptions();
-            return contextProvider.get(null, user.userId)
+            return contextProvider.get(null, userId, { userId, transport, chatId });
           };
           msg.originalMessage.userId = user.userId;
           msg.user = user;
