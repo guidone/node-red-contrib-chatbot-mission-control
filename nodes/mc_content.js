@@ -135,10 +135,9 @@ module.exports = function(RED) {
           content = !_.isEmpty(contents) ? contents[0] : null;
         } else {
           // from all content with the same slug, take the one with the right language
-          console.log('cerco', language, contextLanguage, failbackLanguage)
           content = findContent(contents, { language, contextLanguage, failbackLanguage });
         }
-        console.log('cerco--->', content)
+
         // error if still empty
         if (content == null) {
           send([null, msg]);

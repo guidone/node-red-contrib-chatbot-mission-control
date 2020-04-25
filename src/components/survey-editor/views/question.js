@@ -9,6 +9,7 @@ import { sortableHandle, sortableElement } from 'react-sortable-hoc';
 
 const DragHandle = sortableHandle(() => <div className="grippy"></div>);
 
+import { isFirstOfNested } from '../helpers';
 import SurveyEditorContext from '../context';
 import Tag from './tag';
 
@@ -70,9 +71,10 @@ const Question = ({
     });
 
   let warnings;
-  if (question.parent != null) {
+  if (question.parent != null && isFirstOfNested(questions, question)) {
     // find at least a question which jumps to this question, since it's nested
-    // it will never be reached in the survey
+    // it will never be reached in the survey, only check for the first of the group
+    // of nested questions
     const hasJump = _(questions).chain()
       .filter(question => question.type === 'multiple')
       .map(question => _.isArray(question.data) ? question.data : [])

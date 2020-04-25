@@ -1,6 +1,5 @@
 import React, { useContext } from 'react';
-import { Input, Icon, IconButton, Form, FormControl, FormGroup, SelectPicker, HelpBlock, ControlLabel } from 'rsuite';
-import classNames from 'classnames';
+import { Input, Icon, IconButton, Form, FormControl, FormGroup, HelpBlock, ControlLabel } from 'rsuite';
 import _ from 'lodash';
 
 import CollectionEditor from '../../../collection-editor';
@@ -62,7 +61,7 @@ const AnswerForm = ({ value, onChange, order }) => {
       </div>
       <div className="controls">
         <IconButton
-          className={classNames({ 'not-used': value.value == null })}
+          appearance={value.value != null ? 'primary' : 'default'}
           icon={<Icon icon="align-justify" size="lg"/>}
           onClick={async () => {
             const what = await prompt(AnswerValue, value);
@@ -73,7 +72,7 @@ const AnswerForm = ({ value, onChange, order }) => {
         />
         &nbsp;
         <IconButton
-          className={classNames({ 'not-used': value.jump == null })}
+          appearance={value.jump != null ? 'primary' : 'default'}
           icon={<Icon icon="arrow-circle-right" size="lg"/>}
           onClick={async () => {
             const what = await prompt(props => <GoToForm {...props} exclude={question.id} questions={questions} />, value);

@@ -28,6 +28,15 @@ const dictionarySchema = [
   {
     name: 'survey.end3',
     description: 'End of the survey (version 3)'
+  },
+  {
+    name: 'survey.wrongAnswer',
+    description: `When the user input a wrong answer, for example an answer which is not listed in the multiple choice,
+      a string where is expected a number, etc  `
+  },
+  {
+    name: 'survey.error',
+    description: 'Shown when unrecoverable error happened in the survey flow'
   }
 ];
 

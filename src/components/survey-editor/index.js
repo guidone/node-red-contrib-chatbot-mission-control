@@ -11,7 +11,7 @@ import QuestionDetail from './views/question-detail';
 
 
 import SurveyEditorContext from './context';
-
+import { findQuestion } from './helpers';
 
 const replace = (items, oldElement, newElement) => {
   const result = [...items];
@@ -29,9 +29,7 @@ const hasChildren = (questions, question) => {
   return questions.some(item => item.parent === question.id)
 }
 
-const findQuestion = (questions, question) => {
-  return questions.find(item => item.id === question.id);
-}
+
 
 
 const remove = (questions, question) => {
@@ -119,8 +117,14 @@ const getLevels = questions => {
   return result;
 };
 
+/**
+ * retag
+ * Rebuild tags for te questions, also store the level of the question (0 - root) used in the node-red node
+ */
+
 const retag = questions => {
   const result = [...questions];
+  const levels = getLevels(questions);
   const counters = {
     root: 0
   };
@@ -153,9 +157,11 @@ const retag = questions => {
     return `Q${getPath(parent)}${index}`;
   }
 
-  return questions.map(question => ({ ...question, tag: getLabel(question) }));
-
-
+  return questions.map(question => ({
+    ...question,
+    tag: getLabel(question),
+    level: _.isEmpty(question.parent) ? 0 : levels[question.parent]
+  }));
 }
 
 
@@ -174,7 +180,6 @@ const SurveyEditor = ({ value: questions = [{}], onChange = () => {} }) => {
   //const onSortEnd = ({ oldIndex, newIndex}) => {
   const onSortEnd = ({ oldIndex, newIndex }) => {
 
-    console.log('from, to', oldIndex, newIndex)
 
     // do not move into itself
     if (oldIndex === newIndex) {
@@ -195,10 +200,10 @@ const SurveyEditor = ({ value: questions = [{}], onChange = () => {} }) => {
     const hasSubQuestions = hasChildren(questions, movedQuestion);
     const parent = findParent(questions, movedQuestion);
 
-    console.log('movedQuestion', movedQuestion)
-    console.log('previous', previous)
-    console.log('hasSubQuestions', hasSubQuestions)
-    console.log('parent', parent)
+    //console.log('movedQuestion', movedQuestion)
+    //console.log('previous', previous)
+    //console.log('hasSubQuestions', hasSubQuestions)
+    //console.log('parent', parent)
     // if the previous article has some children, then the moved question becomes
     // its children too
     if (previous != null && hasChildren(questions, previous)) {
