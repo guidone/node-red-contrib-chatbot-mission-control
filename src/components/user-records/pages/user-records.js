@@ -7,37 +7,36 @@ import { Link } from 'react-router-dom';
 
 const { Column, HeaderCell, Cell } = Table;
 
+import { useCodePlug } from '../../../../lib/code-plug';
 import PageContainer from '../../../../src/components/page-container';
 import Breadcrumbs from '../../../../src/components/breadcrumbs';
 import SmartDate from '../../../../src/components/smart-date';
-import Language from '../../../../src/components/language';
 import CustomTable from '../../../../src/components/table';
-import LanguagePicker from '../../../../src/components/language-picker';
-import { Input, UserAutocomplete } from '../../../../src/components/table-filters';
+import { UserAutocomplete } from '../../../../src/components/table-filters';
 import confirm from '../../../../src/components/confirm';
+import ShowError from '../../../../src/components/show-error';
 
 import useUserRecords from '../hooks/records';
 
 
 const USER_RECORDS = gql`
-query($offset: Int, $limit: Int, $order: String, $type: String, $userId: String) {
+query($offset: Int, $limit: Int, $order: String, $type: String, $userId: String, $status: String) {
   counters {
     rows: records {
-     count(type: $type, userId: $userId)
+     count(type: $type, userId: $userId, status: $status)
     }
   }
-  rows: records(offset: $offset, limit: $limit, order: $order, type: $type, userId: $userId) {
+  rows: records(offset: $offset, limit: $limit, order: $order, type: $type, userId: $userId, status: $status) {
     id,
     createdAt,
     title,
     payload,
     type,
+    status,
     userId
   }
 }
 `;
-
-
 
 const LABELS = {
   createContent: 'Create content',
@@ -48,26 +47,43 @@ const LABELS = {
 const UserRecords = ({
   type,
   title,
-  labels,
   breadcrumbs
  }) => {
-  const [filters, setFilters] = useState(null);
-  const [content, setContent ] = useState(null);
   const table = useRef();
+  const { props: userRecordTypes } = useCodePlug('user-record-types');
 
   const {
     error,
     saving,
     deleteRecord,
-    //editContent,
-    //createContent
   } = useUserRecords();
 
-  labels = { ...LABELS, ...labels };
+  const userRecordType = userRecordTypes.find(userRecordType => userRecordType.type === type);
+
+  const hasStatus = _.isArray(userRecordType.status) && !_.isEmpty(userRecordType.status);
+  const filterSchema = [
+    {
+      name: 'userId',
+      label: 'User',
+      control: UserAutocomplete,
+      width: 350
+    }
+  ];
+  if (hasStatus) {
+    filterSchema.push({
+      name: 'status',
+      label: 'Status',
+      control: SelectPicker,
+      data: userRecordType.status,
+      searchable: false
+    });
+  }
+
 
   return (
     <PageContainer className="page-contents">
       <Breadcrumbs pages={breadcrumbs != null ? breadcrumbs : [title]}/>
+      {error != null && <ShowError error={error}/>}
       <CustomTable
         ref={table}
         query={USER_RECORDS}
@@ -81,18 +97,10 @@ const UserRecords = ({
           >Refetch
           </Button>
         )}
-        onFilters={setFilters}
-        filtersSchema={[
-          {
-            name: 'userId',
-            label: 'User',
-            control: UserAutocomplete,
-            width: 350
-          }
-        ]}
+        filtersSchema={filterSchema}
         height={600}
         labels={{
-          empty: labels.emptyContent
+          empty: `No ${userRecordType.list.toLowerCase()}`
         }}
         autoHeight
       >
@@ -101,7 +109,7 @@ const UserRecords = ({
           <Cell dataKey="id" />
         </Column>
 
-        <Column width={140} resizable sortable>
+        <Column width={160} resizable sortable>
           <HeaderCell>Date</HeaderCell>
           <Cell dataKey="createdAt">
             {({ createdAt }) => <SmartDate date={createdAt} />}
@@ -112,6 +120,13 @@ const UserRecords = ({
           <HeaderCell>userId</HeaderCell>
           <Cell>{({ userId }) => <span className="cell-type-id">{userId}</span>}</Cell>
         </Column>
+
+        {hasStatus && (
+          <Column width={100} resizable>
+            <HeaderCell>Status</HeaderCell>
+            <Cell>{({ status }) => <span>{status}</span>}</Cell>
+          </Column>
+        )}
 
         <Column flexGrow={1} align="left" sortable resizable>
           <HeaderCell>Title</HeaderCell>
@@ -127,15 +142,6 @@ const UserRecords = ({
           <Cell>
             {record => (
               <ButtonGroup>
-                <Button
-                  disabled={saving}
-                  size="xs"
-                  onClick={() => {
-                    setContent(content)
-                  }}
-                >
-                  <Icon icon="edit2" />
-                </Button>
                 <Button
                   disabled={saving}
                   size="xs"

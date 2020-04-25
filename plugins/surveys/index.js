@@ -5,6 +5,7 @@ import { plug } from '../../lib/code-plug';
 import withConfigurationPage from '../../src/components/configuration-page';
 import { UserRecords } from '../../src/components/user-records/index.js'
 
+import SurveyViewer from './views/survey-viewer';
 import ConfigurationForm from './views/configuration-form';
 
 const Legend = () => (
@@ -81,6 +82,10 @@ plug(
     name: 'Survey',
     list: `Surveys`,
     description: 'Answer to surveys',
-    form: ({ record }) => <div>sono il form {record.title}</div>
+    form: SurveyViewer,
+    status: [
+      { value: 'new', label: 'New' },
+      { value: 'viewed', label: 'Viewed' },
+    ]
   }
 );

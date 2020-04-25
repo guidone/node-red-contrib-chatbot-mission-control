@@ -177,12 +177,14 @@ module.exports = mcSettings => {
   const Record = sequelize.define('record', {
     userId: { type: Sequelize.STRING, allowNull: false },
     type: { type: Sequelize.STRING, allowNull: false },
-    payload: { type: Sequelize.TEXT, allowNull: false },
-    title: { type: Sequelize.STRING, allowNull: false }
+    payload: { type: Sequelize.TEXT },
+    title: { type: Sequelize.STRING },
+    status: { type: Sequelize.STRING }
   }, {
     indexes: [
       { name: 'record_userid', using: 'BTREE', fields: ['userId'] },
-      { name: 'record_type', using: 'BTREE', fields: ['type'] }
+      { name: 'record_type', using: 'BTREE', fields: ['type'] },
+      { name: 'record_status', using: 'BTREE', fields: ['status'] }
     ]
   })
 

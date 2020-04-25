@@ -1,5 +1,5 @@
 import React, { useState, useRef, Fragment } from 'react';
-import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav } from 'rsuite';
+import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav, Input } from 'rsuite';
 
 
 import Dictionary from '../../../src/components/dictionary';
@@ -81,6 +81,15 @@ export default ({
         )}
         {tab === 'surveys' && (
           <Fragment>
+            <FormGroup>
+              <ControlLabel>Name</ControlLabel>
+              <FormControl
+                name="name"
+                autocomplete="off"
+                accepter={Input}
+                disabled={disabled}
+              />
+            </FormGroup>
             <FormGroup>
               <ControlLabel>Introduction Message
                 <HelpBlock tooltip>Select the content to show when the user starts the survey</HelpBlock>

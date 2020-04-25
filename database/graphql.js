@@ -206,6 +206,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLString,
         description: ''
       },
+      status: {
+        type: GraphQLString,
+        description: ''
+      },
       userId: {
         type: GraphQLString,
         description: ''
@@ -233,6 +237,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         description: ''
       },
       title: {
+        type: GraphQLString,
+        description: ''
+      },
+      status: {
         type: GraphQLString,
         description: ''
       },
@@ -337,15 +345,16 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         args: {
           order: { type: GraphQLString },
           type: { type: GraphQLString },
+          status: { type: GraphQLString },
           offset: { type: GraphQLInt },
           limit: { type: GraphQLInt }
         },
-        resolve: (user, { order = 'createdAt', offset, limit, type }) => {
+        resolve: (user, { order = 'createdAt', offset, limit, type, status }) => {
           return Record.findAll({
             limit,
             offset,
             order: splitOrder(order),
-            where: compactObject({ type, userId: user.userId })
+            where: compactObject({ type, status, userId: user.userId })
           });
         }
       },
@@ -953,12 +962,13 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLInt,
         args: {
           type: { type: GraphQLString },
-          userId: { type: GraphQLString }
+          userId: { type: GraphQLString },
+          status: { type: GraphQLString }
         },
         description: 'Total records',
-        resolve: (root, { type, userId }) => Record.count({
+        resolve: (root, { type, userId, status }) => Record.count({
           where: compactObject({
-            type, userId
+            type, userId, status
           })
         })
       }
@@ -1174,6 +1184,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           resolve(root, { id, category }) {
             return Category.update(category, { where: { id } })
               .then(() => Category.findByPk(id));
+          }
+        },
+
+        editRecord: {
+          type: recordType,
+          args: {
+            id: { type: new GraphQLNonNull(GraphQLInt)},
+            record: { type: new GraphQLNonNull(newRecordType)}
+          },
+          resolve(root, { id, record }) {
+            return Record.update(record, { where: { id } })
+              .then(() => Record.findByPk(id));
           }
         },
 
@@ -1610,16 +1632,17 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           args: {
             order: { type: GraphQLString },
             type: { type: GraphQLString },
+            status: { type: GraphQLString },
             userId: { type: GraphQLString },
             offset: { type: GraphQLInt },
             limit: { type: GraphQLInt }
           },
-          resolve: (root, { order = 'createdAt', offset, limit, type, userId }) => {
+          resolve: (root, { order = 'createdAt', offset, limit, type, userId, status }) => {
             return Record.findAll({
               limit,
               offset,
               order: splitOrder(order),
-              where: compactObject({ type, userId })
+              where: compactObject({ type, userId, status })
             });
           }
         },
