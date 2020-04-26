@@ -21,14 +21,12 @@ const CollectionEditor = ({
   form,
   labelAdd = 'Add item',
   labelEmpty = 'No elements',
-  hideArrows = false,
+  sortable = true,
   style,
   disabled = false,
   disableAdd = false,
   ...rest
 }) => {
-
-
   const onSortEnd = ({ oldIndex, newIndex }) => {
     // do not move into itself
     if (oldIndex === newIndex) {
@@ -66,8 +64,8 @@ const CollectionEditor = ({
             value={item}
             form={form}
             disabled={disabled}
-            hideArrows={hideArrows}
             index={idx}
+            sortable={sortable}
             order={idx}
             onRemove={() => {
               const cloned = [...value];
@@ -110,7 +108,7 @@ CollectionEditor.propTypes = {
   onChange: PropTypes.func,
   readOnly: PropTypes.bool,
   disableAdd: PropTypes.bool,
-  hideArrows: PropTypes.bool,
+  sortable: PropTypes.bool,
   labelAdd: PropTypes.string,
   labelEmpty: PropTypes.string
 };

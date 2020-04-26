@@ -55,12 +55,11 @@ export default ({
   return (
     <div>
       <Nav appearance="tabs" activeKey={tab} onSelect={setTab} style={{ marginBottom: '25px' }}>
-      <Nav.Item eventKey="questions">Questions</Nav.Item>
         <Nav.Item eventKey="surveys">Survey</Nav.Item>
+        <Nav.Item eventKey="questions">Questions</Nav.Item>
         <Nav.Item eventKey="translations">Translations</Nav.Item>
       </Nav>
       <Form
-
         disabled={true}
         formValue={formValue}
         formError={formError}

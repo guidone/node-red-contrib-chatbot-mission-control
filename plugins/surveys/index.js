@@ -15,25 +15,21 @@ const Legend = () => (
 );
 
 plug('sidebar', null, {
-  id: 'configuration',
-  label: 'Configuration',
-  permission: 'configure',
-  icon: 'cog',
+  id: 'surveys',
+  label: 'Surveys',
+  icon: 'logo-survey',
   options: [
     {
-      id: 'configuration-survey',
+      id: 'answer-surveys',
       label: 'Surveys',
+      url: '/surveys',
+    },
+    {
+      id: 'configuration-survey',
+      label: 'Configure survey',
       url: '/configuration-surveys',
     }
   ]
-});
-
-plug('sidebar', null, {
-  id: 'surveys',
-  label: 'Surveys',
-  //permission: 'configure',
-  url: '/surveys',
-  icon: 'cog',
 });
 // register a page to configure the survey
 plug(

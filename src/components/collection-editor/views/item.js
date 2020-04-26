@@ -13,6 +13,7 @@ const Item = ({
   onMoveUp = () => {},
   onMoveDown = () =>{},
   form,
+  sortable = true,
   disabled = false,
   ...rest
 }) => {
@@ -20,9 +21,11 @@ const Item = ({
 
   return (
     <div className="ui-collection-item">
-      <div className="handle">
-        <DragHandle />
-      </div>
+      {sortable && (
+        <div className="handle">
+          <DragHandle />
+        </div>
+      )}
       <div className="form">
         <Form
           value={value}

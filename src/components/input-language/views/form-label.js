@@ -3,26 +3,31 @@ import { Form, FlexboxGrid, FormControl } from 'rsuite';
 import PropTypes from 'prop-types';
 
 import LanguagePicker from '../../language-picker';
+import TextareaAutosize from '../../textarea-autosize';
+
 
 const FormLabel = ({ value, onChange, disabled = false, disabledLanguages }) => (
-  <Form 
-    formValue={value} 
-    onChange={onChange} 
+  <Form
+    formValue={value}
+    onChange={onChange}
     autoComplete="off"
     fluid
   >
     <FlexboxGrid justify="space-between">
       <FlexboxGrid.Item colspan={19}>
-        <FormControl 
+        <FormControl
           name="text"
-          readOnly={disabled}           
+          accepter={TextareaAutosize}
+          readOnly={disabled}
           style={{ width: '100%' }}
+          minRows={1}
+          maxRows={6}
         />
-      </FlexboxGrid.Item>      
+      </FlexboxGrid.Item>
       <FlexboxGrid.Item colspan={4}>
-        <FormControl 
-          readOnly={disabled} 
-          name="language" 
+        <FormControl
+          readOnly={disabled}
+          name="language"
           hideLanguageLabel={true}
           cleanable={false}
           block
@@ -30,7 +35,7 @@ const FormLabel = ({ value, onChange, disabled = false, disabledLanguages }) => 
           accepter={LanguagePicker}
         />
       </FlexboxGrid.Item>
-    </FlexboxGrid>    
+    </FlexboxGrid>
   </Form>
 );
 FormLabel.propTypes = {

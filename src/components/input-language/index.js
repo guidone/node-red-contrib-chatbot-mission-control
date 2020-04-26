@@ -20,18 +20,18 @@ const InputLanguage = ({
   const current = languages.map(key => ({ language: key, text: value[key], id: key }))
   return (
     <div className="ui-input-language" style={style}>
-      <CollectionEditor 
-        value={current} 
+      <CollectionEditor
+        value={current}
         disabled={disabled}
         form={FormLabel}
-        hideArrows={true}
+        sortable={false}
         labelAdd={labelAdd}
         disabledLanguages={languages}
         labelEmpty={labelEmpty}
-        disableAdd={languages.includes('new')} 
+        disableAdd={languages.includes('new')}
         onChange={value => {
           const newValue = {};
-          value.forEach(item => newValue[item.language || 'new'] = item.text);   
+          value.forEach(item => newValue[item.language || 'new'] = item.text);
           onChange(newValue);
         }}
       />
