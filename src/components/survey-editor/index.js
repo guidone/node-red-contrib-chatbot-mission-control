@@ -2,7 +2,6 @@ import React, { useState, useCallback, useEffect } from 'react';
 import _ from 'lodash';
 import { sortableContainer } from 'react-sortable-hoc';
 
-import uniqueId from '../../helpers/unique-id';
 
 
 import './style.scss';

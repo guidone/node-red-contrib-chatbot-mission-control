@@ -20,7 +20,7 @@ import Sidebar from './layout/sidebar';
 import Header from './layout/header';
 import HomePage from './pages/home';
 import WebSocket from './common/web-socket';
-import useCurrentUser from './hooks/current-user';
+import PageNotFound from './layout/page-not-found';
 
 
 // Import plugins
@@ -38,7 +38,6 @@ const client = new ApolloClient({
 
 
 const initialState = {
-  count: 0,
   user: null
 };
 
@@ -125,7 +124,7 @@ const AppRouter = ({ codePlug, bootstrap }) => {
     <ApolloProvider client={client}>
       <AppContext.Provider value={{ state, dispatch, client, platforms, eventTypes, messageTypes, activeChatbots }}>
         <WebSocket dispatch={dispatch}>
-          <Router basename="/mc/">
+          <Router basename="/mc">
             <div className="mission-control-app">
               <Container className="mc-main-container">
                 <Sidebar/>
@@ -134,12 +133,10 @@ const AppRouter = ({ codePlug, bootstrap }) => {
                   <Content className="mc-inner-content">
                     <Switch>
                       {items.map(({ view: View, props }) => (
-                        <Route key={props.url} path={props.url} children={<View {...props} dispatch={dispatch}/>}>
-
-                        </Route>
+                        <Route key={props.url} path={props.url} children={<View {...props} dispatch={dispatch}/>} />
                       ))}
-                      <Route path="/" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}>
-                      </Route>
+                      <Route exact path="/" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}/>
+                      <Route path="*" component={PageNotFound} />
                     </Switch>
                   </Content>
                 </Container>

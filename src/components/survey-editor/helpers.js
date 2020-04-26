@@ -1,5 +1,7 @@
 import _ from 'lodash';
 
+import uniqueId from '../../helpers/unique-id';
+
 const findQuestion = (questions, question) => {
   return questions.find(item => item.id === question.id);
 };

@@ -10,9 +10,9 @@ import './index.scss';
 const ShowError = ({
   error = 'Something went wrong on the server, please try again.',
   title = 'Server error',
-  subtitle = 'Something went really wrong on the server.'
+  subtitle
 }) => {
-  console.log('ERROR', error)
+  console.log('ERROR222', error)
   // TODO try to extract error message
 
   let message;
@@ -25,6 +25,9 @@ const ShowError = ({
         {errors.map(item => <span key={item.message}>{item.message}. </span>)}
       </span>
     );
+  } else if (error != null) {
+
+    message = error;
   }
 
   return (
