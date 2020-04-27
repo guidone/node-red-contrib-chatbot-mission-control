@@ -45,7 +45,7 @@ plug('pages', Categories, {
   namespace: 'faq',
   breadcrumbs: [
     { title: 'Knowledge Base', url: '/knowledge-base' },
-    'Configuration'
+    'Categories'
   ]
 });
 plug('pages', Configuration, {

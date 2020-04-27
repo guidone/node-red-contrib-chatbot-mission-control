@@ -59,11 +59,10 @@ $sidebar-icon: #aaaaaa;
 }
 
 .mc-sidebar {
-  position: relative;
+  overflow-y: scroll;
 
   .bottom {
-    position: absolute;
-    bottom: 0px;
+    margin-top: 20px;
     padding: 5px;
     font-size: 11px;
 

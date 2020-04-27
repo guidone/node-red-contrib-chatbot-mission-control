@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
-import { 
-  Modal, 
-  Button, 
-  Form, 
-  FormGroup, 
-  ControlLabel, 
+import {
+  Modal,
+  Button,
+  Form,
+  FormGroup,
+  ControlLabel,
   FormControl
 } from 'rsuite';
 
@@ -16,45 +16,46 @@ const ModalCategory = ({ category, onCancel = () => {}, onSubmit = () => {}, dis
   const [formValue, setFormValue] = useState(category);
   const [formError, setFormError] = useState(null);
   const form = useRef(null);
-  
-  // TODO: flag for edit or new 
+
+  // TODO: flag for edit or new
 
   return (
     <Modal backdrop show onHide={onCancel} className="modal-content" size="sm">
       <Modal.Header>
         <Modal.Title>Edit Category</Modal.Title>
       </Modal.Header>
-      <Modal.Body>            
-        <Form 
+      <Modal.Body>
+        <Form
           model={categoryModel}
           ref={form}
           checkTrigger="none"
-          formValue={formValue} 
-          formError={formError} 
+          formValue={formValue}
+          formError={formError}
           onChange={formValue => {
             setFormValue(formValue);
             setFormError(null);
-          }} 
+          }}
           onCheck={errors => {
             setFormError(errors);
           }}
           fluid autoComplete="off"
-        >            
+          style={{ marginBottom: '20px' }}
+        >
           <FormGroup>
             <ControlLabel>Name</ControlLabel>
-            <FormControl name="name"/>                      
-          </FormGroup>          
+            <FormControl name="name"/>
+          </FormGroup>
         </Form>
       </Modal.Body>
       <Modal.Footer>
-        <Button 
+        <Button
           appearance="primary"
-          disabled={disabled} 
-          appearance="primary" 
-          onClick={() => {   
+          disabled={disabled}
+          appearance="primary"
+          onClick={() => {
             if (!form.current.check()) {
               return;
-            }         
+            }
             onSubmit(formValue);
           }}
         >
@@ -69,4 +70,3 @@ const ModalCategory = ({ category, onCancel = () => {}, onSubmit = () => {}, dis
 };
 
 export default ModalCategory;
-

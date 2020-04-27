@@ -154,4 +154,48 @@ const retag = questions => {
   }));
 }
 
-export { findQuestion, isFirstOfNested, findParent, hasChildren, remove, replace, add, getLevels, retag };
+const swap = (questions, oldIndex, newIndex) => {
+
+
+  // do not move into itself
+  if (oldIndex === newIndex) {
+    return questions;
+  }
+
+  const newQuestions = [...questions];
+  const to = newIndex;
+  const from = oldIndex
+
+  const startIndex = to < 0 ? newQuestions.length + to : to;
+  const item = newQuestions.splice(from, 1)[0];
+  newQuestions.splice(startIndex, 0, item);
+
+  const movedQuestion = newQuestions[newIndex];
+  const previous = newIndex > 0 ? newQuestions[newIndex - 1] : null;
+  const hasSubQuestions = hasChildren(questions, movedQuestion);
+  const parent = findParent(questions, movedQuestion);
+
+  //console.log('movedQuestion', movedQuestion)
+  //console.log('previous', previous)
+  //console.log('hasSubQuestions', hasSubQuestions)
+  //console.log('parent', parent)
+  // if the previous article has some children, then the moved question becomes
+  // its children too
+  if (previous != null && hasChildren(questions, previous)) {
+    newQuestions[newIndex].parent = previous.id;
+  } else {
+    newQuestions[newIndex].parent = null;
+  }
+  // if the moved question has children, then move up one level
+  if (hasSubQuestions) {
+    questions.forEach(item => {
+      if (item.parent === movedQuestion.id) {
+        item.parent = parent != null ? parent.id : null;
+      }
+    });
+  }
+
+  return newQuestions;
+};
+
+export { findQuestion, isFirstOfNested, findParent, hasChildren, remove, replace, add, getLevels, retag, swap };

@@ -14,7 +14,7 @@ const Item = ({
   onMoveDown = () =>{},
   form,
   sortable = true,
-  disabled = false,
+  disabledIHHOC: disabled = false,
   ...rest
 }) => {
   const Form = form;
@@ -36,11 +36,11 @@ const Item = ({
       </div>
       <div className="control-buttons">
         <IconButton
-            disabled={disabled}
-            icon={<Icon icon="close" />}
-            size="sm"
-            onClick={onRemove}
-          />
+          disabled={disabled}
+          icon={<Icon icon="close" />}
+          size="sm"
+          onClick={onRemove}
+        />
       </div>
     </div>
   );

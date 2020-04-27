@@ -1,33 +1,19 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import _ from 'lodash';
 import { sortableContainer } from 'react-sortable-hoc';
-
-
+import PropTypes from 'prop-types';
 
 import './style.scss';
 import Question from './views/question';
 import QuestionDetail from './views/question-detail';
-
-
 import SurveyEditorContext from './context';
-import { findQuestion, findParent, hasChildren, remove, replace, add, getLevels, retag } from './helpers';
-
-
-
-
+import { remove, replace, add, getLevels, retag, swap } from './helpers';
 
 const SortableContainer = sortableContainer(({ children }) => {
   return <div className="questions">{children}</div>;
 });
 
-
-
-
-
-
-
 const SurveyEditor = ({ value: questions = [{}], onChange = () => {} }) => {
-
   const [active, setActive] = useState();
 
   useEffect(() => {
@@ -36,55 +22,10 @@ const SurveyEditor = ({ value: questions = [{}], onChange = () => {} }) => {
     }
   }, [questions])
 
-
-  //const onSortEnd = ({ oldIndex, newIndex}) => {
-  const onSortEnd = ({ oldIndex, newIndex }) => {
-
-
-    // do not move into itself
-    if (oldIndex === newIndex) {
-      return;
-    }
-
-    const newQuestions = [...questions];
-    const to = newIndex;
-    const from = oldIndex
-
-    const startIndex = to < 0 ? newQuestions.length + to : to;
-	  const item = newQuestions.splice(from, 1)[0];
-	  newQuestions.splice(startIndex, 0, item);
-
-
-    const movedQuestion = newQuestions[newIndex];
-    const previous = newIndex > 0 ? newQuestions[newIndex - 1] : null;
-    const hasSubQuestions = hasChildren(questions, movedQuestion);
-    const parent = findParent(questions, movedQuestion);
-
-    //console.log('movedQuestion', movedQuestion)
-    //console.log('previous', previous)
-    //console.log('hasSubQuestions', hasSubQuestions)
-    //console.log('parent', parent)
-    // if the previous article has some children, then the moved question becomes
-    // its children too
-    if (previous != null && hasChildren(questions, previous)) {
-      newQuestions[newIndex].parent = previous.id;
-    } else {
-      newQuestions[newIndex].parent = null;
-    }
-    // if the moved question has children, then move up one level
-    if (hasSubQuestions) {
-      questions.forEach(item => {
-        if (item.parent === movedQuestion.id) {
-          item.parent = parent != null ? parent.id : null;
-        }
-      });
-    }
-
-
-
+  const onSortEnd = useCallback(({ oldIndex, newIndex }) => {
+    const newQuestions = swap(questions, oldIndex, newIndex);
     onChange(retag(newQuestions));
-  };
-
+  });
 
   const activeQuestion = questions.find(question => question.id === active);
   // get levels, in order to know for every parent what's the indent level
@@ -126,6 +67,25 @@ const SurveyEditor = ({ value: questions = [{}], onChange = () => {} }) => {
       </div>
     </SurveyEditorContext.Provider>
   );
-}
+};
+SurveyEditor.propTypes = {
+  onChange: PropTypes.func,
+  disabled: PropTypes.bool,
+  value: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    level: PropTypes.number,
+    tag: PropTypes.string,
+    title: PropTypes.string.isRequired,
+    type: PropTypes.oneOf(['multiple', 'string', 'number', 'image']).isRequired,
+    data: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.shape({
+        answer: PropTypes.string.isRequired,
+        id: PropTypes.string.isRequired,
+        jump: PropTypes.string,
+        value: PropTypes.string
+      }))
+    ])
+  }))
+};
 
 export default SurveyEditor;

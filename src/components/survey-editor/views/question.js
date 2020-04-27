@@ -1,48 +1,16 @@
-import React, { useRef, Fragment, useContext } from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-
 import classNames from 'classnames';
-import { Icon, Whisper, Tooltip } from 'rsuite';
-
 import { sortableHandle, sortableElement } from 'react-sortable-hoc';
-//const SortableItem = sortableElement(Question);
 
-const DragHandle = sortableHandle(() => <div className="grippy"></div>);
+import IconTooltip from '../../badge-icon-tooltip';
 
 import { isFirstOfNested } from '../helpers';
 import SurveyEditorContext from '../context';
 import Tag from './tag';
 
-
 const INDENT_SIZE = 8;
-
-
-
-const IconTooltip = ({ icon, text, tooltip, color }) => {
-
-  const dom = (
-    <div className={classNames('ui-icon-tooltip', { [color]: true })}>
-      <Icon icon={icon} />
-      {text != null && <span className="text">{text}</span>}
-    </div>
-  );
-
-  if (tooltip != null) {
-    return (
-      <Whisper trigger="hover" placement="top" speaker={<Tooltip>{tooltip}</Tooltip>}>
-        {dom}
-      </Whisper>
-    );
-  } else {
-    return dom;
-  }
-};
-IconTooltip.propTypes = {
-  color: PropTypes.oneOf(['red', 'orange'])
-};
-
-
-
+const DragHandle = sortableHandle(() => <div className="grippy"></div>);
 
 const Question = ({
   question,
@@ -50,7 +18,6 @@ const Question = ({
   active = false,
   level = null
 }) => {
-
   const { questions } = useContext(SurveyEditorContext);
 
   const forks = (_.isArray(question.data) ? question.data : [])
@@ -95,9 +62,6 @@ const Question = ({
     }
   }
 
-
-
-
   return (
     <div className={classNames('ui-survey-question', { active })}>
       {level != null && (
@@ -110,7 +74,6 @@ const Question = ({
       }}>
         <div className="meta">
           <Tag>{question.tag}</Tag>
-
           <div className="icons">
             {forks}
             {warnings}
@@ -140,23 +103,35 @@ const Question = ({
               />
             )}
           </div>
-
         </div>
-
         <div className="title">
           {question.title}
         </div>
-
-
       </div>
-
       <div className="selection-bar">
-
       </div>
-
     </div>
   );
-
-}
+};
+Question.propTypes = {
+  question: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    level: PropTypes.number,
+    tag: PropTypes.string,
+    title: PropTypes.string.isRequired,
+    type: PropTypes.oneOf(['multiple', 'string', 'number', 'image']).isRequired,
+    data: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.shape({
+        answer: PropTypes.string.isRequired,
+        id: PropTypes.string.isRequired,
+        jump: PropTypes.string,
+        value: PropTypes.string
+      }))
+    ])
+  }),
+  onSelect: PropTypes.func,
+  active: PropTypes.bool,
+  level: PropTypes.number
+};
 
 export default sortableElement(Question);
