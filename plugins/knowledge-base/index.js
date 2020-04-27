@@ -14,9 +14,24 @@ plug(
     label: 'Knowledge Base',
     url: '/knowledge-base',
     icon: 'file-text',
+    permission: 'faq.edit',
     options: [
       { label: 'Articles', url: '/knowledge-base', id: 'faqs' },
-      { label: 'Categories', url: '/knowledge-base/categories', id: 'faqs-categories' },
+      { label: 'Categories', url: '/knowledge-base/categories', id: 'faqs-categories' }
+    ]
+  }
+);
+
+plug(
+  'sidebar',
+  null,
+  {
+    id: 'knowledgebase',
+    label: 'Knowledge Base',
+    url: '/knowledge-base',
+    icon: 'file-text',
+    permission: ['faq.configure', 'configure'],
+    options: [
       { label: 'Configuration', url: '/knowledge-base/configure', id: 'faqs-configure' }
     ]
   }
@@ -26,6 +41,7 @@ plug('pages', Categories, {
   url: '/knowledge-base/categories',
   title: 'Categories',
   id: 'faq-categories',
+  permission: 'faq.edit',
   namespace: 'faq',
   breadcrumbs: [
     { title: 'Knowledge Base', url: '/knowledge-base' },
@@ -35,13 +51,15 @@ plug('pages', Categories, {
 plug('pages', Configuration, {
   url: '/knowledge-base/configure',
   title: 'Configure',
-  id: 'faqs-configure'
+  id: 'faqs-configure',
+  permission: ['faq.configure', 'configure'],
 });
 plug('pages', Contents, {
   url: '/knowledge-base',
   title: 'Knowledge Base',
   id: 'faqs',
   namespace: 'faq',
+  permission: 'faq.edit',
   breadcrumbs: ['Knowledge Base', 'Articles'],
   labels: {
     saveContent: 'Save article'

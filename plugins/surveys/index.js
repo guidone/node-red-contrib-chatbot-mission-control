@@ -18,6 +18,7 @@ plug('sidebar', null, {
   id: 'surveys',
   label: 'Surveys',
   icon: 'logo-survey',
+  permission: 'surveys.view',
   options: [
     {
       id: 'answer-surveys',

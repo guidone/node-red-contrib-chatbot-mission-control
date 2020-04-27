@@ -6,7 +6,7 @@ const useCurrentUser = () => {
 
   return {
     user: state.user,
-    permissionQuery: { permission: { '$in': state.user.permissions } },
+    permissionQuery: { permission: { '$intersect': state.user.permissions } },
     can: permission => state.user.permissions.includes(permission) || state.user.permissions.includes('*')
   };
 };

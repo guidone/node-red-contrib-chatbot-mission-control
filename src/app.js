@@ -105,8 +105,7 @@ const usePrefetchedData = () => {
 
 
 const AppRouter = ({ codePlug, bootstrap }) => {
-
-  const { items } = useCodePlug('pages', { permission: { '$in': bootstrap.user.permissions }})
+  const { items } = useCodePlug('pages', { permission: { '$intersect': bootstrap.user.permissions }})
   const { platforms, eventTypes, messageTypes, activeChatbots, loading } = usePrefetchedData();
 
   const reducers = useMemo(() => compose(...codePlug.getItems('reducers').map(item => item.view )));

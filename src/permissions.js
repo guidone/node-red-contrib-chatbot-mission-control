@@ -19,7 +19,7 @@ plug(
   {
     permission: 'configure',
     name: 'Configure',
-    description: 'Configure plugins and Mission Control (unless plugin has a specific permission)',
+    description: `Configure plugins and Mission Control, will access to all configuration pages.`,
     group: 'General'
   }
 );
