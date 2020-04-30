@@ -1424,7 +1424,11 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
                 currentUser = await User.findOne({ where: { userId: user.userId }});
               }
               userId = user.userId;
-              await ChatId.create({ userId: user.userId, chatId: message.chatId, transport: message.transport });
+              if (_.isEmpty(message.chatId)) {
+                await ChatId.create({ userId: user.userId, chatId: message.chatId, transport: message.transport });
+              } else {
+                console.trace(`Warning: received message without chatId for transport ${transport}`)
+              }
             } else {
               userId = existingChatId.userId;
             }

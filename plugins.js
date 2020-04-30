@@ -3,6 +3,7 @@ import './plugins/send-message';
 import './plugins/configuration-openings';
 //import './plugins/configuration-test';
 
+import './plugins/schema-form-demo';
 import './plugins/messages-log';
 import './plugins/messages';
 import './plugins/users';

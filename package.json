@@ -23,8 +23,7 @@
       "mc-event": "nodes/mc_event.js",
       "mc-simulator-receiver": "nodes/mc_simulator_receiver.js",
       "mc-simulator-sender": "nodes/mc_simulator_sender.js",
-      "mc-user-payload": "nodes/mc_user_payload.js",
-      "mc-user": "nodes/mc_user.js"
+      "mc-user-payload": "nodes/mc_user_payload.js"
     }
   },
   "dependencies": {
