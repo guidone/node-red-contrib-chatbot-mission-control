@@ -5,10 +5,12 @@ import classNames from 'classnames';
 import { Button } from 'rsuite';
 import { sortableContainer } from 'react-sortable-hoc';
 
+
 import uniqueId from '../../helpers/unique-id';
 
 import Item from './views/item';
 import './style.scss';
+import { max } from 'moment';
 
 const SortableContainer = sortableContainer(({ children }) => {
   return <div>{children}</div>;
@@ -25,6 +27,8 @@ const CollectionEditor = ({
   style,
   disabled = false,
   disableAdd = false,
+  minItems,
+  maxItems,
   ...rest
 }) => {
   const onSortEnd = ({ oldIndex, newIndex }) => {
@@ -39,10 +43,15 @@ const CollectionEditor = ({
     onChange(newValue);
   };
 
+  const items = value || [];
+  const canAdd = !disabled && !disableAdd && (maxItems == null || maxItems > items.length);
+
+
+
   const addButton = (
     <Button
       size="sm"
-      disabled={disabled || disableAdd}
+      disabled={!canAdd}
       onClick={() => onChange([...value, { id: uniqueId('c') }])}
     >
       {labelAdd}
@@ -58,7 +67,7 @@ const CollectionEditor = ({
         </div>
       )}
       <SortableContainer onSortEnd={onSortEnd} helperClass="sorting" useDragHandle>
-        {(value || []).map((item, idx) => (
+        {items.map((item, idx) => (
           <Item
             key={item.id}
             value={item}
@@ -77,24 +86,7 @@ const CollectionEditor = ({
               cloned[idx] = item;
               onChange(cloned);
             }}
-            onMoveUp={idx > 0 ? () => {
-              if (idx > 0) {
-                const cloned = [...value];
-                const temp = cloned[idx - 1];
-                cloned[idx - 1] = cloned[idx];
-                cloned[idx] = temp;
-                onChange(cloned);
-              }
-            } : null}
-            onMoveDown={idx < (value.length - 1) ? () => {
-              if (idx < (value.length - 1)) {
-                const cloned = [...value];
-                const temp = cloned[idx + 1];
-                cloned[idx + 1] = cloned[idx];
-                cloned[idx] = temp;
-                onChange(cloned);
-              }
-            } : null}
+            canRemove={minItems == null || items.length > minItems}
             {...rest}
           />
         ))}
@@ -110,7 +102,12 @@ CollectionEditor.propTypes = {
   disableAdd: PropTypes.bool,
   sortable: PropTypes.bool,
   labelAdd: PropTypes.string,
-  labelEmpty: PropTypes.string
+  labelEmpty: PropTypes.string,
+  minItems: PropTypes.number,
+  maxItems: PropTypes.number
 };
 
-export default CollectionEditor;
+
+
+
+export { CollectionEditor as default }

@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useEffect, useCallback, useMemo } from 'react';
+import React, { Fragment, useContext, useState, useLayoutEffect, useEffect, useCallback, useMemo } from 'react';
 import _ from 'lodash';
 import {
   FormGroup,
@@ -13,40 +13,46 @@ import {
   Icon
  } from 'rsuite';
 import classNames from 'classnames';
+import djv from 'djv';
 
 import './style.scss';
+import useControl from './helpers/use-control';
 
-const FormContext = React.createContext();
+import FormContext from './context';
 
-const useControl = ({ jsonSchema, value, onChange }) => {
-  const { permissions, debug } = useContext(FormContext);
-  const isAdmin = permissions.includes('*');
-  const options = jsonSchema.options || {};
-  const canWrite = isAdmin || _.isEmpty(options.writePermission) || (permissions || []).includes(options.writePermission);
-  const canRead = isAdmin || _.isEmpty(options.readPermission) || (permissions || []).includes(options.readPermission);
 
-  return {
-    canRead,
-    canWrite,
-    debug,
-    permissions: permissions || [],
-    log: function(str) {
-      if (!debug) {
-        return;
-      }
 
-      //const args = Array.from(arguments);
-      console.log(
-        `%cFORM-SCHEMA%c id:${jsonSchema['$id']} %c${str}`,
-        'background-color:#2258F8;color:#ffffff',
-        'font-size:11px;color:#999999',
-        'color: #000000',
-        'color:#1B6BB3',
-        'color: #000000'
-        );
+const setDefaults = (value, jsonSchema) => {
+
+  if (jsonSchema.type === 'object') {
+    if (value == null) {
+      value = {};
     }
-   };
-};
+    Object.entries(jsonSchema.properties)
+      .filter(([field, schema]) => value[field] == null)
+      .forEach(([field, schema]) => {
+        value[field] = setDefaults(null, schema);
+      })
+    return value;
+  } else if (jsonSchema.type === 'array') {
+    if (value == null) {
+      value = [];
+    }
+    return value;
+  } else {
+    if (value == null && jsonSchema.default != null) {
+      value = jsonSchema.default;
+    }
+    return value;
+  }
+}
+
+
+
+
+
+
+
 
 
 // Reserved keywords for options in the json schema, these props are NOT passed with the spread operator
@@ -84,47 +90,57 @@ const HelpBlock = ({ jsonSchema = {} }) => {
   return null;
 }
 
-const StringController = ({ jsonSchema, required = false, readOnly = undefined, ...props }) => {
-  const { canWrite, log, permissions } = useControl({ jsonSchema, ...props });
+const ErrorBlock = ({ error }) => {
+
+  if (error == null) {
+    return <Fragment/>;
+  }
+  let msg;
+  if (!_.isEmpty(error.error)) {
+    msg = error.error;
+  } else if (_.isArray(error.errors) && !_.isEmpty(error.errors)) {
+    msg = error.errors[0].error;
+  }
+
+  return (
+    <div className="error-msg">{msg}</div>
+  );
+}
+
+
+const StringController = props => {
+  const { jsonSchema, required = false, readOnly = undefined } = props;
+  const { canWrite, log, permissions, error } = useControl(props);
   const { tooltip } = jsonSchema.options || {};
 
   if (!canWrite) {
     log(`is readonly, available permissions %c"${permissions.join(',')}"`);
   }
 
-
-  /*if (!canRead) {
-    log(`hidden, no read permission, available permissions %c"${permissions.join(',')}"`);
-    return <div/>;
-  }*/
-
-  /*let hint;
-  if (!_.isEmpty(help)) {
-    hint = <HelpBlock>{help}</HelpBlock>
-  } else if (_.isArray(jsonSchema.examples) && !_.isEmpty(jsonSchema.examples)) {
-    hint = <HelpBlock>Example: {jsonSchema.examples.join(', ')}</HelpBlock>
-  }*/
-
   return (
     <FormGroup>
       {!_.isEmpty(jsonSchema.title) && <ControlLabel required={required} tooltip={tooltip}>{jsonSchema.title}</ControlLabel>}
       <Input
+        className={classNames({ 'whit-error': error != null})}
         readOnly={readOnly || !canWrite}
         {..._.omit(props, RESERVED_KEYWORDS)}
       />
       <HelpBlock jsonSchema={jsonSchema}/>
+      <ErrorBlock error={error}/>
     </FormGroup>
 
   );
 }
 
-const SelectController = ({ jsonSchema, required = false, searchable = false, readOnly = undefined, ...props }) => {
-  const { canWrite } = useControl({ jsonSchema, ...props });
+const SelectController = props => {
+  const { jsonSchema, required = false, searchable = false, readOnly = undefined } = props;
+  const { canWrite, error } = useControl(props);
 
   return (
     <FormGroup>
       {!_.isEmpty(jsonSchema.title) && <ControlLabel required={required}>{jsonSchema.title}</ControlLabel>}
       <SelectPicker
+        className={classNames({ 'whit-error': error != null})}
         data={jsonSchema.enum.map(value => ({ value, label: value }))}
         block
         searchable={searchable}
@@ -133,6 +149,7 @@ const SelectController = ({ jsonSchema, required = false, searchable = false, re
         {..._.omit(props, RESERVED_KEYWORDS)}
       />
       <HelpBlock jsonSchema={jsonSchema}/>
+      <ErrorBlock error={error}/>
     </FormGroup>
 
   );
@@ -150,15 +167,25 @@ const BooleanController = ({ jsonSchema, required = false, value, ...props }) =>
 };
 
 
-const IntegerController = ({ jsonSchema, required = false, onChange, ...props }) => {
+const pickNumber = function() {
+  const list = Array.from(arguments);
+  return list.find(_.isNumber);
+}
 
 
+const IntegerController = props => {
+  const { jsonSchema, required = false, onChange } = props;
+  const { error } = useControl(props);
+  const { minimum , exclusiveMinimum, maximum, exclusiveMaximum } = jsonSchema || {};
 
   return (
     <FormGroup>
       {!_.isEmpty(jsonSchema.title) && <ControlLabel required={required}>{jsonSchema.title}</ControlLabel>}
       <InputNumber
         {...props}
+        className={classNames({ 'whit-error': error != null})}
+        max={pickNumber(maximum, exclusiveMaximum)}
+        min={pickNumber(minimum, exclusiveMinimum)}
         onChange={value => {
           if (!isNaN(parseFloat(value))) {
             onChange(parseFloat(value));
@@ -168,8 +195,8 @@ const IntegerController = ({ jsonSchema, required = false, onChange, ...props })
         }}
       />
       <HelpBlock jsonSchema={jsonSchema}/>
+      <ErrorBlock error={error}/>
     </FormGroup>
-
   );
 }
 
@@ -193,6 +220,7 @@ const ArrayController = ({ jsonSchema, level, value = [], onChange, readOnly = f
   if (!canWrite) {
     log(`is readonly, available permissions %c"${permissions.join(',')}"`);
   }
+  const { maxItems, minItems } = jsonSchema;
 
   return (
     <Fragment>
@@ -201,6 +229,8 @@ const ArrayController = ({ jsonSchema, level, value = [], onChange, readOnly = f
          value={value}
          form={ArrayControllerForm}
          disabled={readOnly || !canWrite}
+         maxItems={_.isNumber(maxItems) ? maxItems : null}
+         minItems={_.isNumber(minItems) ? minItems : null}
          onChange={onChange}
          jsonSchema={jsonSchema.items}
          {..._.omit(props, RESERVED_KEYWORDS)}
@@ -210,7 +240,7 @@ const ArrayController = ({ jsonSchema, level, value = [], onChange, readOnly = f
 }
 
 const ObjectController = ({ jsonSchema, level, value = {}, onChange }) => {
-  const { permissions, canRead, canWrite, log } = useControl({ jsonSchema, value, onChange });
+  const { permissions, canRead, canWrite, log, error } = useControl({ jsonSchema, value, onChange });
 
   if (!canRead) {
     log('is hidden, no read permission');
@@ -242,9 +272,10 @@ const ObjectController = ({ jsonSchema, level, value = {}, onChange }) => {
       return canRead;
     })
     .map(([field, schema]) => {
-      // come ci passo il value e onChange e key
-      //const Controller = generateController({ jsonSchema: schema, level: level + 1 })
-
+      let fieldError;
+      if (error && !_.isEmpty(error.errors)) {
+        fieldError = error.errors.find(error => error.id === schema['$id']);
+      }
       const controller = (
         <Controller
           field={field}
@@ -254,8 +285,8 @@ const ObjectController = ({ jsonSchema, level, value = {}, onChange }) => {
           level={level + 1}
           required={requireds.includes(field)}
           readOnly={!canWrite ? true : undefined}
+          error={fieldError}
           onChange={newValue => {
-
             onChange({ ...value, [field]: newValue });
           }}
         />
@@ -270,8 +301,6 @@ const ObjectController = ({ jsonSchema, level, value = {}, onChange }) => {
       } else {
         return controller;
       }
-
-
     });
 
   if (layout === 'accordion' || layout === 'panel') {
@@ -315,7 +344,7 @@ const Controller = ({ value, field, jsonSchema, level = 0, onChange, ...props })
     ...props
   }
 
-  if (jsonSchema.type === 'string' && _.isArray(jsonSchema.enum) && !_.isEmpty(jsonSchema.enum)) {
+  if (['string', 'integer', 'number'].includes(jsonSchema.type) && _.isArray(jsonSchema.enum) && !_.isEmpty(jsonSchema.enum)) {
     return <SelectController {...common}/>;
   } else if (jsonSchema.type === 'boolean') {
     return (<BooleanController {...common}/>)
@@ -348,11 +377,25 @@ const SchemaForm = ({
   permissions = ['read', 'write', 'global-read', 'global-write'],
   debug = true
 }) => {
+  const [formValue, setFormValue] = useState(setDefaults(value, jsonSchema));
+  const { validate } = useControl({ jsonSchema });
+
+
+
+
+
 
   return (
     <div className="ui-schema-form">
-      <FormContext.Provider value={{ permissions, debug }}>
-        <Controller jsonSchema={jsonSchema} value={value} onChange={onChange}/>
+      <FormContext.Provider value={{ permissions, debug, errors: validate(formValue) }}>
+        <Controller
+          jsonSchema={jsonSchema}
+          value={formValue}
+          onChange={value => {
+            console.log('---> validation', validate(value))
+            setFormValue(value);
+            onChange(value);
+          }}/>
       </FormContext.Provider>
     </div>
   );
