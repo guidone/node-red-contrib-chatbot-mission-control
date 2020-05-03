@@ -116,7 +116,7 @@ const ChatPage = () => {
                 },
                 "thres": {
                   "$id": "#/properties/digital/items/properties/thres",
-                  "type": "integer",
+                  "type": "number",
                   "minimum": 30,
                   "title": "Soglia Allarme",
                   "default": 42,
@@ -175,8 +175,26 @@ const ChatPage = () => {
               "snooze",
               "upd",
               "alarm",
-              "adc"
+              "adc",
+              "a-date"
             ],
+            dependencies: {
+              "a-date": ["a-time"],
+              creditCard: {
+                required: ['expirationDate'],
+                properties: {
+                  expirationDate: {
+                    "$id": "#/properties/network/properties/mqtt/properties/expirationDate",
+                    type: 'string',
+                    format: 'date-time',
+                    title: 'Credit Card Expiration Date',
+                    options: {
+                      help: 'Need to know when expires'
+                    }
+                  }
+                }
+              }
+            },
             "options": {
               "collapsed": true,
               readPermission: 'global-read',
@@ -218,6 +236,18 @@ const ChatPage = () => {
                 ],
                 "format": "checkbox"
               },
+              "a-date": {
+                "$id": "#/properties/network/properties/mqtt/properties/a-date",
+                "type": "string",
+                "title": "A date",
+                "format": "date-time"
+              },
+              "a-time": {
+                "$id": "#/properties/network/properties/mqtt/properties/a-time",
+                "type": "string",
+                "title": "A time",
+                "format": "time"
+              },
               "tele": {
                 "$id": "#/properties/network/properties/mqtt/properties/tele",
                 "type": "boolean",
@@ -227,6 +257,11 @@ const ChatPage = () => {
                   false
                 ],
                 "format": "checkbox"
+              },
+              creditCard: {
+                "$id": "#/properties/network/properties/mqtt/properties/creditCard",
+                title: 'Credit Card',
+                type: 'string'
               }
             }
           },

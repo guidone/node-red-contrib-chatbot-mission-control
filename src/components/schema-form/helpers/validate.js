@@ -1,5 +1,17 @@
 import _ from 'lodash';
-import { hasError } from 'apollo-client/core/ObservableQuery';
+
+import isValidDate from '../../../helpers/is-valid-date';
+
+/*const useValidation = (path, schema) => {
+
+  let validation = createBlankValidation(path, jsonSchema);
+
+  return {
+    validation,
+    namme
+  }
+
+}*/
 
 
 const append = (validation, msg) => ({
@@ -20,35 +32,88 @@ const createBlankValidation = (path, jsonSchema) => ({
   errors: []
 });
 
-
-const validateObject = (value, path, jsonSchema) => {
-
-  const { required } = jsonSchema || [];
+const validateArray = (value, path, jsonSchema) => {
+  const { maxItems , minItems, title } = jsonSchema || [];
   let validation = createBlankValidation(path, jsonSchema);
+  const fieldName = !_.isEmpty(title) ? `"${title}"` : 'array';
   let validations = [];
 
   if (!_.isObject(value)) {
-    return [append(validation, { error: `is not an object` })];
+    return [append(validation, { error: `${fieldName} is not an array` })];
   }
 
+  if (_.isNumber(minItems) && value.length < minItems) {
+    validation = append(validation, { error: `${fieldName} length is smaller than ${minItems}` });
+  }
 
-  // TODO extract title for better messages
+  if (_.isNumber(maxItems) && value.length > maxItems) {
+    validation = append(validation, { error: `${fieldName}  length is greater than ${maxItems}` });
+  }
+  // validate items of array
+  value.forEach((item, idx) => {
+    // only check if not null
+    if (item != null) {
+      // check validation of sub array items
+      const subValidation = validate(item, `${path}[${idx}]`, jsonSchema.items);
+      if (hasErrors(subValidation)) {
+        validations = [...validations, ...subValidation];
+      }
+    }
+  });
+
+  // add local validation
+  if (hasErrors(validation)) {
+    validations = [validation, ...validations];
+  }
+
+  return !_.isEmpty(validations) ? validations : null;
+};
+
+
+const validateObject = (value, path, jsonSchema) => {
+
+  let { required, title, dependencies, properties } = jsonSchema || [];
+  let validation = createBlankValidation(path, jsonSchema);
+  const fieldName = !_.isEmpty(title) ? `"${title}"` : 'object';
+  let validations = [];
+
+  if (!_.isObject(value)) {
+    return [append(validation, { error: `${fieldName} is not an object` })];
+  }
+
+  // add all required field from dependencies
+  Object.entries(jsonSchema.dependencies || {})
+    .forEach(([field, fields]) => {
+      // if the key of the dependencies is present
+      if (value[field] != null && value[field] !== '') {
+        // if it's an array, just add the fields to the requireds array, if it's an object
+        // then merge properties and requireds array (that allows some fields to appear in some conditions)
+        if (_.isArray(fields)) {
+          required = _.uniq([...required, ...fields]);
+        } else {
+          required = _.uniq([...required, ...fields.required]);
+          properties = { ...properties, ...fields.properties };
+        }
+      }
+    });
+
   // check required values
   (required || [])
     .forEach(field => {
       if (_.isEmpty(value[field]) && !_.isNumber(value[field])) {
         // check local validation of the object
+        const fieldName = properties[field] != null && !_.isEmpty(properties[field].title) ?
+          properties[field].title : field;
         validation = append(validation, {
-          id: jsonSchema.properties[field] != null ? jsonSchema.properties[field]['$id'] : null,
+          id: properties[field] != null ? properties[field]['$id'] : null,
           path: `${path}/${field}`,
-          error: `${field} is required`
+          error: `"${fieldName}" is required`
         });
       }
     });
 
-
   // check sub properties
-  Object.entries(jsonSchema.properties)
+  Object.entries(properties)
     .forEach(([field, schema]) => {
       // only check if not null
       if (value[field] != null) {
@@ -70,40 +135,51 @@ const validateObject = (value, path, jsonSchema) => {
 }
 
 const validateString = (value, path, jsonSchema) => {
-  const { minLength, maxLength, title } = jsonSchema || {};
+  const { minLength, maxLength, title, format } = jsonSchema || {};
   let validation = createBlankValidation(path, jsonSchema);
+  const fieldName = !_.isEmpty(title) ? `"${title}"` : 'string';
 
   if (!_.isString(value)) {
-    return [append(validation, { error: `"${title}" is not a string` })];
+    return [append(validation, { error: `${fieldName} is not a string` })];
   }
-  if (_.isNumber(minLength) && value.length < minLength) {
-    validation = append(validation, { error: `"${title}" is shorter than ${minLength} chars` });
-  }
-  if (_.isNumber(maxLength) && value.length > maxLength) {
-    validation = append(validation, { error: `"${title}" is longer than ${maxLength} chars` });
+
+  if (['date-time', 'date', 'time'].includes(format)) {
+    const date = new Date(value);
+    if (!isValidDate(date)) {
+      validation = append(validation, { error: `${fieldName} is not a valid date/time` });
+    }
+  } else {
+
+    if (_.isNumber(minLength) && value.length < minLength) {
+      validation = append(validation, { error: `${fieldName} is shorter than ${minLength} chars` });
+    }
+    if (_.isNumber(maxLength) && value.length > maxLength) {
+      validation = append(validation, { error: `${fieldName} is longer than ${maxLength} chars` });
+    }
   }
 
   return hasErrors(validation) ? [validation] : null;
 };
 
-const validateInteger = (value, path, jsonSchema) => {
+const validateNumber = (value, path, jsonSchema) => {
   const { minimum , exclusiveMinimum, maximum, exclusiveMaximum, title } = jsonSchema || {};
   let validation = createBlankValidation(path, jsonSchema);
+  const fieldName = !_.isEmpty(title) ? `"${title}"` : 'number';
 
   if (!_.isNumber(value)) {
-    return [append(validation, { error: `"${title}" is not an integer` })];
+    return [append(validation, { error: `${fieldName} is not an integer` })];
   }
-  if (_.isNumber(minimum) && value >= minimum) {
-    validation = append(validation, { error: `"${title}" is greater or equal than ${minimum}` });
+  if (_.isNumber(minimum) && value <= minimum) {
+    validation = append(validation, { error: `${fieldName} is greater or equal than ${minimum}` });
   }
-  if (_.isNumber(exclusiveMinimum) && value > exclusiveMinimum) {
-    validation = append(validation, { error: `"${title}" is not greater than ${exclusiveMinimum}` });
+  if (_.isNumber(exclusiveMinimum) && value < exclusiveMinimum) {
+    validation = append(validation, { error: `${fieldName} is not greater than ${exclusiveMinimum}` });
   }
-  if (_.isNumber(maximum) && value <= maximum) {
-    validation = append(validation, { error: `"${title}" is not smallar or equal than ${maximum}` });
+  if (_.isNumber(maximum) && value >= maximum) {
+    validation = append(validation, { error: `${fieldName} is not smallar or equal than ${maximum}` });
   }
-  if (_.isNumber(exclusiveMaximum) && value < exclusiveMaximum) {
-    validation = append(validation, { error: `"${title}" is not smaller than ${exclusiveMaximum}` });
+  if (_.isNumber(exclusiveMaximum) && value > exclusiveMaximum) {
+    validation = append(validation, { error: `${fieldName} is not smaller than ${exclusiveMaximum}` });
   }
 
   return hasErrors(validation) ? [validation] : null;
@@ -114,7 +190,9 @@ const validateInteger = (value, path, jsonSchema) => {
 const validators = {
   object: validateObject,
   string: validateString,
-  integer: validateInteger
+  integer: validateNumber,
+  number: validateNumber,
+  array: validateArray
 };
 
 const validate = (value, path = '', jsonSchema) => {
