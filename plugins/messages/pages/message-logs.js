@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import gql from 'graphql-tag';
 import classNames from 'classnames';
 import _ from 'lodash';

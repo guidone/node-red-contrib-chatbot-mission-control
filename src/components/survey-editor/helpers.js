@@ -155,8 +155,6 @@ const retag = questions => {
 }
 
 const swap = (questions, oldIndex, newIndex) => {
-
-
   // do not move into itself
   if (oldIndex === newIndex) {
     return questions;

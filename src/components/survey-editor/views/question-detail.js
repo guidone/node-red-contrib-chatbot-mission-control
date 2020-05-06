@@ -66,7 +66,8 @@ const QuestionDetail = ({
                 onClick={async () => {
                   if (await confirm(
                     <div>
-                      Remove the question <Tag>{question.tag}</Tag> <em>"{question.title}"</em> ?
+                      Remove the question <Tag>{question.tag}</Tag>
+                      {!_.isEmpty(question.title) ? <em> "{question.title}"</em> : null} ?
                     </div>,
                     { okLabel: 'Yes, remove' }
                   )) {

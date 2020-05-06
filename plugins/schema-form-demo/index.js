@@ -20,6 +20,9 @@ import SchemaForm from '../../src/components/schema-form';
 
 const ChatPage = () => {
 
+    const { permissions } = useCurrentUser();
+    console.log('permissions', permissions)
+
     const [formValue, setFormValue] = useState({
       name: 'ciccio',
       poll: 42
@@ -507,22 +510,21 @@ const ChatPage = () => {
       }
     ;
 
+    // ['read', 'write', 'global-read', 'global-write'],
+
     return (
       <div className="chat-demo" style={{ padding: 50}}>
-
         <div style={{width: '700px'}}>
           <SchemaForm
             value={formValue}
             jsonSchema={jsonSchema}
+            permissions={permissions}
             onChange={newValue => {
               console.log('ON CHANGE', newValue)
               setFormValue(newValue);
             }}
           />
         </div>
-
-
-
       </div>
     );
   }
@@ -535,9 +537,50 @@ import { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, Mess
   MessageButtons,
   MessagePhoto
 } from '../../src/components/chat';
+import useCurrentUser from '../../src/hooks/current-user';
 
 
-
+// register permissions
+plug(
+  'permissions',
+  null,
+  {
+    permission: 'read',
+    name: 'Read',
+    description: `Generic form read`,
+    group: 'Schema Form Test'
+  }
+);
+plug(
+  'permissions',
+  null,
+  {
+    permission: 'write',
+    name: 'Write',
+    description: `Generic form write`,
+    group: 'Schema Form Test'
+  }
+);
+plug(
+  'permissions',
+  null,
+  {
+    permission: 'global-read',
+    name: 'Global Read',
+    description: `Read global settings`,
+    group: 'Schema Form Test'
+  }
+);
+plug(
+  'permissions',
+  null,
+  {
+    permission: 'global-write',
+    name: 'Global Write',
+    description: `Write global settings`,
+    group: 'Schema Form Test'
+  }
+);
 
 
 plug('sidebar', null, { id: 'schema-form-demo', label: 'Schema form', url: '/mc/schema-form', icon: 'shield' })

@@ -2,6 +2,7 @@ const _ = require('lodash')
 const moment = require('moment');
 const gql = require('graphql-tag');
 
+const { graphQLError } = require('../lib/lcd/index');
 const { isValidMessage, isSimulator, when } = require('../lib/utils/index');
 const client = require('../database/client');
 
@@ -141,10 +142,12 @@ module.exports = function(RED) {
         done();
       } catch(error) {
 
-        console.log(error)
+        //console.log(error)
         // TODO: improve error handling here
-        console.log('error', error.graphQLErrors)
-        console.log('error', error.graphQLErrors[0].locations)
+        //console.log('error', error.graphQLErrors)
+        //console.log('error', error.graphQLErrors[0].locations)
+        graphQLError(error, node);
+
         done(error.graphQLErrors)
       }
     });

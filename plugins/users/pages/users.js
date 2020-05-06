@@ -154,20 +154,6 @@ const Users = () => {
           <Cell>
             {user => (
               <ButtonGroup>
-                {can('users.edit') && (
-                  <Button
-                    size="xs"
-                    onClick={() => {
-                      const name = [user.first_name, user.last_name].join(' ');
-                      if (confirm(`Delete user${!_.isEmpty(name.trim()) ? ` "${name}"` : ''} (${user.userId})?`)) {
-                        deleteUser({ variables: { id: user.id }})
-                          .then(table.current.refetch);
-                      }
-                    }}
-                  >
-                    <Icon icon="trash" />
-                  </Button>
-                )}
                 {can('users.context.edit') && (
                   <Button
                     size="xs"
@@ -190,6 +176,20 @@ const Users = () => {
                     onClick={() => mergeUser(user)}
                   >
                     <Icon icon="user-plus"/>
+                  </Button>
+                )}
+                {can('users.edit') && (
+                  <Button
+                    size="xs"
+                    onClick={() => {
+                      const name = [user.first_name, user.last_name].join(' ');
+                      if (confirm(`Delete user${!_.isEmpty(name.trim()) ? ` "${name}"` : ''} (${user.userId})?`)) {
+                        deleteUser({ variables: { id: user.id }})
+                          .then(table.current.refetch);
+                      }
+                    }}
+                  >
+                    <Icon icon="trash" />
                   </Button>
                 )}
             </ButtonGroup>

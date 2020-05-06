@@ -9,7 +9,7 @@ import './plugins/messages';
 import './plugins/users';
 import './plugins/admins';
 import './plugins/users-suspend';
-import './plugins/users-data';
+// import './plugins/users-data';
 import './plugins/chat-demo';
 import './plugins/funnel';
 import './plugins/simulator';

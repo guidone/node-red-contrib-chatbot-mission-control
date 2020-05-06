@@ -99,7 +99,7 @@ const SchemaForm = ({
   jsonSchema,
   value,
   onChange = () => {},
-  permissions = ['read', 'write', 'global-read', 'global-write'],
+  permissions = [],
   debug = true
 }) => {
   const [formValue, setFormValue] = useState(setDefaults(value, jsonSchema));

@@ -28,11 +28,19 @@ const CustomTable = ({
   ...rest
 }, ref) => {
   let filterKeys = (filtersSchema || []).map(item => item.name);
+  // get all keys that are numeric and must be parsed to int
   const numericKeys = (filtersSchema || [])
     .filter(filter => filter.type === 'number')
     .map(filter => filter.name);
 
-  const { query: urlQuery, setQuery } = useRouterQuery({ numericKeys });
+  const { query: urlQuery, setQuery } = useRouterQuery({
+    numericKeys,
+    onChangeQuery: query => {
+      console.log('risetto', _.pick(query, filterKeys))
+      setFilters(_.pick(query, filterKeys))
+
+    }
+  });
 
   const [ filters, setFilters ] = useState(_.pick(urlQuery, filterKeys));
   const [ cursor, setCursor ] = useState({

@@ -1386,6 +1386,7 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
               await user.destroy();
             }
             await ChatId.destroy({ where: { userId }});
+            await Context.destroy({ where: { userId }});
             return user;
           }
         },
@@ -1424,10 +1425,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
                 currentUser = await User.findOne({ where: { userId: user.userId }});
               }
               userId = user.userId;
-              if (_.isEmpty(message.chatId)) {
+              if (message.chatId != null) {
                 await ChatId.create({ userId: user.userId, chatId: message.chatId, transport: message.transport });
               } else {
-                console.trace(`Warning: received message without chatId for transport ${transport}`)
+                console.trace(`Warning: received message without chatId for transport ${message.transport}`)
               }
             } else {
               userId = existingChatId.userId;
