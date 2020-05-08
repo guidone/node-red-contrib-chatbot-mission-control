@@ -174,6 +174,19 @@ module.exports = mcSettings => {
     ]
   });
 
+  const Device = sequelize.define('device', {
+    name: { type: Sequelize.STRING, allowNull: false },
+    status: { type: Sequelize.STRING, allowNull: false },
+    payload: { type: Sequelize.TEXT, allowNull: false },
+    jsonSchema: { type: Sequelize.TEXT, allowNull: false },
+    lat: { type: Sequelize.FLOAT, allowNull: false },
+    lon: { type: Sequelize.FLOAT, allowNull: false }
+  }, {
+    indexes: [
+
+    ]
+  });
+
   const Record = sequelize.define('record', {
     userId: { type: Sequelize.STRING, allowNull: false },
     type: { type: Sequelize.STRING, allowNull: false },
@@ -241,6 +254,7 @@ module.exports = mcSettings => {
     Context,
     Admin,
     Record,
+    Device,
     sequelize,
     mcSettings
   });
@@ -257,7 +271,8 @@ module.exports = mcSettings => {
     Category,
     Field,
     Context,
-    Record
+    Record,
+    Device
   };
 
   return exportCache;

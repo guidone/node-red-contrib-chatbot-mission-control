@@ -98,7 +98,7 @@ const PayloadType = new GraphQLScalarType({
 });
 
 
-module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, Admin, Record, sequelize, mcSettings }) => {
+module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, Admin, Record, Device, sequelize, mcSettings }) => {
 
   const newUserType = new GraphQLInputObjectType({
     name: 'NewUser',
@@ -186,6 +186,47 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       payload: {
         type: JSONType,
         description: ''
+      }
+    })
+  });
+
+  const deviceType = new GraphQLObjectType({
+    name: 'Device',
+    description: 'tbd',
+    fields: () => ({
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The unique id of the device',
+      },
+      status: {
+        type: GraphQLString,
+        description: ''
+      },
+      name: {
+        type: GraphQLString,
+        description: ''
+      },
+      payload: {
+        type: JSONType,
+        description: ''
+      },
+      jsonSchema: {
+        type: JSONType,
+        description: ''
+      },
+      lat: {
+        type: GraphQLFloat,
+        description: ''
+      },
+      lon: {
+        type: GraphQLFloat,
+        description: ''
+      },
+      createdAt: {
+        type: DateType
+      },
+      updatedAt: {
+        type: DateType
       }
     })
   });
@@ -916,6 +957,20 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     }
   });
 
+  const deviceCounterType = new GraphQLObjectType({
+    name: 'DeviceCounters',
+    description: 'Device Counters',
+    fields: {
+      count: {
+        type: GraphQLInt,
+        description: 'Total devices',
+        args: {
+        },
+        resolve: (root, { }) => Device.count()
+      }
+    }
+  });
+
   const adminCounterType = new GraphQLObjectType({
     name: 'AdminCounters',
     description: 'User Counters',
@@ -1049,6 +1104,13 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       records: {
         type: recordCounterType,
         description: 'Counters for user records',
+        resolve: () => {
+          return {};
+        }
+      },
+      devices: {
+        type: deviceCounterType,
+        description: 'Counters for devices',
         resolve: () => {
           return {};
         }
@@ -1597,6 +1659,14 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           resolve: resolver(Content)
         },
 
+        device: {
+          type: deviceType,
+          args: {
+            id: { type: GraphQLInt }
+          },
+          resolve: resolver(Device)
+        },
+
         record: {
           type: recordType,
           args: {
@@ -1668,6 +1738,22 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
               where: compactObject({
                 namespace
               })
+            });
+          }
+        },
+
+        devices: {
+          type: new GraphQLList(deviceType),
+          args: {
+            order: { type: GraphQLString },
+            offset: { type: GraphQLInt },
+            limit: { type: GraphQLInt }
+          },
+          resolve: (root, { order = 'name', offset, limit }) => {
+            return Device.findAll({
+              limit,
+              offset,
+              order: splitOrder(order)
             });
           }
         },

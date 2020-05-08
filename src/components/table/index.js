@@ -25,6 +25,7 @@ const CustomTable = ({
   toolbar,
   onFilters = () => {},
   filterEvaluateParams = ['data'],
+  onData = () => {},
   ...rest
 }, ref) => {
   let filterKeys = (filtersSchema || []).map(item => item.name);
@@ -36,7 +37,6 @@ const CustomTable = ({
   const { query: urlQuery, setQuery } = useRouterQuery({
     numericKeys,
     onChangeQuery: query => {
-      console.log('risetto', _.pick(query, filterKeys))
       setFilters(_.pick(query, filterKeys))
 
     }
@@ -62,7 +62,16 @@ const CustomTable = ({
     error,
     data,
     refetch
-  } = useTable({ query, limit, page, sortField, sortType, filters, variables });
+  } = useTable({
+    query,
+    limit,
+    page,
+    sortField,
+    sortType,
+    filters,
+    variables,
+    onCompleted: rows => onData(rows)
+  });
 
   useImperativeHandle(ref, () => ({
     refetch: () => refetch()

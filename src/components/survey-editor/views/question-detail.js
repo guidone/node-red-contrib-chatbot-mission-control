@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { Form, FormGroup, FormControl, Dropdown, ButtonToolbar, Button, ButtonGroup, IconButton, Icon } from 'rsuite';
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Dropdown, ButtonToolbar, Button, ButtonGroup, IconButton, Icon } from 'rsuite';
 
 import confirm from '../../confirm';
 
@@ -16,9 +17,6 @@ const CONTROLS = [
   { type: 'number', label: 'Number', default: null },
   { type: 'image', label: 'Upload image', default: null }
 ];
-
-
-
 
 const QuestionDetail = ({
   question,
@@ -44,7 +42,6 @@ const QuestionDetail = ({
         </div>
       );
   }
-
 
   return (
     <QuestionDetailContext.Provider value={{ question }}>
@@ -78,7 +75,6 @@ const QuestionDetail = ({
               />
             </ButtonToolbar>
           </div>
-
         </div>
         <div className="title">
           <textarea
@@ -107,7 +103,26 @@ const QuestionDetail = ({
       </div>
     </QuestionDetailContext.Provider>
   );
-
 }
+QuestionDetail.propTypes = {
+  question: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    level: PropTypes.number,
+    tag: PropTypes.string,
+    title: PropTypes.string.isRequired,
+    type: PropTypes.oneOf(['multiple', 'string', 'number', 'image']).isRequired,
+    data: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.shape({
+        answer: PropTypes.string.isRequired,
+        id: PropTypes.string.isRequired,
+        jump: PropTypes.string,
+        value: PropTypes.string
+      }))
+    ])
+  }),
+  onChange: PropTypes.func,
+  onAdd: PropTypes.func,
+  onRemove: PropTypes.func
+};
 
 export default QuestionDetail;

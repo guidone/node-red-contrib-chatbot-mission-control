@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import PropTypes from 'prop-types';
 import { Input, Icon, IconButton, Form, FormControl, FormGroup, HelpBlock, ControlLabel } from 'rsuite';
 import _ from 'lodash';
 
@@ -12,9 +13,6 @@ import GoToForm from './views/go-to';
 import QuestionDetailContext from '../../context-question-detail';
 
 const ALPHABET = 'ABCDEFGHILMNOPQRTSUVZ';
-
-
-
 
 const AnswerValue = ({ formValue, onChange = () => {} }) => {
   return (
@@ -44,10 +42,12 @@ const AnswerValue = ({ formValue, onChange = () => {} }) => {
     </div>
   );
 };
-
-
-
-
+AnswerValue.propTypes = {
+  formDefaultValue: PropTypes.shape({
+    value: PropTypes.string
+  }),
+  onChange: PropTypes.func
+};
 
 const AnswerForm = ({ value, onChange, order }) => {
   const { questions } = useContext(SurveyEditorContext);
@@ -85,6 +85,16 @@ const AnswerForm = ({ value, onChange, order }) => {
     </div>
   )
 };
+AnswerForm.propTypes = {
+  value: PropTypes.shape({
+    answer: PropTypes.string.isRequired,
+    id: PropTypes.string.isRequired,
+    jump: PropTypes.string,
+    value: PropTypes.string
+  }),
+  onChange: PropTypes.func,
+  order: PropTypes.number
+}
 
 
 const Multiple = ({ data, onChange = () => {} }) => {
@@ -100,5 +110,17 @@ const Multiple = ({ data, onChange = () => {} }) => {
     </div>
   );
 };
+Multiple.propTypes = {
+  onChange: PropTypes.func,
+  data: PropTypes.oneOfType([
+    PropTypes.arrayOf(PropTypes.shape({
+      answer: PropTypes.string.isRequired,
+      id: PropTypes.string.isRequired,
+      jump: PropTypes.string,
+      value: PropTypes.string
+    }))
+  ])
+}
+
 
 export default Multiple;

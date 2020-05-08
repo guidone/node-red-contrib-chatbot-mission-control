@@ -3,7 +3,7 @@ import { useQuery } from 'react-apollo';
 
 const makeOrder = (sortField, sortType) => `${sortType === 'desc' ? 'reverse:' : ''}${sortField}`;
 
-const useTable = ({ query, limit, page, sortField, sortType, filters = {}, variables = {} }) => {
+const useTable = ({ query, limit, page, sortField, sortType, filters = {}, variables = {}, onCompleted = () => {} }) => {
   const { loading, error, data, refetch } = useQuery(query, {
     fetchPolicy: 'network-only',
     errorPolicy: 'all',
@@ -15,7 +15,10 @@ const useTable = ({ query, limit, page, sortField, sortType, filters = {}, varia
       ...filters,
       ...variables
     },
-    onCompleted: () => setBootstrapping(false)
+    onCompleted: data => {
+      setBootstrapping(false);
+      onCompleted(data.rows);
+    }
   });
   const [bootstrapping, setBootstrapping] = useState(true);
 
