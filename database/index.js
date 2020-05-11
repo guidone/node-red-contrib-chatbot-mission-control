@@ -245,7 +245,7 @@ module.exports = mcSettings => {
       + ' ' + lcd.grey(resolve(dbPath)));
   }
 
-  const graphQLServer = GraphQLServer({
+  const { graphQLServer, graphQLSchema } = GraphQLServer({
     Configuration,
     Message,
     User,
@@ -267,6 +267,7 @@ module.exports = mcSettings => {
     Message,
     User,
     graphQLServer,
+    graphQLSchema,
     ChatId,
     Event,
     Admin,

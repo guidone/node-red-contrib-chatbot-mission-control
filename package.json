@@ -35,7 +35,8 @@
     "apollo-client": "^2.6.8",
     "apollo-link": "^1.2.13",
     "apollo-link-http": "^1.5.16",
-    "apollo-server-express": "^2.9.14",
+    "apollo-link-ws": "^1.0.20",
+    "apollo-server-express": "^2.13.0",
     "classnames": "^2.2.6",
     "cli-color": "^2.0.0",
     "cloudinary": "^1.21.0",
@@ -46,6 +47,7 @@
     "graphql": "^14.5.8",
     "graphql-relay": "^0.6.0",
     "graphql-sequelize": "^9.3.6",
+    "graphql-subscriptions": "^1.1.0",
     "gravatar": "^1.8.0",
     "lodash": "^4.17.15",
     "md5": "^2.2.1",
@@ -76,6 +78,7 @@
     "sockette": "^2.0.6",
     "sqlite3": "^4.1.1",
     "streamifier": "^0.1.1",
+    "subscriptions-transport-ws": "^0.9.16",
     "ws": "^7.2.0"
   },
   "devDependencies": {

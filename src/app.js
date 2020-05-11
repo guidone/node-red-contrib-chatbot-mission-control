@@ -11,6 +11,9 @@ import {
   Route,
   Link,
 } from 'react-router-dom';
+import { WebSocketLink } from 'apollo-link-ws';
+import { getMainDefinition } from 'apollo-utilities';
+import { split } from 'apollo-link';
 
 import { CodePlug, useCodePlug } from '../lib/code-plug';
 
@@ -19,7 +22,7 @@ import AppContext from './common/app-context';
 import Sidebar from './layout/sidebar';
 import Header from './layout/header';
 import HomePage from './pages/home';
-import WebSocket from './common/web-socket';
+import WebSocketReact from './common/web-socket';
 import PageNotFound from './layout/page-not-found';
 
 
@@ -28,12 +31,36 @@ import './permissions';
 import '../plugins';
 
 
+import ws from 'ws';
+
 const cache = new InMemoryCache(); // where current data is stored
 const apolloLink = createHttpLink({ uri: '/graphql' });
 
+// Create a WebSocket link:
+const wsLink = new WebSocketLink({
+  uri: `ws://localhost:1880/graphql`,
+  options: {
+    reconnect: true
+  },
+  //webSocketImpl: WebSocket
+});
+
+const link = split(
+  // split based on operation type
+  ({ query }) => {
+    const definition = getMainDefinition(query);
+    return (
+      definition.kind === 'OperationDefinition' &&
+      definition.operation === 'subscription'
+    );
+  },
+  wsLink,
+  apolloLink
+);
+
 const client = new ApolloClient({
   cache,
-  link: ApolloLink.from([apolloLink])
+  link: ApolloLink.from([link])
 });
 
 
@@ -122,7 +149,7 @@ const AppRouter = ({ codePlug, bootstrap }) => {
   return (
     <ApolloProvider client={client}>
       <AppContext.Provider value={{ state, dispatch, client, platforms, eventTypes, messageTypes, activeChatbots }}>
-        <WebSocket dispatch={dispatch}>
+        <WebSocketReact dispatch={dispatch}>
           <Router basename="/mc">
             <div className="mission-control-app">
               <Container className="mc-main-container">
@@ -142,7 +169,7 @@ const AppRouter = ({ codePlug, bootstrap }) => {
               </Container>
             </div>
           </Router>
-        </WebSocket>
+        </WebSocketReact>
       </AppContext.Provider>
     </ApolloProvider>
   );

@@ -1,10 +1,14 @@
-const { ApolloServer } = require('apollo-server-express');
+const { ApolloServer, graphqlExpress } = require('apollo-server-express');
 const { resolver } = require('graphql-sequelize');
 const { Kind } = require('graphql/language');
+const { PubSub, withFilter } = require('graphql-subscriptions');
 const _ = require('lodash');
 const Sequelize = require('sequelize');
 
+
 const Op = Sequelize.Op;
+
+const pubsub = new PubSub();
 
 const { when, hash } = require('../lib/utils');
 
@@ -1444,7 +1448,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           },
           async resolve(root, { id, device }) {
             await Device.update(device, { where: { id }});
-            return await Device.findOne({ where: { id }});
+            const updated = await Device.findOne({ where: { id }});
+            console.log('publish', 'deviceUpdated', updated.id)
+            pubsub.publish('deviceUpdated', { device: updated.toJSON() });
+            return updated;
           }
         },
 
@@ -1849,10 +1856,32 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           resolve: () => 42
         }
       }
+    }),
+
+
+    subscription: new GraphQLObjectType({
+      name: 'Subscriptions',
+      fields: {
+        deviceUpdated: {
+          type: deviceType,
+          subscribe: () => pubsub.asyncIterator('deviceUpdated'),
+          args: {
+            id: { type: GraphQLInt }
+          },
+          resolve: (payload) => {
+            //console.log('payload', payload)
+            return payload.device;
+          },
+        }
+      }
+
     })
+
   });
 
-  const graphQLServer = new ApolloServer({ schema });
+  const graphQLServer = new ApolloServer({
+    schema
+  });
 
-  return graphQLServer;
+  return { graphQLServer, graphQLSchema: schema };
 };

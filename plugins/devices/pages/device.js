@@ -1,6 +1,6 @@
 import React, { useState, useRef, Fragment, useCallback } from 'react';
 import { Table, Icon, ButtonGroup, Button, FlexboxGrid } from 'rsuite';
-import { useQuery, useMutation } from 'react-apollo';
+import { useQuery, useMutation, useSubscription } from 'react-apollo';
 import gql from 'graphql-tag';
 import GoogleMapReact from 'google-map-react';
 
@@ -61,9 +61,29 @@ mutation($id: Int!, $device: NewDevice!) {
     lon,
     jsonSchema,
     version,
-    lastUpdate
+    lastUpdate,
+    snapshot
   }
 }
+`;
+
+const DEVICE_SUBSCRIPTION = gql`
+  subscription onDeviceUpdated($id: Int!) {
+    device: deviceUpdated(id: $id) {
+      id,
+      name,
+      payload,
+      createdAt,
+      updatedAt,
+      status,
+      lat,
+      lon,
+      jsonSchema,
+      version,
+      lastUpdate,
+      snapshot
+    }
+  }
 `;
 
 
@@ -222,6 +242,17 @@ const Device = () => {
   const { id } = useParams();
   const { googleMapsKey } = useSettings();
 
+  const { data, error: error2 } = useSubscription(
+    DEVICE_SUBSCRIPTION,
+    {
+      variables: { id: parseInt(id, 10) },
+      onSubscriptionData: ({ subscriptionData: { data: { device }} }, value2) => {
+        console.log('device updated', device)
+
+      }
+    }
+  );
+  console.log('sububb', data, error2);
   console.log('googleMapsKey', googleMapsKey)
 
   const { data: { device } = {}, loading, error } = useQuery(DEVICE, {
@@ -239,9 +270,7 @@ const Device = () => {
     breadcrumbs = [...breadcrumbs, device.name];
   }
 
-  console.log('DEVICE', device)
-
-  return (
+    return (
     <PageContainer className="page-device">
       <Breadcrumbs pages={breadcrumbs}/>
       {!loading && (

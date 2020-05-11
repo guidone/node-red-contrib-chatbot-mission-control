@@ -17,6 +17,9 @@ const Settings = require('./src/settings');
 const validators = require('./lib/helpers/validators');
 const uploadFromBuffer = require('./lib/helpers/upload-from-buffer');
 
+const { execute, subscribe } = require('graphql');
+const { SubscriptionServer } = require('subscriptions-transport-ws');
+
 let initialized = false;
 const Events = new events.EventEmitter();
 
@@ -125,7 +128,7 @@ function bootstrap(server, app, log, redSettings) {
 
   // todo put db schema here
   const databaseSchema = DatabaseSchema(mcSettings)
-  const { Configuration, graphQLServer, Admin } = databaseSchema;
+  const { Configuration, graphQLServer, graphQLSchema, Admin } = databaseSchema;
 
   //passport authentication
   passport.use(new BasicStrategy(async function (username, password, done) {
@@ -156,7 +159,26 @@ function bootstrap(server, app, log, redSettings) {
   app.use(passport.initialize());
 
   // install graphql server
-  app.use(graphQLServer.getMiddleware())
+  //app.use(graphQLServer.getMiddleware())
+
+  //const PORT = 4000;
+  //const appSubscriptions = express();
+
+
+  graphQLServer.applyMiddleware({ app });
+
+  graphQLServer.installSubscriptionHandlers(server);
+  /*new SubscriptionServer({
+    execute,
+    subscribe,
+    schema: graphQLSchema,
+  }, {
+    server: server,
+    path: '/subscriptions',
+  });*/
+
+
+
   // eslint-disable-next-line no-console
   console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
   + ' - [info] GraphQL ready at :')
@@ -223,6 +245,7 @@ function bootstrap(server, app, log, redSettings) {
   );
 
   // Setup web socket
+  console.log('Starting WS at ', Settings.wsPort)
   const wss = new WebSocket.Server({ port: Settings.wsPort });
   wss.on('connection', ws => {
     const sendHandler = (topic, payload) => ws.send(JSON.stringify({ topic, payload }));
