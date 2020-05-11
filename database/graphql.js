@@ -206,6 +206,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLString,
         description: ''
       },
+      version: {
+        type: GraphQLString,
+        description: ''
+      },
       payload: {
         type: JSONType,
         description: ''
@@ -226,6 +230,53 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: DateType
       },
       updatedAt: {
+        type: DateType
+      },
+      lastUpdate: {
+        type: DateType
+      }
+    })
+  });
+
+  const newDeviceType = new GraphQLInputObjectType({
+    name: 'NewDevice',
+    description: 'tbd',
+    fields: () => ({
+      status: {
+        type: GraphQLString,
+        description: ''
+      },
+      name: {
+        type: GraphQLString,
+        description: ''
+      },
+      version: {
+        type: GraphQLString,
+        description: ''
+      },
+      payload: {
+        type: JSONType,
+        description: ''
+      },
+      jsonSchema: {
+        type: JSONType,
+        description: ''
+      },
+      lat: {
+        type: GraphQLFloat,
+        description: ''
+      },
+      lon: {
+        type: GraphQLFloat,
+        description: ''
+      },
+      createdAt: {
+        type: DateType
+      },
+      updatedAt: {
+        type: DateType
+      },
+      lastUpdate: {
         type: DateType
       }
     })
@@ -1366,6 +1417,18 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
             }
             await Admin.update(admin, { where: { id } })
             return await Admin.findOne({ where: { id } });
+          }
+        },
+
+        editDevice: {
+          type: deviceType,
+          args: {
+            id: { type: GraphQLInt },
+            device: { type: newDeviceType }
+          },
+          async resolve(root, { id, device }) {
+            await Device.update(device, { where: { id }});
+            return await Device.findOne({ where: { id }});
           }
         },
 
