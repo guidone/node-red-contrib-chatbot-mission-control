@@ -19,6 +19,7 @@ import Controller from '../controller';
 import isValidDate from '../../../../src/helpers/is-valid-date';
 
 import useControl from '../helpers/use-control';
+import matchPath from '../helpers/match-path';
 import ControlLabel from '../views/control-label';
 import HelpBlock from '../views/help-block';
 import ErrorBlock from '../views/error-block';
@@ -35,8 +36,10 @@ const makeKey = (name, jsonSchema) => {
 }
 
 const ObjectControl = props => {
-  const { jsonSchema, level, value = {}, onChange } = props;
-  const { permissions, canRead, canWrite, log, error } = useControl(props);
+  const { jsonSchema, level, value = {}, onChange, currentPath } = props;
+  const { permissions, canRead, canWrite, log, error, path, hideTitles } = useControl(props);
+
+  console.log('hideTitles', hideTitles  )
 
   if (!canRead) {
     log('is hidden, no read permission');
@@ -44,7 +47,6 @@ const ObjectControl = props => {
   }
 
   const isAdmin = permissions.includes('*');
-  // TODO implement also dependencies
   let requireds = jsonSchema.required || [];
   const options = jsonSchema.options || {};
   let properties = jsonSchema.properties;
@@ -83,13 +85,21 @@ const ObjectControl = props => {
       return canRead;
     })
     .map(([field, schema]) => {
+      // return an empty element if current path doesn't match allowed paths
+      const controllerPath = `${currentPath}/${field}`;
+      if (!matchPath(controllerPath, path)) {
+        return <Fragment />;
+      }
+
       let fieldError;
       if (error && !_.isEmpty(error.errors)) {
         fieldError = error.errors.find(error => error.id === schema['$id']);
       }
+
       const controller = (
         <Controller
           field={field}
+          currentPath={controllerPath}
           jsonSchema={options.layout === 'accordion' || options.layout === 'panel' ? _.omit(schema, 'title') : schema}
           value={value[field]}
           key={makeKey(field, schema)}
@@ -102,8 +112,9 @@ const ObjectControl = props => {
           }}
         />
       );
-
-      if (layout === 'accordion' || layout === 'panel') {
+      // wrap into panel if layout and if title of the forms are not hidden (when using path to show only a portion of
+      // the form, it doesn't always make sense to show all the titles)
+      if (['accordion','panel'].includes(layout) && !hideTitles) {
         return (
           <Panel key={makeKey(field, schema)} header={!_.isEmpty(schema.title) ? schema.title : 'No title'} collapsible defaultExpanded={!collapsed}>
             {controller}
@@ -114,7 +125,7 @@ const ObjectControl = props => {
       }
     });
 
-  if (layout === 'accordion' || layout === 'panel') {
+  if (['accordion','panel'].includes(layout) && !hideTitles) {
     return (
       <Fragment>
         {!_.isEmpty(jsonSchema.title) && <div className={classNames('title', { [`title-${level}`]: true })}>{jsonSchema.title}</div>}
@@ -126,7 +137,9 @@ const ObjectControl = props => {
   } else {
     return (
       <div className={classNames('rs-form rs-form-vertical rs-form-fluid', { [layout]: true })}>
-        {!_.isEmpty(jsonSchema.title) && <div className={classNames('title', { [`title-${level}`]: true })}>{jsonSchema.title}</div>}
+        {!_.isEmpty(jsonSchema.title) && !hideTitles && (
+          <div className={classNames('title', { [`title-${level}`]: true })}>{jsonSchema.title}</div>
+        )}
         {items}
       </div>
     );

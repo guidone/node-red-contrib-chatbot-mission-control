@@ -6,11 +6,11 @@ import classNames from 'classnames';
 import validate from './validate';
 import FormContext from '../context';
 
-const RESERVED_KEYWORDS = ['readPermission', 'writePermission', 'layout', 'collapsed', 'tooltip', 'readOnly', 'jsonSchema'];
+const RESERVED_KEYWORDS = ['readPermission', 'writePermission', 'layout', 'collapsed', 'tooltip', 'readOnly', 'jsonSchema', 'currentPath'];
 
 const useControl = props => {
   const { jsonSchema, error, readOnly = false } = props;
-  const { permissions, debug, errors } = useContext(FormContext);
+  const { permissions, debug, errors, path, disabled, hideTitles } = useContext(FormContext);
   const isAdmin = permissions.includes('*');
   const options = jsonSchema.options || {};
   const canWrite = isAdmin || _.isEmpty(options.writePermission) || (permissions || []).includes(options.writePermission);
@@ -38,9 +38,11 @@ const useControl = props => {
   return {
     canRead,
     canWrite: !readOnly && canWrite,
-    disabled: !(!readOnly && canWrite),
+    disabled: !(!readOnly && !disabled && canWrite),
     className: classNames(options.className, { 'whit-error': error != null }),
     debug,
+    hideTitles,
+    path,
     error: error || contextError,
     validate: value => validate(value, jsonSchema),
     permissions: permissions || [],

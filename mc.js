@@ -107,6 +107,9 @@ function bootstrap(server, app, log, redSettings) {
   } else {
     console.log(lcd.timestamp() + '  ' + lcd.green('salt: ') + lcd.grey('****'));
   }
+  if (mcSettings.googleMapsKey != null) {
+    console.log(lcd.timestamp() + '  ' + lcd.green('googleMapsKey: ') + lcd.grey(mcSettings.googleMapsKey));
+  }
   if (validators.credentials.cloudinary(mcSettings.cloudinary)) {
     console.log(lcd.timestamp() + '  ' + lcd.green('cloudinary name: ') + lcd.grey(mcSettings.cloudinary.cloudName));
     console.log(lcd.timestamp() + '  ' + lcd.green('cloudinary apiKey: ') + lcd.grey(mcSettings.cloudinary.apiKey));

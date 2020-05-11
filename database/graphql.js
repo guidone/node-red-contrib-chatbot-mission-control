@@ -210,11 +210,19 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLString,
         description: ''
       },
+      status: {
+        type: GraphQLString,
+        description: ''
+      },
       payload: {
         type: JSONType,
         description: ''
       },
       jsonSchema: {
+        type: JSONType,
+        description: ''
+      },
+      snapshot: {
         type: JSONType,
         description: ''
       },
@@ -254,11 +262,19 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLString,
         description: ''
       },
+      status: {
+        type: GraphQLString,
+        description: ''
+      },
       payload: {
         type: JSONType,
         description: ''
       },
       jsonSchema: {
+        type: JSONType,
+        description: ''
+      },
+      snapshot: {
         type: JSONType,
         description: ''
       },

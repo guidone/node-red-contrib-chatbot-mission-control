@@ -497,6 +497,285 @@ const ChatPage = () => {
                 }
               }
             }
+          },
+          "network": {
+            "$id": "#/properties/network",
+            "type": "object",
+            "options": {
+              "collapsed": true
+            },
+            "title": "Configurazione Network",
+            "required": [
+              "apn",
+              "mqtt",
+              "rest"
+            ],
+            "properties": {
+              "apn": {
+                "$id": "#/properties/network/properties/apn",
+                "type": "object",
+                "title": "Configurazione APN",
+                "required": [
+                  "name",
+                  "user",
+                  "pw"
+                ],
+                "properties": {
+                  "name": {
+                    "$id": "#/properties/network/properties/apn/properties/name",
+                    "type": "string",
+                    "title": "Nome APN",
+                    "default": "",
+                    "examples": [
+                      "TM"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "user": {
+                    "$id": "#/properties/network/properties/apn/properties/user",
+                    "type": "string",
+                    "title": "Nome Utente",
+                    "default": "",
+                    "examples": [
+                      ""
+                    ]
+                  },
+                  "pw": {
+                    "$id": "#/properties/network/properties/apn/properties/pw",
+                    "type": "string",
+                    "title": "Password",
+                    "default": "",
+                    "examples": [
+                      ""
+                    ]
+                  }
+                }
+              },
+              "mqtt": {
+                "$id": "#/properties/network/properties/mqtt",
+                "type": "object",
+                "title": "Configurazione MQTT",
+                "options": {
+                  "collapsed": true
+                },
+                "required": [
+                  "user",
+                  "pw",
+                  "broker",
+                  "port",
+                  "id",
+                  "alive",
+                  "tele",
+                  "alarm",
+                  "control",
+                  "ota"
+                ],
+                "properties": {
+                  "user": {
+                    "$id": "#/properties/network/properties/mqtt/properties/user",
+                    "type": "string",
+                    "title": "Username",
+                    "default": "",
+                    "examples": [
+                      ""
+                    ]
+                  },
+                  "pw": {
+                    "$id": "#/properties/network/properties/mqtt/properties/pw",
+                    "type": "string",
+                    "title": "Password",
+                    "default": "",
+                    "examples": [
+                      ""
+                    ]
+                  },
+                  "broker": {
+                    "$id": "#/properties/network/properties/mqtt/properties/broker",
+                    "type": "string",
+                    "title": "Indirizzo Broker (IP o URL)",
+                    "default": "",
+                    "examples": [
+                      "mqtt.eclipse.org"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "port": {
+                    "$id": "#/properties/network/properties/mqtt/properties/port",
+                    "type": "integer",
+                    "title": "Porta Broker",
+                    "default": 1883,
+                    "examples": [
+                      1883
+                    ]
+                  },
+                  "id": {
+                    "$id": "#/properties/network/properties/mqtt/properties/id",
+                    "type": "string",
+                    "title": "ID dispositivo",
+                    "default": "",
+                    "examples": [
+                      "dev1234"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "alive": {
+                    "$id": "#/properties/network/properties/mqtt/properties/alive",
+                    "type": "boolean",
+                    "title": "Alive",
+                    "default": false,
+                    "examples": [
+                      false
+                    ],
+                    "format": "checkbox"
+                  },
+                  "tele": {
+                    "$id": "#/properties/network/properties/mqtt/properties/tele",
+                    "type": "boolean",
+                    "title": "Telemetria",
+                    "default": false,
+                    "examples": [
+                      false
+                    ],
+                    "format": "checkbox"
+                  },
+                  "alarm": {
+                    "$id": "#/properties/network/properties/mqtt/properties/alarm",
+                    "type": "boolean",
+                    "title": "Allarmi",
+                    "default": false,
+                    "examples": [
+                      true
+                    ],
+                    "format": "checkbox"
+                  },
+                  "control": {
+                    "$id": "#/properties/network/properties/mqtt/properties/control",
+                    "type": "boolean",
+                    "title": "Controllo Remoto",
+                    "default": false,
+                    "examples": [
+                      false
+                    ],
+                    "format": "checkbox"
+                  },
+                  "ota": {
+                    "$id": "#/properties/network/properties/mqtt/properties/ota",
+                    "type": "boolean",
+                    "title": "Aggiornamento da Remoto",
+                    "default": false,
+                    "examples": [
+                      true
+                    ],
+                    "format": "checkbox"
+                  }
+                }
+              },
+              "rest": {
+                "$id": "#/properties/network/properties/rest",
+                "type": "object",
+                "title": "REST API",
+                "required": [
+                  "key",
+                  "url",
+                  "port",
+                  "id",
+                  "alive",
+                  "tele",
+                  "alarm",
+                  "control",
+                  "ota"
+                ],
+                "properties": {
+                  "key": {
+                    "$id": "#/properties/network/properties/rest/properties/key",
+                    "type": "null",
+                    "title": "Chiave API",
+                    "default": null,
+                    "examples": [
+                      null
+                    ]
+                  },
+                  "url": {
+                    "$id": "#/properties/network/properties/rest/properties/url",
+                    "type": "string",
+                    "title": "Indirizzo Server",
+                    "default": "",
+                    "examples": [
+                      "example.com"
+                    ]
+                  },
+                  "port": {
+                    "$id": "#/properties/network/properties/rest/properties/port",
+                    "type": "integer",
+                    "title": "Porta",
+                    "default": 80,
+                    "examples": [
+                      80
+                    ]
+                  },
+                  "id": {
+                    "$id": "#/properties/network/properties/rest/properties/id",
+                    "type": "string",
+                    "title": "ID dispositivo",
+                    "default": "",
+                    "examples": [
+                      "dev1234"
+                    ],
+                    "pattern": "^(.*)$"
+                  },
+                  "alive": {
+                    "$id": "#/properties/network/properties/rest/properties/alive",
+                    "type": "boolean",
+                    "title": "Alive",
+                    "default": false,
+                    "examples": [
+                      false
+                    ],
+                    "format": "checkbox"
+                  },
+                  "tele": {
+                    "$id": "#/properties/network/properties/rest/properties/tele",
+                    "type": "boolean",
+                    "title": "Telemetria",
+                    "default": false,
+                    "examples": [
+                      false
+                    ],
+                    "format": "checkbox"
+                  },
+                  "alarm": {
+                    "$id": "#/properties/network/properties/rest/properties/alarm",
+                    "type": "boolean",
+                    "title": "Allarmi",
+                    "default": false,
+                    "examples": [
+                      true
+                    ],
+                    "format": "checkbox"
+                  },
+                  "control": {
+                    "$id": "#/properties/network/properties/rest/properties/control",
+                    "type": "boolean",
+                    "title": "Controllo Remoto",
+                    "default": false,
+                    "examples": [
+                      false
+                    ],
+                    "format": "checkbox"
+                  },
+                  "ota": {
+                    "$id": "#/properties/network/properties/rest/properties/ota",
+                    "type": "boolean",
+                    "title": "Aggiornamento da Remoto",
+                    "default": false,
+                    "examples": [
+                      true
+                    ],
+                    "format": "checkbox"
+                  }
+                }
+              }
+            }
           }
 
 

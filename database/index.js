@@ -176,11 +176,14 @@ module.exports = mcSettings => {
 
   const Device = sequelize.define('device', {
     name: { type: Sequelize.STRING, allowNull: false },
-    status: { type: Sequelize.STRING, allowNull: false },
-    payload: { type: Sequelize.TEXT, allowNull: false },
-    jsonSchema: { type: Sequelize.TEXT, allowNull: false },
-    lat: { type: Sequelize.FLOAT, allowNull: false },
-    lon: { type: Sequelize.FLOAT, allowNull: false }
+    status: { type: Sequelize.STRING },
+    version: { type: Sequelize.STRING },
+    lastUpdate: { type: Sequelize.DATE },
+    payload: { type: Sequelize.TEXT },
+    jsonSchema: { type: Sequelize.TEXT },
+    snapshot: { type: Sequelize.TEXT },
+    lat: { type: Sequelize.FLOAT },
+    lon: { type: Sequelize.FLOAT }
   }, {
     indexes: [
 

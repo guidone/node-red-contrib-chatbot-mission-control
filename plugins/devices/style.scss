@@ -111,3 +111,33 @@
     margin-bottom: 10px;
   }
 }
+
+
+.page-device {
+
+  .device-name {
+    margin-bottom: 10px;
+    h3 {
+      display: inline-block;
+    }
+    .device-id {
+      color: #999999;
+    }
+  }
+
+  .device-header {
+    .header-group {
+      margin-top: 5px;
+      .header-label {
+        text-align: right;
+        font-weight: bold;
+        padding-right: 10px;
+      }
+      .header-value {
+        color: #666666;
+      }
+    }
+
+  }
+
+}

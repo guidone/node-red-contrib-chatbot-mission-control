@@ -35,20 +35,20 @@ import Controller from '../controller';
 
 import CollectionEditor from '../../collection-editor';
 
-const ArrayControllerForm = ({ jsonSchema, value, onChange, disabled }) => {
+const ArrayControllerForm = ({ jsonSchema, order, value, onChange, disabled, currentPath }) => {
   return (
     <Controller
       jsonSchema={jsonSchema}
       value={value}
       readOnly={disabled}
       onChange={onChange}
-
+      currentPath={`${currentPath}[${order}]`}
     />
   );
 } ;
 
 const ArrayController = props => {
-  const { jsonSchema, level, value = [], onChange, readOnly = false } = props;
+  const { jsonSchema, level, value = [], onChange, readOnly = false, currentPath } = props;
   const { canWrite, canRead, log, permissions, filteredProps } = useControl(props);
 
   if (!canWrite) {
@@ -68,7 +68,8 @@ const ArrayController = props => {
          minItems={_.isNumber(minItems) ? minItems : null}
          onChange={onChange}
          jsonSchema={jsonSchema.items}
-
+         sortable={false}
+         currentPath={currentPath}
       />
     </Fragment>
   );

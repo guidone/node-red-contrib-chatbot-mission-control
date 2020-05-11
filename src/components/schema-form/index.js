@@ -1,4 +1,5 @@
 import React, { Fragment, useContext, useState, useLayoutEffect, useEffect, useCallback, useMemo } from 'react';
+import PropTypes from 'prop-types';
 import _ from 'lodash';
 import {
   FormGroup,
@@ -18,6 +19,7 @@ import classNames from 'classnames';
 import './style.scss';
 import useControl from './helpers/use-control';
 import FormContext from './context';
+import validate from './helpers/validate';
 
 import HelpBlock from './views/help-block';
 import ErrorBlock from './views/error-block';
@@ -28,6 +30,9 @@ import IntegerControl from './controls/integer';
 
 
 const setDefaults = (value, jsonSchema) => {
+  if (jsonSchema == null) {
+    return {};
+  }
 
   if (jsonSchema.type === 'object') {
     if (value == null) {
@@ -53,44 +58,6 @@ const setDefaults = (value, jsonSchema) => {
 }
 
 
-
-
-
-
-
-
-
-// Reserved keywords for options in the json schema, these props are NOT passed with the spread operator
-// to the component
-const RESERVED_KEYWORDS = ['readPermission', 'writePermission', 'layout', 'collapsed', 'tooltip', 'readOnly'];
-
-
-
-
-
-
-
-
-
-
-
-
-
-import pickNumber from './helpers/pick-number';
-
-
-
-
-
-
-
-
-
-
-import ObjectControl from './controls/object';
-
-
-
 import Controller from './controller';
 
 
@@ -100,19 +67,35 @@ const SchemaForm = ({
   value,
   onChange = () => {},
   permissions = [],
-  debug = true
+  debug = true,
+  disabled = false,
+  path,
+  hideTitles = false,
+  validateAsType = false,
+  errors
 }) => {
+  if (jsonSchema == null) {
+    console.warn('An empty schema was passed to SchemaForm');
+    return <Fragment />
+  }
+
   const [formValue, setFormValue] = useState(setDefaults(value, jsonSchema));
   const { validate } = useControl({ jsonSchema });
 
   return (
     <div className="ui-schema-form">
-      <FormContext.Provider value={{ permissions, debug, errors: validate(formValue) }}>
+      <FormContext.Provider value={{
+        permissions,
+        debug,
+        disabled,
+        hideTitles,
+        errors: validateAsType ? validate(formValue) : errors,
+        path: _.isArray(path) ? path : [path]
+      }}>
         <Controller
           jsonSchema={jsonSchema}
           value={formValue}
           onChange={value => {
-            console.log('---> validation', validate(value))
             setFormValue(value);
             onChange(value);
           }}/>
@@ -120,5 +103,21 @@ const SchemaForm = ({
     </div>
   );
 };
+SchemaForm.propTypes = {
+  jsonSchema: PropTypes.object,
+  value: PropTypes.object,
+  onChange: PropTypes.func,
+  permissions: PropTypes.arrayOf(PropTypes.string),
+  debug: PropTypes.bool,
+  disabled: PropTypes.bool,
+  path: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.arrayOf(PropTypes.string),
+  ]),
+  hideTitles: PropTypes.bool,
+  // validate form as user is typing
+  validateAsType: PropTypes.bool
+};
 
-export default SchemaForm;
+
+export { SchemaForm as default, validate };

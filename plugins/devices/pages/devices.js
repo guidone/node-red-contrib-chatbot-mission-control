@@ -18,7 +18,7 @@ import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmartDate from '../../../src/components/smart-date';
 import CustomTable from '../../../src/components/table';
 import { Input } from '../../../src/components/table-filters';
-import confirm from '../../../src/components/confirm';
+import useSettings from '../../../src/hooks/settings';
 
 // import '../styles/admins.scss';
 
@@ -46,7 +46,7 @@ query ($limit: Int, $offset: Int, $order: String) {
 
 
 const DevicesMap = ({ devices, height = 250 }) => {
-
+  const { googleMapsKey } = useSettings();
   let center = { lat: 45.504372, lng: 9.077766 };
 
   const handleMapLoaded = (google, toolbar, groupedPoints, channels) => {
@@ -64,12 +64,10 @@ const DevicesMap = ({ devices, height = 250 }) => {
     />
   ));
 
-
-
   return (
     <div className="ui-devices-map" style={{ height: `${height}px` }}>
       <GoogleMapReact
-        bootstrapURLKeys={{ libraries: 'drawing', key: '' }}
+        bootstrapURLKeys={{ libraries: 'drawing', key: googleMapsKey }}
         onGoogleApiLoaded={google =>
           handleMapLoaded(
             google,
@@ -137,7 +135,7 @@ const Devices = () => {
           </Cell>
         </Column>
 
-        <Column flexGrow={1} resizable>
+        <Column flexGrow={1}>
           <HeaderCell>Name</HeaderCell>
           <Cell dataKey="name">
             {({ name, id }) => <Link to={`/devices/${id}`}>{name}</Link>}

@@ -12,7 +12,7 @@ import isValidDate from '../../../helpers/is-valid-date';
   }
 
 }*/
-
+import matchPath from './match-path';
 
 const append = (validation, msg) => ({
   ...validation,
@@ -186,7 +186,6 @@ const validateNumber = (value, path, jsonSchema) => {
 };
 
 
-
 const validators = {
   object: validateObject,
   string: validateString,
@@ -205,19 +204,24 @@ const validate = (value, path = '', jsonSchema) => {
   } else {
     console.log(`Warning, don't know how to validate "${type}"`);
   }
-
-
   return errors;
-}
+};
 
 
-
-
-export default (value, jsonSchema) => {
-
+/**
+ * @method validate
+ * Validate a json object against a json schema, uses path to validate only some parts of the schema in case the object
+ * is split between different forms
+ * @param {Object} value
+ * @param {Object} jsonSchema
+ * @param {String/Array} path String or array of string with path of elements
+ * @return {Array}
+ */
+export default (value, jsonSchema, path) => {
   return validate(value, '/', jsonSchema)
     .map(error => ({
       ...error,
       path: error.path.replace('//', '/')
-    }));
+    }))
+    .filter(error => matchPath(error.path, _.isArray(path) ? path : [path]));
 };

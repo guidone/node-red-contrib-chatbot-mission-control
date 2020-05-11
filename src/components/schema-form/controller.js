@@ -40,6 +40,8 @@ const StringController = props => {
   const { error, filteredProps, className, disabled } = useControl(props);
   const { tooltip } = jsonSchema.options || {};
 
+
+
   return (
     <FormGroup>
       {!_.isEmpty(jsonSchema.title) && <ControlLabel required={required} tooltip={tooltip}>{jsonSchema.title}</ControlLabel>}
@@ -89,18 +91,25 @@ const BooleanController = ({ jsonSchema, required = false, value, ...props }) =>
 
 
 
-const Controller = ({ value, field, jsonSchema, level = 0, onChange, ...props }) => {
+const Controller = ({ value, field, jsonSchema, level = 0, onChange, currentPath = '', ...props }) => {
+  const { path } = useControl({ jsonSchema });
   const common = {
     field,
     jsonSchema,
     value: value,
     level,
+    currentPath,
     onChange: newValue => {
       onChange(newValue);
     },
     ...(_.isObject(jsonSchema.options) ? _.omit(jsonSchema.options, RESERVED_KEYWORDS) : {}),
+    currentPath,
     ...props
-  }
+  };
+
+  // console.log('CONTROLLER', currentPath, path )
+
+
 
   if (['string', 'integer', 'number'].includes(jsonSchema.type) && _.isArray(jsonSchema.enum) && !_.isEmpty(jsonSchema.enum)) {
     return <SelectController {...common}/>;
