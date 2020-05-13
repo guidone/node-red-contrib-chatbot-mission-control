@@ -1,9 +1,10 @@
 import React from 'react';
 import moment from 'moment';
+import PropTypes from 'prop-types';
 
 import './smart-date.scss';
 
-export default ({ date }) => {
+ const SmartDate = ({ date }) => {
   const now = moment();
   const m = moment(date);
 
@@ -24,4 +25,9 @@ export default ({ date }) => {
       {day != null && <span className="day">, {day}</span>}
     </span>
   );
-}
+};
+SmartDate.propTypes = {
+  date: PropTypes.string
+};
+
+export default SmartDate;

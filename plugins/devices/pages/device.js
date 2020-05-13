@@ -41,6 +41,7 @@ query ($id: Int!) {
     lat,
     lon,
     jsonSchema,
+    snapshot,
     version,
     lastUpdate
   }
@@ -48,24 +49,7 @@ query ($id: Int!) {
 `;
 
 
-const EDIT_DEVICE = gql`
-mutation($id: Int!, $device: NewDevice!) {
-  editDevice(id: $id, device: $device) {
-    id,
-    name,
-    payload,
-    createdAt,
-    updatedAt,
-    status,
-    lat,
-    lon,
-    jsonSchema,
-    version,
-    lastUpdate,
-    snapshot
-  }
-}
-`;
+
 
 const DEVICE_SUBSCRIPTION = gql`
   subscription onDeviceUpdated($id: Int!) {
@@ -87,106 +71,9 @@ const DEVICE_SUBSCRIPTION = gql`
 `;
 
 
-import { Modal, Tooltip, Whisper } from 'rsuite';
-import SchemaForm, { validate } from '../../../src/components/schema-form';
-import ShowError from '../../../src/components/show-error';
-import modalCanClose from '../../../src/hooks/modal-can-close';
 
-
-const EditSchema = ({
-  jsonSchema,
-  value,
-  path,
-  children,
-  tooltip,
-  title
-}) => {
-  const [state, setState] = useState({ editing: false, value: null });
-  const onCancel = useCallback(() => setState({ editing: false, value: null }));
-  const { handleCancel, setIsChanged } = modalCanClose({ onCancel });
-
-  const [
-    editDevice,
-    { loading, error },
-  ] = useMutation(EDIT_DEVICE, {
-    onCompleted: () => setState({ editing: false, value: null })
-  });
-
-  if (state.editing) {
-    return (
-      <Modal backdrop show onHide={handleCancel} size="sm" overflow={false} className="modal-edit-schema">
-      <Modal.Header>
-        <Modal.Title>{!_.isEmpty(title) ? title : 'Edit'}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {error != null && <ShowError error={error}/>}
-        <SchemaForm
-          value={state.value}
-          jsonSchema={jsonSchema}
-          path={path}
-          errors={state.errors}
-          disabled={loading}
-          hideTitles={true}
-          onChange={value => {
-            setState({ ...state, value, errors: undefined });
-            setIsChanged(true);
-          }}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          onClick={handleCancel}
-          appearance="subtle"
-          disabled={loading}
-        >
-          Cancel
-        </Button>
-        <Button
-          appearance="primary"
-          disabled={loading}
-          appearance="primary"
-          onClick={() => {
-            const errors = validate(state.value, jsonSchema, path);
-            console.log('errors', errors);
-            if (!_.isEmpty(errors)) {
-              setState({ ...state, errors });
-            } else {
-              editDevice({ variables: { id: value.id, device: { payload: state.value } } });
-            }
-          }}
-        >
-          Save
-        </Button>
-      </Modal.Footer>
-    </Modal>
-    );
-  } else {
-    const link = (
-      <a
-        style={{ display: 'inline-block' }}
-        className="ui-edit-schema-button"
-        href="#"
-        onClick={e => {
-          e.preventDefault();
-          setState({ editing: true, value: value.payload });
-        }}
-      >
-        <Icon icon="edit2"/>
-      </a>
-    );
-
-    if (!_.isEmpty(tooltip)) {
-      return (
-        <Whisper trigger="hover" placement="top" speaker={<Tooltip>{tooltip}</Tooltip>}>
-          <span>{link}</span>
-        </Whisper>
-      );
-    }
-    return link;
-  }
-}
-
-
+import EditDevice from '../../../src/components/edit-device';
+import SmartDate from '../../../src/components/smart-date';
 
 const DeviceHeader = ({ device }) => {
   const { items } = useCodePlug('device-header');
@@ -203,6 +90,14 @@ const DeviceHeader = ({ device }) => {
             {device.id} <SmallTag capitalize={false} color="#2685DB">v{device.version}</SmallTag>
           </FlexboxGrid.Item>
         </FlexboxGrid>
+        <FlexboxGrid>
+          <FlexboxGrid.Item colspan={6} className="header-label">
+            Last update
+          </FlexboxGrid.Item>
+          <FlexboxGrid.Item colspan={18}  className="header-value">
+            <SmartDate date={device.updatedAt} />
+          </FlexboxGrid.Item>
+        </FlexboxGrid>
       </div>
       {items.map(({ view: View, props }) => {
 
@@ -217,7 +112,7 @@ const DeviceHeader = ({ device }) => {
                 {props.edit != null && (
                   <Fragment>
                     &nbsp;
-                    <EditSchema
+                    <EditDevice
                       path={props.edit}
                       jsonSchema={device.jsonSchema}
                       value={device}
@@ -237,29 +132,81 @@ const DeviceHeader = ({ device }) => {
 }
 
 
+const byString = function(o, s) {
+  let str = s.replace(/\[(\w+)\]/g, '.$1'); // convert indexes to properties
+  str = str.replace(/^\./, '');           // strip a leading dot
+  var a = str.split('.');
+  for (var i = 0, n = a.length; i < n; ++i) {
+      var k = a[i];
+      if (k in o) {
+          o = o[k];
+      } else {
+          return;
+      }
+  }
+  return o;
+}
+
+
+const Channel = props => {
+  const { items } = useCodePlug('device-header');
+
+  return (
+    <div className="device-channel">
+      <Views
+        region="device-channel"
+        {...props}
+      />
+
+    </div>
+  );
+
+}
+
+
+const findValue = (snapshot, name) => {
+
+  let result;
+  if (snapshot == null) {
+    return null;
+  }
+
+  result = snapshot.analog.find(channel => channel.name === name);
+
+  result = result != null ? result : snapshot.digital.find(channel => channel.name === name);
+
+  return result;
+}
 
 const Device = () => {
+  const [device, setDevice] = useState();
   const { id } = useParams();
   const { googleMapsKey } = useSettings();
+
+  const channelPaths = [
+    'digital',
+    'analogInput',
+    'analogOutput'
+  ];
 
   const { data, error: error2 } = useSubscription(
     DEVICE_SUBSCRIPTION,
     {
       variables: { id: parseInt(id, 10) },
-      onSubscriptionData: ({ subscriptionData: { data: { device }} }, value2) => {
+      onSubscriptionData: ({ subscriptionData: { data: { device } } }) => {
         console.log('device updated', device)
-
+        setDevice(device);
       }
     }
   );
-  console.log('sububb', data, error2);
-  console.log('googleMapsKey', googleMapsKey)
 
-  const { data: { device } = {}, loading, error } = useQuery(DEVICE, {
+
+  const { loading, error } = useQuery(DEVICE, {
     fetchPolicy: 'network-only',
     variables: { id: parseInt(id, 10) },
     onCompleted: (data) => {
       console.log('data', data);
+      setDevice(data.device);
     }
   });
 
@@ -270,10 +217,15 @@ const Device = () => {
     breadcrumbs = [...breadcrumbs, device.name];
   }
 
-    return (
+  if (device != null) {
+    console.log('PAYLOAD', device.payload)
+    console.log('SNAPSHOT', device.snapshot)
+  }
+
+  return (
     <PageContainer className="page-device">
       <Breadcrumbs pages={breadcrumbs}/>
-      {!loading && (
+      {device != null && (
         <Fragment>
           <div className="device-name">
 
@@ -288,13 +240,8 @@ const Device = () => {
 
               <DeviceHeader device={device}/>
 
-
             </FlexboxGrid.Item>
             <FlexboxGrid.Item colspan={10}>
-
-
-
-
               <div style={{ height: '200px '}}>
                 <GoogleMapReact
                   bootstrapURLKeys={{ libraries: 'drawing', key: googleMapsKey }}
@@ -313,10 +260,27 @@ const Device = () => {
               </div>
             </FlexboxGrid.Item>
           </FlexboxGrid>
+          <div className="channels">
+            {_.flatten(channelPaths.map(channelPath => {
+
+
+              const items = byString(device.payload, channelPath);
+              if (_.isArray(items) && !_.isEmpty(items)) {
+                return items.map((item, index) => (
+                  <Channel
+                    key={item.name}
+                    channel={item}
+                    path={`/${channelPath}[${index}]`}
+                    device={device}
+                    value={findValue(device.snapshot, item.name)}
+                  />
+                ))
+              }
+            }))}
+
+          </div>
         </Fragment>
       )}
-
-
     </PageContainer>
   );
 };

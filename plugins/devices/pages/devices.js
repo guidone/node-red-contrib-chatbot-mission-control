@@ -97,7 +97,7 @@ const Devices = () => {
 
 
   return (
-    <PageContainer className="page-users">
+    <PageContainer className="page-devices">
       <Breadcrumbs pages={['Devices']}/>
       {devices != null && (
         <DevicesMap devices={devices} />

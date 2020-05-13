@@ -9,6 +9,7 @@ import './plugins/messages';
 import './plugins/users';
 import './plugins/admins';
 import './plugins/devices';
+import './plugins/officine-digitali';
 import './plugins/users-suspend';
 // import './plugins/users-data';
 import './plugins/chat-demo';

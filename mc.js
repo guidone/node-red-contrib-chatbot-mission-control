@@ -5,6 +5,8 @@ const WebSocket = require('ws');
 const fs = require('fs');
 const moment = require('moment');
 const passport = require('passport');
+const express = require('express');
+const http = require('http');
 const { BasicStrategy } = require('passport-http');
 const _ = require('lodash');
 const fileupload = require('express-fileupload');
@@ -162,12 +164,16 @@ function bootstrap(server, app, log, redSettings) {
   //app.use(graphQLServer.getMiddleware())
 
   //const PORT = 4000;
-  //const appSubscriptions = express();
-
+  const appSubscriptions = express();
+  const httpServerSubscriptions = http.createServer(appSubscriptions);
 
   graphQLServer.applyMiddleware({ app });
 
-  graphQLServer.installSubscriptionHandlers(server);
+  graphQLServer.installSubscriptionHandlers(httpServerSubscriptions);
+
+  httpServerSubscriptions.listen(1943, () => {
+    console.log('started subscriptions server 1943')
+  });
   /*new SubscriptionServer({
     execute,
     subscribe,

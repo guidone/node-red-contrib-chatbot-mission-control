@@ -38,7 +38,7 @@ const apolloLink = createHttpLink({ uri: '/graphql' });
 
 // Create a WebSocket link:
 const wsLink = new WebSocketLink({
-  uri: `ws://localhost:1880/graphql`,
+  uri: `ws://localhost:1943/graphql`,
   options: {
     reconnect: true
   },

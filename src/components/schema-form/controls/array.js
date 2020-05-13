@@ -56,6 +56,8 @@ const ArrayController = props => {
   }
   const { maxItems, minItems } = jsonSchema;
 
+  console.log('currentPath in array', currentPath)
+
   return (
     <Fragment>
       {!_.isEmpty(jsonSchema.title) && <div className={classNames('title', { [`title-${level}`]: true })}>{jsonSchema.title}</div>}

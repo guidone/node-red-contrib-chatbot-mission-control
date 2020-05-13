@@ -57,7 +57,7 @@ const StringController = props => {
 }
 
 const SelectController = props => {
-  const { jsonSchema, required = false, searchable = false, readOnly = undefined } = props;
+  const { jsonSchema, required = false, searchable = false, parseNumber = false, onChange = () => {}, value } = props;
   const { error, className, disabled, filteredProps } = useControl(props);
 
   return (
@@ -67,7 +67,7 @@ const SelectController = props => {
         {...filteredProps}
         className={className}
         disabled={disabled}
-        data={jsonSchema.enum.map(value => ({ value, label: value }))}
+        data={jsonSchema.enum.map(value => ({ value, label: String(value) }))}
         block
         searchable={searchable}
         cleanable={true}
@@ -111,8 +111,10 @@ const Controller = ({ value, field, jsonSchema, level = 0, onChange, currentPath
 
 
 
-  if (['string', 'integer', 'number'].includes(jsonSchema.type) && _.isArray(jsonSchema.enum) && !_.isEmpty(jsonSchema.enum)) {
+  if (['string'].includes(jsonSchema.type) && _.isArray(jsonSchema.enum) && !_.isEmpty(jsonSchema.enum)) {
     return <SelectController {...common}/>;
+  } else if (['integer', 'number'].includes(jsonSchema.type) && _.isArray(jsonSchema.enum) && !_.isEmpty(jsonSchema.enum)) {
+    return <SelectController {...common} parseNumber />;
   } else if (jsonSchema.type === 'number') {
     return (<NumberControl {...common}/>)
   }else if (jsonSchema.type === 'boolean') {
