@@ -107,7 +107,13 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
               <FormControl readOnly={disabled} name="email" />
             </FormGroup>
             <FormGroup>
-              <ControlLabel>ChatIds</ControlLabel>
+              <ControlLabel>
+                ChatIds
+                <HelpBlock tooltip>
+                  <em>chatId</em> is the unique identifier of a user on a specific platform, each user can have assigned multiple <em>chatIds</em>.
+                  From the general list of users, it's possible to merge two users with different <em>chatIds</em> into the same identity.
+                </HelpBlock>
+              </ControlLabel>
               <FormControl
                 readOnly={disabled}
                 name="chatIds"
@@ -165,6 +171,9 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
         </Views>
       </Modal.Body>
       <Modal.Footer>
+        <div style={{ float: 'left' }}>
+          <Views region="user-button" user={user} />
+        </div>
         <Button onClick={() => handleCancel()} appearance="subtle">
           Cancel
         </Button>

@@ -164,9 +164,9 @@ module.exports = mcSettings => {
   });
 
   const Context = sequelize.define('context', {
-    userId: { type: Sequelize.STRING, allowNull: false },
-    chatId: { type: Sequelize.STRING, allowNull: false },
-    payload: { type: Sequelize.TEXT, allowNull: false }
+    userId: { type: Sequelize.STRING },
+    chatId: { type: Sequelize.STRING },
+    payload: { type: Sequelize.TEXT }
   }, {
     indexes: [
       { name: 'chatid_userid', using: 'BTREE', fields: ['userId'] },

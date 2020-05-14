@@ -33,7 +33,7 @@ const Breadcrumbs = ({ pages = [], codePlug }) => {
 
   return (
     <Breadcrumb className="ui-breadcrumbs">
-      <NavLink to="/mc/">Mission Control</NavLink>
+      <NavLink to="/">Mission Control</NavLink>
       {breadcrumbs}
     </Breadcrumb>
   );

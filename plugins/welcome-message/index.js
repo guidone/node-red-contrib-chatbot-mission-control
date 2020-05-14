@@ -4,17 +4,17 @@ import { Tag } from 'rsuite';
 import { plug } from '../../lib/code-plug';
 
 import withConfigurationPage from '../../src/components/configuration-page';
+import { NodeRedNode, SlugHelp, TypeCommand } from '../../src/components/help-elements';
 import ConfigurationForm from './views/form';
 
 const Legend = () => (
   <div>
-    Configure the behaviour of the <Tag color="violet">New User</Tag> node.<br/>
-    Select a content to show to the user when he joins the chatbot or a group. Use the <em>slug</em> field
-    to group different articles that represents the same content (for example the different translations).<br/>
-    To test the show content type <code>/start</code>
+    <NodeRedNode>New User</NodeRedNode>
+    <p>Select the message to show when a new user joins the chatbot by selecting a <em>slug</em> from the <strong>Content</strong> section.</p>
+    <SlugHelp/>
+    <p>To test message type <TypeCommand>/start</TypeCommand> in the chatbot</p>
   </div>
 );
-
 
 plug('sidebar', null, {
   permission: 'configure',

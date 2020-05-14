@@ -1,6 +1,7 @@
 import { useContext } from 'react';
 import AppContext from '../common/app-context';
 
+
 const useCurrentUser = () => {
   const { state } = useContext(AppContext);
 

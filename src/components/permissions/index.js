@@ -55,8 +55,6 @@ const Permissions = ({ value, onChange = () => {} }) => {
     .groupBy(permission => permission.group)
     .value();
 
-  console.log('groupås', permissionsGroups)
-
   return (
     <div className="ui-permissions">
       <div className="selector">

@@ -7,6 +7,7 @@ import { UserRecords } from '../../src/components/user-records/index.js'
 
 import SurveyViewer from './views/survey-viewer';
 import ConfigurationForm from './views/configuration-form';
+import GoToSurveyButton from './views/go-to-survey-button';
 
 const Legend = () => (
   <div>
@@ -85,4 +86,9 @@ plug(
       { value: 'viewed', label: 'Viewed' },
     ]
   }
+);
+// register button in the user modal to redirect to survey lists
+plug(
+  'user-button',
+  GoToSurveyButton
 );

@@ -23,6 +23,7 @@ import LanguagePicker from '../../../../src/components/language-picker';
 import JSONEditor from '../../../../src/components/json-editor';
 import { Views } from '../../../../lib/code-plug';
 import useCanCloseModal from '../../../../src/hooks/modal-can-close';
+import useCurrentUser from '../../../../src/hooks/current-user';
 
 import { content as contentModel } from '../models';
 import '../styles/modal-content.scss';
@@ -54,6 +55,7 @@ const ModalContent = ({
   customFieldsSchema,
   namespace
 }) => {
+  const { can } = useCurrentUser();
   const { isChanged, setIsChanged, handleCancel } = useCanCloseModal({ onCancel });
   const [formValue, setFormValue] = useState(content);
   const [formError, setFormError] = useState(null);
@@ -98,7 +100,13 @@ const ModalContent = ({
           <Nav.Item eventKey="content">Content</Nav.Item>
           <Nav.Item eventKey="custom_fields">Custom Fields</Nav.Item>
           <Views region="content-tabs">
-            {(View, { label, id}) => <Nav.Item key={id} active={id === tab} eventKey={id} onSelect={() => setTab(id)}>{label}</Nav.Item>}
+            {(View, { label, id, permission }) => {
+              if (_.isEmpty(permission) || can(permission)) {
+                return (
+                  <Nav.Item key={id} active={id === tab} eventKey={id} onSelect={() => setTab(id)}>{label}</Nav.Item>
+                );
+              }
+            }}
           </Views>
           <Nav.Item eventKey="content-payload">Content payload</Nav.Item>
         </Nav>

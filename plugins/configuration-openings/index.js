@@ -3,13 +3,16 @@ import { Tag } from 'rsuite';
 
 import { plug } from '../../lib/code-plug';
 import withConfigurationPage from '../../src/components/configuration-page';
+import { NodeRedNode, SlugHelp } from '../../src/components/help-elements';
 
 import ConfigurationForm from './views/form';
 
 const Legend = () => (
   <div>
-    Configure the behaviour of the <Tag color="violet">Opening Hours node</Tag>, setting the list of
-    opening hours and an extra content to show extra openings, etc
+    <NodeRedNode>Opening Hours node</NodeRedNode>
+    <p>Configure the behaviour of this node: customize the
+    opening hours and and some additional content (for example to show extra openings, etc).</p>
+    <SlugHelp/>
   </div>
 );
 
