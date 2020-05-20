@@ -41,7 +41,6 @@ const useSimulator = ({ activeChatbots }) => {
     () => {},
     {},
     (topic, payload) => {
-      console.log('arrivo2', topic, payload)
       if (topic === 'simulator') {
         dispatch({ type: 'message', payload, topic });
       }
