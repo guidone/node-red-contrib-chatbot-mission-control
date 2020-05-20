@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -10,11 +10,7 @@ import { Message, Content, Metadata, MessageDate, MessageUser, UserStatus, Butto
 const MessageQuickReplies = ({ message, onClick = () => {}, ...props }) => {
 
   return (
-    <Message {...props}>
-      <Metadata>
-        <MessageDate date={moment()}/> &nbsp; &nbsp;
-        <MessageUser>{message.username}</MessageUser> <UserStatus />
-      </Metadata>
+    <Fragment>
       {message.buttons != null && message.buttons.length !== 0 && (
         <Buttons layout="quick-replies">
           {message.buttons
@@ -29,7 +25,7 @@ const MessageQuickReplies = ({ message, onClick = () => {}, ...props }) => {
           }
         </Buttons>
       )}
-    </Message>
+    </Fragment>
   );
 };
 MessageQuickReplies.propTypes = {

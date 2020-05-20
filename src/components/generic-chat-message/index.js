@@ -10,6 +10,7 @@ import {
   MessageDate,
   MessageUser,
   UserStatus,
+  MessageFrame,
   MessageText,
   MessageButtons,
   MessagePhoto,
@@ -30,29 +31,39 @@ const GenericMessage = ({ message = {}, onClick = () => {} }) => {
   switch (message.type) {
     case 'message':
       return (
-        <MessageText
-          message={message}
-          inbound={message.inbound}
-          markdown={message.params != null && message.params.parseMode === 'Markdown'}
-        />
+        <MessageFrame message={message} inbound={message.inbound}>
+          <MessageText
+            message={message}
+            inbound={message.inbound}
+            markdown={message.params != null && message.params.parseMode === 'Markdown'}
+          />
+        </MessageFrame>
       );
     case 'photo':
-      return <MessagePhoto message={message} inbound={message.inbound} />;
+      return (
+        <MessageFrame message={message} inbound={message.inbound} className="ui-chat-message-photo">
+          <MessagePhoto message={message} inbound={message.inbound} />
+        </MessageFrame>
+      );
     case 'inline-buttons':
       return (
-        <MessageButtons
-          message={message}
-          inbound={message.inbound}
-          onClick={onClick}
-        />
+        <MessageFrame message={message} inbound={message.inbound}>
+          <MessageButtons
+            message={message}
+            inbound={message.inbound}
+            onClick={onClick}
+          />
+        </MessageFrame>
       );
     case 'quick-replies':
       return (
-        <MessageQuickReplies
-          message={message}
-          inbound={message.inbound}
-          onClick={onClick}
-        />
+        <MessageFrame message={message} inbound={message.inbound}>
+          <MessageQuickReplies
+            message={message}
+            inbound={message.inbound}
+            onClick={onClick}
+          />
+        </MessageFrame>
       );
     default:
       return <div>Unsupported message type</div>;

@@ -7,13 +7,13 @@ import withSocket from '../../src/wrappers/with-socket';
 import withActiveChatbots from '../../src/wrappers/with-active-chatbots';
 import withState from '../../src/wrappers/with-state';
 import useSocket from '../../src/hooks/socket';
+import useReducer from '../../src/hooks/use-reducer';
 
 import {
   Messages,
   ChatWindow,
   MessageComposer
 } from '../../src/components/chat';
-
 
 
 import Message from '../../src/components/generic-chat-message';
@@ -26,20 +26,33 @@ import SimulatorContext from './context';
 
 const useSimulator = ({ activeChatbots }) => {
 
-  const { state, dispatch, sendMessage } = useSocket(handleMessages, {
-    messages: {},
-    transport: !_.isEmpty(activeChatbots) ? activeChatbots[0].transport : null,
-    nodeId: !_.isEmpty(activeChatbots) ? activeChatbots[0].nodeId : null,
-    globals: null,
-    language: 'en',
-    user: null
+  const { state, dispatch } = useReducer({
+    simulator: {
+      messages: {},
+      transport: !_.isEmpty(activeChatbots) ? activeChatbots[0].transport : null,
+      nodeId: !_.isEmpty(activeChatbots) ? activeChatbots[0].nodeId : null,
+      globals: null,
+      language: 'en',
+      user: null
+    }
   });
+
+  const { sendMessage } = useSocket(
+    () => {},
+    {},
+    (topic, payload) => {
+      console.log('arrivo2', topic, payload)
+      if (topic === 'simulator') {
+        dispatch({ type: 'message', payload, topic });
+      }
+    }
+  );
 
   return {
     state,
     dispatch,
-    sendMessage: (text, { echo = true} = {}) => {
-      const { transport, nodeId, language, user: impersonatedUser } = state;
+    sendMessage: (text, { echo = true } = {}) => {
+      const { transport, nodeId, language, user: impersonatedUser } = state.simulator;
       sendMessage('simulator', {
         transport,
         nodeId,
@@ -64,8 +77,8 @@ const useSimulator = ({ activeChatbots }) => {
 
 
 const SimulatorWidget = ({ activeChatbots, user }) => {
-  const { state, dispatch, sendMessage } = useSimulator({ activeChatbots });
-  const { messages, transport, nodeId, language, user: impersonatedUser } = state;
+  const { state: { simulator }, dispatch, sendMessage } = useSimulator({ activeChatbots });
+  const { messages, transport, nodeId, language, user: impersonatedUser } = simulator;
   const loading = activeChatbots == null;
 
   const clickHandler = (obj) => {
@@ -90,7 +103,7 @@ const SimulatorWidget = ({ activeChatbots, user }) => {
       />}
     >
       {!loading && (
-        <SimulatorContext.Provider value={state}>
+        <SimulatorContext.Provider value={simulator}>
         <ChatWindow>
           <Messages>
             {messages[transport] != null && messages[transport].map(message => {
@@ -130,6 +143,20 @@ plug(
   withState(withActiveChatbots(SimulatorWidget), 'user'),
   { x: 0, y: 0, w: 2, h: 8, isResizable: true, id: 'simulator-widget', permission: 'simulator' }
 );
+
+
+// TODO move from here
+plug('reducers', (state, action) => {
+  if (action.type === 'default') {
+    return { ...state, [action.key]: action.value };
+  }
+  return state;
+});
+
+
+plug('reducers', handleMessages);
+
+
 
 plug(
   'permissions',

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -10,11 +10,7 @@ import { Message, Content, Metadata, MessageDate, MessageUser, UserStatus, Butto
 const MessageButtons = ({ message, onClick = () => {}, ...props }) => {
 
   return (
-    <Message {...props}>
-      <Metadata>
-        <MessageDate date={moment()}/> &nbsp; &nbsp;
-        <MessageUser>{message.username}</MessageUser> <UserStatus />
-      </Metadata>
+    <Fragment>
       <Content position="first">
         {message.content}
       </Content>
@@ -32,7 +28,7 @@ const MessageButtons = ({ message, onClick = () => {}, ...props }) => {
           }
         </Buttons>
       )}
-    </Message>
+    </Fragment>
   );
 };
 MessageButtons.propTypes = {

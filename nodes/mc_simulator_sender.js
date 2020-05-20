@@ -38,11 +38,12 @@ module.exports = function(RED) {
       }
       // check if this node has some wirings in the follow up pin, in that case
       // the next message should be redirected here
+      console.log('is tracking', node.track)
       if (context != null && node.track && !_.isEmpty(node.wires[0])) {
         console.log('storing track node', node.id)
         await when(context.set({
-          currentConversationNode: node.id,
-          currentConversationNode_at: moment()
+          simulator_currentConversationNode: node.id,
+          simulator_currentConversationNode_at: moment()
         }));
       }
 

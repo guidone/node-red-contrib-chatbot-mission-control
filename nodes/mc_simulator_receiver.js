@@ -32,7 +32,6 @@ module.exports = function(RED) {
           node.error(`Unable to find a RedBot chat node with id ${message.nodeId}`);
           return;
         }
-        console.log('SIM--->', message)
 
         // get simulator options from payload
         const { echo = true } = message.simulatorOptions || {};
@@ -72,7 +71,8 @@ module.exports = function(RED) {
           }
         }
 
-        await context.set({ username, userId, language, firstName, lastName, message: text });
+        await context.set({ username, language, firstName, lastName, message: text });
+        context.statics = { ...context.statics, userId }; // tricky
         // send back the evaluated message so also originated messages are visible in the simulator
         if (echo) {
           sendMessage('simulator', {
@@ -85,12 +85,12 @@ module.exports = function(RED) {
         }
 
         // check if there is a conversation is going on
-        const currentConversationNode = await when(context.get('currentConversationNode'));
+        const currentConversationNode = await when(context.get('simulator_currentConversationNode'));
         // if there's a current converation, then the message must be forwarded
         if (currentConversationNode != null) {
           // if the current node is master, then redirect, if not master do nothing
           if (isMaster) {
-            await when(context.remove('currentConversationNode'))
+            await when(context.remove('simulator_currentConversationNode'))
             // emit message directly the node where the conversation stopped
             RED.events.emit('node:' + currentConversationNode, msg);
           }

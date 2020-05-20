@@ -160,30 +160,16 @@ function bootstrap(server, app, log, redSettings) {
   }));
   app.use(passport.initialize());
 
-  // install graphql server
-  //app.use(graphQLServer.getMiddleware())
-
-  //const PORT = 4000;
-  const appSubscriptions = express();
-  const httpServerSubscriptions = http.createServer(appSubscriptions);
-
+  // mount graphql endpoints to Node-RED app
   graphQLServer.applyMiddleware({ app });
 
+  // Start web socket subscription server (on different port than WS of node-red or will clash)
+  const appSubscriptions = express();
+  const httpServerSubscriptions = http.createServer(appSubscriptions);
   graphQLServer.installSubscriptionHandlers(httpServerSubscriptions);
-
-  httpServerSubscriptions.listen(1943, () => {
-    console.log('started subscriptions server 1943')
+  httpServerSubscriptions.listen(Settings.notificationPort, () => {
+    console.log(`Starting Subscription Server at ${Settings.notificationPort}`);
   });
-  /*new SubscriptionServer({
-    execute,
-    subscribe,
-    schema: graphQLSchema,
-  }, {
-    server: server,
-    path: '/subscriptions',
-  });*/
-
-
 
   // eslint-disable-next-line no-console
   console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
@@ -251,7 +237,7 @@ function bootstrap(server, app, log, redSettings) {
   );
 
   // Setup web socket
-  console.log('Starting WS at ', Settings.wsPort)
+  console.log(`Starting WebSocket at ${Settings.wsPort}`);
   const wss = new WebSocket.Server({ port: Settings.wsPort });
   wss.on('connection', ws => {
     const sendHandler = (topic, payload) => ws.send(JSON.stringify({ topic, payload }));

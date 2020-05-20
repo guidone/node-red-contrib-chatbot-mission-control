@@ -47,7 +47,23 @@ const ChatWindow = ({ children, width = '100%', style }) => {
 
 import Showdown from 'showdown';
 
-const MessageText = ({ message, markdown = false, ...props }) => {
+const MessageFrame = ({ children, ...props }) => {
+  const { message } = props;
+  return (
+    <Message {...props}>
+      <Metadata>
+        <MessageDate date={message.ts}/> &nbsp; &nbsp;
+        <MessageUser>{message.username}</MessageUser> <UserStatus />
+      </Metadata>
+      {children}
+    </Message>
+  );
+};
+
+
+
+const MessageText = props => {
+  const { message, markdown = false } = props;
 
   let html = message.content;
   if (markdown) {
@@ -56,13 +72,9 @@ const MessageText = ({ message, markdown = false, ...props }) => {
   }
 
   return (
-    <Message {...props}>
-      <Metadata>
-        <MessageDate date={message.ts}/> &nbsp; &nbsp;
-        <MessageUser>{message.username}</MessageUser> <UserStatus />
-      </Metadata>
+
       <Content text={html}/>
-    </Message>
+
   );
 };
 MessageText.propTypes = {
@@ -90,21 +102,15 @@ class MessagePhoto extends React.Component {
   render() {
     const { message } = this.props;
 
-    const arrayBufferView = new Uint8Array( message.content.data );
-    const blob = new Blob( [ arrayBufferView ], { type: 'image/jpeg' } );
+    const arrayBufferView = new Uint8Array(message.content.data);
+    const blob = new Blob([arrayBufferView], { type: 'image/jpeg' });
     const urlCreator = window.URL || window.webkitURL;
     const imageUrl = urlCreator.createObjectURL(blob);
 
     return (
-      <Message {...this.props} className="ui-chat-message-photo">
-        <Metadata>
-          <MessageDate date={moment()}/> &nbsp; &nbsp;
-          <MessageUser>{message.username}</MessageUser> <UserStatus />
-        </Metadata>
-        <Content>
-          <img src={imageUrl}/>
-        </Content>
-      </Message>
+      <Content>
+        <img src={imageUrl}/>
+      </Content>
     );
   }
 };
@@ -122,6 +128,7 @@ export {
   Content,
   Metadata,
   ChatWindow,
+  MessageFrame,
   MessageComposer,
   MessageDate,
   MessageUser,
