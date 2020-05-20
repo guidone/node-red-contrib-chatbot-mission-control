@@ -123,7 +123,10 @@ import { Message, Messages, Content, Metadata, ChatWindow, MessageComposer, Mess
 
 const LastMessageWidget = () => {
 
-  const { state, dispatch } = useSocket(handleMessages, { lastMessage: null });
+  const { state, dispatch } = useSocket({
+    reducer: handleMessages,
+    initialState: { lastMessage: null }
+  });
   const { lastMessage } = state;
 
   return (

@@ -37,15 +37,13 @@ const useSimulator = ({ activeChatbots }) => {
     }
   });
 
-  const { sendMessage } = useSocket(
-    () => {},
-    {},
-    (topic, payload) => {
+  const { sendMessage } = useSocket({
+    onMessage: (topic, payload) => {
       if (topic === 'simulator') {
         dispatch({ type: 'message', payload, topic });
       }
     }
-  );
+  });
 
   return {
     state,

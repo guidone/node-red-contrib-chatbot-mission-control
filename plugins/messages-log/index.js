@@ -21,7 +21,7 @@ const handleMessages = (state, action) => {
         return {
           ...state,
           messageOutLog
-        }; 
+        };
       } else if (action.topic === 'message.in') {
         const payload = _.isArray(action.payload) ? action.payload : [action.payload];
         const messages = payload.map(message => ({ ...message, ts: moment() }));
@@ -29,7 +29,7 @@ const handleMessages = (state, action) => {
         return {
           ...state,
           messageInLog
-        }; 
+        };
       }
       return state;
     case 'clear-out':
@@ -41,24 +41,24 @@ const handleMessages = (state, action) => {
       return {
         ...state,
         messageInLog: []
-      }; 
+      };
     default:
-      return state; 
+      return state;
   }
 };
 
 
-const MessageOutLogWidget = () => {   
-  const { state, dispatch } = useSocket(handleMessages, { messageOutLog: [] });
+const MessageOutLogWidget = () => {
+  const { state, dispatch } = useSocket({ reducer: handleMessages, initialState: { messageOutLog: [] }});
   const { messageOutLog } = state;
 
   return (
-    <Panel 
-      title="Outbound Message Log" 
+    <Panel
+      title="Outbound Message Log"
       className="widget-message-log"
       hint={`To see outgoing messages here, set a MC Output node with topic "message.out" in the Node-RED flow in a way that
         receives the same input of the Sender nodes`}
-      menu={<IconButton onClick={() => dispatch({ type: 'clear-out' })} appearance="link" icon={<Icon icon="trash"/>} size="md"/>} 
+      menu={<IconButton onClick={() => dispatch({ type: 'clear-out' })} appearance="link" icon={<Icon icon="trash"/>} size="md"/>}
       scrollable
     >
       {messageOutLog.length === 0 && (
@@ -69,17 +69,17 @@ const MessageOutLogWidget = () => {
   );
 }
 
-const MessageInLogWidget = () => {   
-  const { state, dispatch } = useSocket(handleMessages, { messageInLog: [] });
+const MessageInLogWidget = () => {
+  const { state, dispatch } = useSocket({ reducer: handleMessages, initialState: { messageInLog: [] }});
   const { messageInLog } = state;
 
   return (
-    <Panel 
-      title="Inbound Message Log" 
+    <Panel
+      title="Inbound Message Log"
       className="widget-message-log"
       hint={`To see ingoing messages here, set a MC Output node with topic "message.in" in the Node-RED flow in a way that
         receives the same output of the Receiver nodes`}
-      menu={<IconButton onClick={() => dispatch({ type: 'clear-in' })} appearance="link" icon={<Icon icon="trash"/>} size="md"/>} 
+      menu={<IconButton onClick={() => dispatch({ type: 'clear-in' })} appearance="link" icon={<Icon icon="trash"/>} size="md"/>}
       scrollable
     >
       {messageInLog.length === 0 && (
@@ -92,7 +92,3 @@ const MessageInLogWidget = () => {
 
 plug('widgets', MessageOutLogWidget, { x: 0, y: 0, w: 2, h: 4, minW: 2, isResizable: true, id: 'message-out-log' })
 plug('widgets', MessageInLogWidget, { x: 0, y: 0, w: 2, h: 4, minW: 2, isResizable: true, id: 'message-in-log' })
-
-
-
-

@@ -2,7 +2,7 @@ import { useEffect, useReducer } from 'react';
 
 import socketListener from '../../lib/socket';
 
-const useSocket = (reducer = () => {}, initialState = {}, onMessage = () => {}) => {
+const useSocket = ({ reducer = () => {}, initialState = {}, onMessage = () => {} } = {}) => {
   const handler = (topic, payload) => {
     dispatch({ type: 'socket.message', topic, payload });
     onMessage(topic, payload);
