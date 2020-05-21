@@ -13,7 +13,10 @@ const MyView = props => {
 
 const SendMessageButton = ({ user }) => {
 
-  const { open, close, error, dump } = useModal({ view: MyView })
+  const { open, close, error, dump } = useModal({
+    view: MyView,
+    title: 'I am a modal'
+  })
 
   return (
 

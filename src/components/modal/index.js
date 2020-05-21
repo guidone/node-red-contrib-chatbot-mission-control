@@ -4,16 +4,22 @@ import _ from 'lodash';
 
 const ModalContext = React.createContext({});
 
-const useModal = ({ view }) => {
+/**
+ * useModal
+ * @param {React.View} props.view
+ * @param {String} props.title Title of the modal
+ *
+ */
+const useModal = props => {
    const context = useContext(ModalContext);
    const { appendView, removeView, setErrorView } = context;
 
    const [id, setId] = useState(_.uniqueId('modal_'));
 
   return {
-    open: props => {
+    open: modalProps => {
       console.log('open', props)
-      return appendView(id, { view }, props)
+      return appendView(id, { initialValue: modalProps, ...props })
     },
     close: () => {
       removeView(id)
@@ -27,9 +33,10 @@ const useModal = ({ view }) => {
 }
 
 const ModalWrapper = ({
-  innerView: InnerView,
+  view: InnerView,
   initialValue,
   disabled = false,
+  title,
   onSubmit = () => {},
   onCancel = () => {},
   error
@@ -39,9 +46,11 @@ const ModalWrapper = ({
 
   return (
     <Modal backdrop show onHide={() => handleCancel()} size="md" overflow={false} className="modal-admin">
-      <Modal.Header>
-        <Modal.Title>modal title</Modal.Title>
-      </Modal.Header>
+      {!_.isEmpty(title) && (
+        <Modal.Header>
+          <Modal.Title>{title}</Modal.Title>
+        </Modal.Header>
+      )}
       <Modal.Body>
         {error != null && (
           <div>erorr: {error}</div>
@@ -72,23 +81,20 @@ const ModalWrapper = ({
 
 const reducer = (state, action) => {
   if (action.type === 'appendView') {
-    const { id, view, props, resolve } = action;
+    const { id, resolve, type, ...rest } = action;
     const newModals = [
 
       ...state.modals,
       {
         id,
-        component: view,
-        initialValue: props,
         view: (
           <ModalWrapper
             key={id}
-            innerView={view}
-            initialValue={props}
             onSubmit={function(value) {
               resolve(value);
             }}
             onCancel={() => resolve()}
+            {...rest}
           />
         )
       }
@@ -100,18 +106,11 @@ const reducer = (state, action) => {
       if (modal.id === id) {
         return {
           ...modal,
-          view: (
-            <ModalWrapper
-              key={modal.id}
-              innerView={modal.component}
-              initialValue={modal.initialValue}
-              error={error}
-              onSubmit={function(value) {
-                resolve(value);
-              }}
-              onCancel={() => resolve()}
-            />
-          )
+          view: React.cloneElement(modal.view, {
+            error,
+            onSubmit: value => resolve(value),
+            onCancel: () => resolve()
+          })
         };
       }
       return modal;
@@ -148,8 +147,8 @@ const ModalProvider = ({ children }) => {
       setErrorView: function(id, error) {
         return new Promise(resolve => dispatch({ type: 'setError', error, id, resolve }));
       },
-      appendView: function(id, { view }, props) {
-        return new Promise(resolve => dispatch({ type: 'appendView', id, view, props, resolve }));
+      appendView: function(id, props) {
+        return new Promise(resolve => dispatch({ type: 'appendView', id, resolve, ...props }));
       }
     }}>
       {!_.isEmpty(modals) && (
