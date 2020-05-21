@@ -1,6 +1,7 @@
 import { plug } from '../../lib/code-plug';
 
 import MessageLogs from './pages/message-logs';
+import GoToMessagesButton from './views/go-to-messages';
 
 plug('sidebar', null, {
   id: 'message-log',
@@ -24,4 +25,10 @@ plug(
     description: `View messages sent and received by the chatbot users`,
     group: 'General'
   }
+);
+
+// register button in the user modal to redirect to survey lists
+plug(
+  'user-button',
+  GoToMessagesButton
 );

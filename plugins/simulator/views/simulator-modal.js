@@ -1,26 +1,13 @@
 import React, { useState } from 'react'
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import { FlexboxGrid, SelectPicker, Modal, Button, FormGroup, ControlLabel, Form, FormControl } from 'rsuite';
+import { FlexboxGrid, Modal, Button, FormGroup, ControlLabel, Form, FormControl } from 'rsuite';
 
-import Transport from '../../../src/components/transport';
 import LanguagePicker from '../../../src/components/language-picker';
 import UserAutocomplete from '../../../src/components/user-autocomplete';
+import SelectTransport from '../../../src/components/select-transport';
 
-const TransportValue = (value, item) => (
-  <div className="picker-item-transport">
-    <Transport transport={item.transport}/>
-    &nbsp;<b>{item.name}</b>
-  </div>
-);
 
-const MenuItem = (label, item) => (
-  <div className="picker-item-transport">
-    <b>{item.name}</b><br/>
-    <Transport transport={item.transport}/>
-    &nbsp;<em>(id: {item.nodeId})</em>
-  </div>
-);
 
 // TODO default user in user autocomplete
 
@@ -64,11 +51,6 @@ const SimulatorParamsModal = ({
             name="user"
             placeholder="Test User"
             style={{ width: '100%' }}
-            onChange2={user => {
-              if (user != null && user.language != null) {
-                setFormValue({ ...formValue, language: user.language })
-              }
-            }}
           />
         </FormGroup>
         <FlexboxGrid justify="space-between" style={{ marginBottom: '20px' }}>
@@ -86,15 +68,11 @@ const SimulatorParamsModal = ({
             <FormGroup>
               <ControlLabel>Transport</ControlLabel>
               <FormControl
-                accepter={SelectPicker}
+                accepter={SelectTransport}
                 name="nodeId"
-                renderValue={TransportValue}
-                renderMenuItem={MenuItem}
-                searchable={false}
                 block
                 size="sm"
                 cleanable={false}
-                data={activeChatbots.map(chatbot => ({ value: chatbot.nodeId, label: chatbot.transport, ...chatbot }))}
               />
             </FormGroup>
           </FlexboxGrid.Item>

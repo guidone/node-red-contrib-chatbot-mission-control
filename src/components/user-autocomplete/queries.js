@@ -8,7 +8,11 @@ query($id: Int,$username: String, $search: String) {
     username,
     language,
     first_name,
-    last_name
+    last_name,
+    chatIds {
+      chatId,
+      transport
+    }
   }
 }`;
 

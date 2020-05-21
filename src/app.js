@@ -2,7 +2,7 @@ import React, { useReducer, useEffect, useState, useMemo} from 'react';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { createHttpLink } from 'apollo-link-http';
 import { ApolloClient } from 'apollo-client';
-import { ApolloLink } from "apollo-link";
+import { ApolloLink } from 'apollo-link';
 import { ApolloProvider } from 'react-apollo';
 import { Container, Content, Loader } from 'rsuite';
 import {
@@ -25,6 +25,8 @@ import HomePage from './pages/home';
 import WebSocketReact from './common/web-socket';
 import PageNotFound from './layout/page-not-found';
 
+
+import { ModalProvider } from './components/modal';
 
 // Import plugins
 import './permissions';
@@ -150,25 +152,27 @@ const AppRouter = ({ codePlug, bootstrap }) => {
     <ApolloProvider client={client}>
       <AppContext.Provider value={{ state, dispatch, client, platforms, eventTypes, messageTypes, activeChatbots }}>
         <WebSocketReact dispatch={dispatch}>
-          <Router basename="/mc">
-            <div className="mission-control-app">
-              <Container className="mc-main-container">
-                <Sidebar/>
-                <Container className="mc-inner-container">
-                  <Header/>
-                  <Content className="mc-inner-content">
-                    <Switch>
-                      {items.map(({ view: View, props }) => (
-                        <Route key={props.url} path={props.url} children={<View {...props} dispatch={dispatch}/>} />
-                      ))}
-                      <Route exact path="/" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}/>
-                      <Route path="*" component={PageNotFound} />
-                    </Switch>
-                  </Content>
+          <ModalProvider>
+            <Router basename="/mc">
+              <div className="mission-control-app">
+                <Container className="mc-main-container">
+                  <Sidebar/>
+                  <Container className="mc-inner-container">
+                    <Header/>
+                    <Content className="mc-inner-content">
+                      <Switch>
+                        {items.map(({ view: View, props }) => (
+                          <Route key={props.url} path={props.url} children={<View {...props} dispatch={dispatch}/>} />
+                        ))}
+                        <Route exact path="/" children={<HomePage dispatch={dispatch} codePlug={codePlug} />}/>
+                        <Route path="*" component={PageNotFound} />
+                      </Switch>
+                    </Content>
+                  </Container>
                 </Container>
-              </Container>
-            </div>
-          </Router>
+              </div>
+            </Router>
+          </ModalProvider>
         </WebSocketReact>
       </AppContext.Provider>
     </ApolloProvider>
