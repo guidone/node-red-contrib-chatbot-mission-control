@@ -322,6 +322,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         type: GraphQLString,
         description: ''
       },
+      transport: {
+        type: GraphQLString,
+        description: ''
+      },
       userId: {
         type: GraphQLString,
         description: ''
@@ -353,6 +357,10 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
         description: ''
       },
       status: {
+        type: GraphQLString,
+        description: ''
+      },
+      transport: {
         type: GraphQLString,
         description: ''
       },

@@ -1,39 +1,45 @@
 import React from 'react';
-import { Button } from 'rsuite';
-import { Link } from 'react-router-dom';
+import { Button, Notification } from 'rsuite';
 
 import { useModal } from '../../../src/components/modal';
+import useSocket from '../../../src/hooks/socket';
+import name from '../../../src/helpers/user/readable-name';
 
 
-const MyView = props => {
 
-  return <div>apro dentro modal {props.value.value}</div>
-};
+const time = seconds => new Promise(resolve => setTimeout(() => resolve(), seconds * 1000));
+
+import SendMessageForm from './send-form';
+
+
+
+
 
 
 const SendMessageButton = ({ user }) => {
-
-  const { open, close, error, dump } = useModal({
-    view: MyView,
-    title: 'I am a modal'
-  })
+  const { sendMessage } = useSocket();
+  const { open, close, error, disable } = useModal({
+    view: SendMessageForm,
+    title: 'Send Message',
+    labelSubmit: 'Send',
+    size: 'sm'
+  });
 
   return (
-
     <Button
       appearance="ghost"
       onClick={async () => {
-        let res = await open({ value: 42 })
-        console.log('res', res)
-        res = await error('sbagliato tutto')
-        console.log('res2', res)
+        let msg = await open({ recipient: user })
         close();
-
-        //res = await open({ value: 43 })
-
+        if (msg) {
+          sendMessage('message.send', msg);
+          Notification.success({
+            title: 'Message sent',
+            description: `Message sent successfully to "${name(msg.recipient)}"`
+          });
+        }
       }}
     >Contact User</Button>
-
   );
 };
 

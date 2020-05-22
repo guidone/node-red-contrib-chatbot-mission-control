@@ -195,7 +195,8 @@ module.exports = mcSettings => {
     type: { type: Sequelize.STRING, allowNull: false },
     payload: { type: Sequelize.TEXT },
     title: { type: Sequelize.STRING },
-    status: { type: Sequelize.STRING }
+    status: { type: Sequelize.STRING },
+    transport: { type: Sequelize.STRING }
   }, {
     indexes: [
       { name: 'record_userid', using: 'BTREE', fields: ['userId'] },

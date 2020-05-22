@@ -31,6 +31,7 @@ query($id: Int!) {
     payload,
     userId,
     status,
+    transport,
     user {
       id,
       username,
@@ -123,11 +124,9 @@ const UserRecord = () => {
     );
   }
 
-  console.log('userRecordTypes', userRecordTypes)
+
   const userRecordType = userRecordTypes.find(userRecordType => userRecordType.type === record.type);
   const UserRecordForm = userRecordType.form;
-
-  console.log('user-record id', id, 'status', status)
 
   const breadcrumbs = [
     {
@@ -172,11 +171,8 @@ const UserRecord = () => {
 
             />
           </div>
-
-
-
-
-        </div>)}
+        </div>
+      )}
     </PageContainer>
 
   );

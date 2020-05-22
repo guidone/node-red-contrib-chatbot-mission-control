@@ -3,6 +3,7 @@ import _ from 'lodash';
 
 import SmartDate from '../../../src/components/smart-date';
 import Language from '../../../src/components/language';
+import Transport from '../../../src/components/transport';
 
 const Header = ({ record }) => {
 
@@ -30,6 +31,9 @@ const Header = ({ record }) => {
               &nbsp;<Language>{record.user.language}</Language>
             </Fragment>
           )}
+          <div>
+            <Transport transport={record.transport} />
+          </div>
         </div>
       </div>
     </div>

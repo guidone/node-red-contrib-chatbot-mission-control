@@ -171,7 +171,7 @@ const ModalUser = ({ user, onCancel = () => {}, onSubmit = () => {}, disabled = 
         </Views>
       </Modal.Body>
       <Modal.Footer>
-        <div style={{ float: 'left' }}>
+        <div className="custom-buttons">
           <Views region="user-button" user={user} />
         </div>
         <Button onClick={() => handleCancel()} appearance="subtle">
