@@ -138,3 +138,10 @@ plug(
   'user-button',
   SendMessageButton
 );
+plug(
+  'user-record-buttons',
+  ({ record }) => <SendMessageButton transport={record.transport} appearance="primary" user={record.user}/>,
+  {
+    type: 'survey'
+  }
+);

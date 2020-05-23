@@ -16,7 +16,7 @@ import SelectTransport from '../../../src/components/select-transport';
 const hasChatbot = (activeChatbots, transport) => activeChatbots.some(chatbot => chatbot.transport === transport);
 
 
-const SendMessageForm = ({ value: formValue, onChange = () => {}, onSu }) => {
+const SendMessageForm = ({ value: formValue, onChange = () => {}, onSubmit = () => {} }) => {
   const { activeChatbots } = useGlobals();
 
   return (
@@ -89,7 +89,7 @@ const SendMessageForm = ({ value: formValue, onChange = () => {}, onSu }) => {
             style={{ height: '100%' }}
             onKeyUp={event => {
               if (event.shiftKey && event.keyCode === 13) {
-                //sendMessage('message.send', { ...formValue, chatId });
+                onSubmit();
                 onChange({ ...formValue, message: '' });
               }
             }}

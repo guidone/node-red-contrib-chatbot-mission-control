@@ -5,10 +5,13 @@ import { Button, ButtonToolbar, SelectPicker } from 'rsuite';
 
 import confirm from '../../../src/components/confirm';
 
+import { useCodePlug, Views } from '../../../lib/code-plug';
 
 const Buttons = ({ edit, remove, userRecordType, disabled = false, record, dispatch = () => {} }) => {
   const history = useHistory();
-  console.log('userRecordType', userRecordType)
+  const { items } = useCodePlug('user-record-buttons');
+
+  console.log('items',items);
 
   return (
     <div className="user-record-buttons">
@@ -34,6 +37,10 @@ const Buttons = ({ edit, remove, userRecordType, disabled = false, record, dispa
         >
           Edit payload
         </Button>
+        {items
+          .filter(({ props }) => _.isEmpty(props.type) || props.type === record.type)
+          .map(({ view: View, props }) => <View {...props} record={record}/>)
+        }
       </ButtonToolbar>
       </div>
       <div className="right">

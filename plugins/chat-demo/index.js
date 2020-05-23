@@ -144,7 +144,7 @@ const LastMessageWidget = () => {
   );
 }
 
-plug('widgets', LastMessageWidget, { x: 0, y: 0, w: 2, h: 8,  isResizable: false, id: 'last-message' })
+//plug('widgets', LastMessageWidget, { x: 0, y: 0, w: 2, h: 8,  isResizable: false, id: 'last-message' })
 
 plug('sidebar', null, { id: 'chat-demo', label: 'Chat Demo', url: '/mc/chat', icon: 'shield' })
 plug('pages', ChatPage, { url: '/mc/chat', id: 'chat', title: 'Chat Demo' });

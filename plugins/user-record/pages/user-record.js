@@ -38,7 +38,11 @@ query($id: Int!) {
       first_name,
       last_name,
       language,
-      email
+      email,
+      chatIds {
+        chatId,
+        transport
+      }
     }
   }
 }
