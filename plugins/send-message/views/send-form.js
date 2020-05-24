@@ -16,12 +16,17 @@ import SelectTransport from '../../../src/components/select-transport';
 const hasChatbot = (activeChatbots, transport) => activeChatbots.some(chatbot => chatbot.transport === transport);
 
 
-const SendMessageForm = ({ value: formValue, onChange = () => {}, onSubmit = () => {} }) => {
+const SendMessageForm = ({
+  value: formValue,
+  validation,
+  onChange = () => {},
+  onSubmit = () => {}
+}) => {
   const { activeChatbots } = useGlobals();
 
   return (
     <div>
-      <Form fluid formValue={formValue} onChange={onChange}>
+      <Form fluid formValue={formValue} onChange={onChange} formError={validation}>
         <FlexboxGrid justify="space-between">
           <FlexboxGrid.Item colspan={15}>
             <FormGroup>
@@ -31,15 +36,12 @@ const SendMessageForm = ({ value: formValue, onChange = () => {}, onSubmit = () 
                 accepter={UserAutocomplete}
                 cleanable={true}
                 onChange={user => {
-                  console.log('user', user)
                   if (user != null && _.isArray(user.chatIds) && !_.isEmpty(user.chatIds)) {
                     // select the first chatId with an available active chatbot
                     const item = user.chatIds.find(chat => {
                       return hasChatbot(activeChatbots, chat.transport);
                     });
-
                     if (item != null) {
-
                       onChange({
                         ...formValue,
                         chatId: item.chatId,

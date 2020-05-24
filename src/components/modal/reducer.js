@@ -1,18 +1,40 @@
 export default (state, action) => {
   if (action.type === 'appendView') {
     const { id, resolve, type, view, ...rest } = action;
-    const newModals = [
-      ...state.modals,
-      {
-        id,
-        view,
-        props: {
-          ...rest,
-          onSubmit: value => resolve(value),
-          onCancel: () => resolve()
+    let newModals;
+    if (state.modals.some(modal => modal.id === id)) {
+      // if already exists, just refresh the promise
+      newModals = state.modals
+        .map(modal => {
+          if (modal.id === id) {
+            return {
+              ...modal,
+              props: {
+                ...modal.props,
+                ...rest,
+                onSubmit: value => resolve(value),
+                onCancel: () => resolve()
+              }
+            };
+          }
+          return modal;
+        });
+      console.log('action', action)
+      console.log('rimetto', newModals)
+    } else {
+      newModals = [
+        ...state.modals,
+        {
+          id,
+          view,
+          props: {
+            ...rest,
+            onSubmit: value => resolve(value),
+            onCancel: () => resolve()
+          }
         }
-      }
-    ];
+      ];
+    }
     return { ...state, modals: newModals };
   } else if (action.type === 'mergeModalProps') {
     const newModals = state.modals.map(modal => {

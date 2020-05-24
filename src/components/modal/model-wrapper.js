@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Modal, Button } from 'rsuite';
 import _ from 'lodash';
 import classNames from 'classnames';
+
+import ShowErrors from '../show-error';
+
 
 const ModalWrapper = ({
   view: InnerView,
@@ -15,9 +18,16 @@ const ModalWrapper = ({
   className,
   size = 'md',
   error,
+  validation: validationProp,
   enableSummit = () => true
 }) => {
   const [value, setValue] = useState(initialValue);
+  const [validation, setValidation] = useState(validationProp);
+  useEffect(() => {
+    setValidation(validationProp);
+  }, [validationProp]);
+
+
   return (
     <Modal
       backdrop
@@ -33,13 +43,16 @@ const ModalWrapper = ({
         </Modal.Header>
       )}
       <Modal.Body>
-        {error != null && (
-          <div>erorr: {error}</div>
-        )}
+        {error != null && <ShowErrors error={error}/>}
         <InnerView
           disabled={disabled}
           value={value}
-          onChange={value => setValue(value)}
+          validation={validation}
+          error={error}
+          onChange={value => {
+            setValue(value);
+            setValidation(null)
+          }}
           onSubmit={() => onSubmit(value)}
         />
       </Modal.Body>
