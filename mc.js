@@ -225,7 +225,7 @@ function bootstrap(server, app, log, redSettings) {
     passport.authenticate('basic', { session: false }),
     (req, res) => {
       // inject user info into template
-      fs.readFile(`${__dirname}/src/index.html`, (err, data) => {
+      fs.readFile(`${__dirname}/dist/index.html`, (err, data) => {
         const template = data.toString();
         const bootstrap = { user: req.user, settings: mcSettings };
         const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};</script>`;

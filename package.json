@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --open --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js -p"
+    "build": "webpack --config webpack.prod.js -p --max-old-space-size=8192"
   },
   "author": "",
   "license": "ISC",
@@ -90,7 +90,7 @@
     "babel-loader": "^8.0.6",
     "css-loader": "^3.3.1",
     "file-loader": "^5.0.2",
-    "html-webpack-plugin": "^4.0.4",
+    "html-webpack-plugin": "^4.3.0",
     "node-sass": "^4.13.0",
     "sass-loader": "^8.0.0",
     "style-loader": "^1.0.1",
