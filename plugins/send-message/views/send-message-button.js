@@ -9,7 +9,7 @@ import name from '../../../src/helpers/user/readable-name';
 
 import SendMessageForm from './send-form';
 
-const isValidMessage = value => value.recipient != null && value.chatId  != null && value.botNode != null && !_.isEmpty(value.message) && false;
+const isValidMessage = value => value.recipient != null && value.chatId  != null && value.botNode != null && !_.isEmpty(value.message);
 
 const { StringType, ObjectType } = Schema.Types;
 const messageModel = Schema.Model({
@@ -25,7 +25,7 @@ const messageModel = Schema.Model({
 const SendMessageButton = ({ user, appearance = 'ghost', transport }) => {
   const { sendMessage } = useSocket();
   const { activeChatbots } = useGlobals();
-  const { open, close, validate, error, disable, openForModel } = useModal({
+  const { open, close, validate, error, disable, openWithModel, openWith } = useModal({
     view: SendMessageForm,
     title: 'Send message',
     labelSubmit: 'Send message',
@@ -49,42 +49,15 @@ const SendMessageButton = ({ user, appearance = 'ghost', transport }) => {
     }
   }
 
-  console.log('botNode', botNode)
 
   return (
     <Button
       appearance={appearance}
       onClick={async () => {
         let msg = { recipient: user, botNode, chatId, message: '' };
-        /*let validation = null;
-        do {
-          msg = await open(msg);
-          if (msg != null) {
-            validation = messageModel.check(msg);
-            console.log('validation', validation, Object.values(validation).every(item => !item.hasError))
-            if (!Object.values(validation).every(item => !item.hasError)) {
-              const errors = {};
-              Object.keys(validation)
-                .forEach(field => {
-                  if (validation[field].hasError) {
-                    errors[field] = validation[field].errorMessage;
-                  }
-                })
-              validate(errors);
-            } else {
-              validate(null);
-            }
-          }
 
-        } while (msg != null && !Object.values(validation).every(item => !item.hasError));
-        */
-
-
-
-        //close();
-
-        msg = await openForModel(msg, messageModel);
-
+        //msg = await openWithModel(msg, messageModel);
+        msg = await openWith(msg, isValidMessage);
         if (msg) {
           sendMessage('message.send', msg);
           Notification.success({

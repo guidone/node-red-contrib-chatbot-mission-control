@@ -19,7 +19,7 @@ const ModalWrapper = ({
   size = 'md',
   error,
   validation: validationProp,
-  enableSummit = () => true
+  enableSubmit = () => true
 }) => {
   const [value, setValue] = useState(initialValue);
   const [validation, setValidation] = useState(validationProp);
@@ -61,7 +61,7 @@ const ModalWrapper = ({
           {labelCancel}
         </Button>
         <Button
-          disabled={disabled || !enableSummit(value)}
+          disabled={disabled || !enableSubmit(value)}
           appearance="primary"
           onClick={() => onSubmit(value)}
         >

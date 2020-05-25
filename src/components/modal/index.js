@@ -20,7 +20,8 @@ const ModalContext = React.createContext({});
  * @param {String} props.enableSummit Enable or disable the submit button, takes as argument the current value of the form
  * @return {Object}
  * @return {Function} return.open Open the modal with
- * @return {Function} return.validate Sets the validation info for the form
+ * @return {Function} return.validate Set the validation info for the form
+ * @return {Function} return.error Set the server side error for the form
  */
 const useModal = props => {
   const context = useContext(ModalContext);
@@ -28,42 +29,54 @@ const useModal = props => {
 
   const [id] = useState(_.uniqueId('modal_'));
 
-  const open = useCallback(modalProps => new Promise(resolve => dispatch({ type: 'appendView', id, resolve, initialValue: modalProps, ...props })));
+  const open = useCallback((modalProps, params) => {
+    return new Promise(resolve => dispatch({ type: 'appendView', id, resolve, initialValue: modalProps, ...props, ...params }))
+  });
   const validate = useCallback(validation => dispatch({ type: 'mergeModalProps', id, props: { validation } }));
   const close = useCallback(() => dispatch({ type: 'removeView', id }));
+  const disable = useCallback(() => dispatch({ type: 'mergeModalProps', id, props: { disabled: true } }));
+  const enable = useCallback(() => dispatch({ type: 'mergeModalProps', id, props: { disabled: false } }));
+  const error = useCallback(error => dispatch({ type: 'mergeModalProps', id, props: { error } }));
+  const openWith = useCallback(async (modalProps, enableSubmit) => {
+    let result = await open(modalProps, { enableSubmit });
+    close();
+    return result;
+  });
+  const openWithModel = useCallback(async (modalProps, model) => {
+    let validation = null;
+    let value = { ...modalProps };
+    do {
+      value = await open(value);
+      if (value != null) {
+        validation = model.check(value);
+        if (!isValid(validation)) {
+          // translate validation object
+          const errors = {};
+          Object.keys(validation)
+            .forEach(field => {
+              if (validation[field].hasError) {
+                errors[field] = validation[field].errorMessage;
+              }
+            })
+          validate(errors);
+        } else {
+          validate(null);
+        }
+      }
+    } while (value != null && !isValid(validation));
+    close();
+    return value;
+  });
 
   return {
     open,
     close,
-    error: error => dispatch({ type: 'mergeModalProps', id, props: { error } }),
+    error,
     validate,
-    disable: () => dispatch({ type: 'mergeModalProps', id, props: { disabled: true } }),
-    enable: () => dispatch({ type: 'mergeModalProps', id, props: { disabled: false } }),
-    openForModel: async (modalProps, model) => {
-      let validation = null;
-      let value = { ...modalProps };
-      do {
-        value = await open(value);
-        if (value != null) {
-          validation = model.check(value);
-          if (!isValid(validation)) {
-            // translate validation object
-            const errors = {};
-            Object.keys(validation)
-              .forEach(field => {
-                if (validation[field].hasError) {
-                  errors[field] = validation[field].errorMessage;
-                }
-              })
-            validate(errors);
-          } else {
-            validate(null);
-          }
-        }
-      } while (value != null && !isValid(validation));
-      close();
-      return value;
-    }
+    disable,
+    enable,
+    openWith,
+    openWithModel
   };
 };
 
