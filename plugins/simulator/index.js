@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 
-import { plug } from '../../lib/code-plug';
+import { plug } from 'code-plug';
 import Panel from '../../src/components/grid-panel';
 import withSocket from '../../src/wrappers/with-socket';
 import withActiveChatbots from '../../src/wrappers/with-active-chatbots';

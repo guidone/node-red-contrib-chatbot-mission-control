@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Dropdown, Nav, Icon, Sidebar, Sidenav } from 'rsuite';
 
 import Logo from '../components/logo';
-import { useCodePlug } from '../../lib/code-plug';
+import { useCodePlug } from 'code-plug';
 import useCurrentUser from '../hooks/current-user';
 import useSettings from '../hooks/settings';
 

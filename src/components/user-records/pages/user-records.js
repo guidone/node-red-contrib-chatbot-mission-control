@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 
 const { Column, HeaderCell, Cell } = Table;
 
-import { useCodePlug } from '../../../../lib/code-plug';
+import { useCodePlug } from 'code-plug';
 import PageContainer from '../../../../src/components/page-container';
 import Breadcrumbs from '../../../../src/components/breadcrumbs';
 import SmartDate from '../../../../src/components/smart-date';

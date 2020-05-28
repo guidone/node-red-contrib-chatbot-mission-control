@@ -5,7 +5,7 @@ import { Breadcrumb } from 'rsuite';
 import { Link } from 'react-router-dom';
 
 import './breadcrumbs.scss';
-import { withCodePlug } from '../../../lib/code-plug';
+import { withCodePlug } from 'code-plug';
 
 const NavLink = props => <Breadcrumb.Item componentClass={Link} {...props} />;
 const findPage = (pages = [], id) => pages.find(page => page.props != null && page.props.id === id)

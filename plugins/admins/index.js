@@ -1,4 +1,4 @@
-import { plug } from '../../lib/code-plug';
+import { plug } from 'code-plug';
 
 import Users from './pages/admins';
 

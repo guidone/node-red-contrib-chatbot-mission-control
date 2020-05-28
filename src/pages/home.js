@@ -5,7 +5,7 @@ import { Responsive, WidthProvider } from 'react-grid-layout';
 
 import withState from '../wrappers/with-state';
 import useConfiguration from '../hooks/configuration';
-import { useCodePlug } from '../../lib/code-plug';
+import { useCodePlug } from 'code-plug';
 import useCurrentUser from '../hooks/current-user';
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);

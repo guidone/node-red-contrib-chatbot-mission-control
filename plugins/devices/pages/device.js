@@ -15,7 +15,7 @@ import {
 
 const { Column, HeaderCell, Cell } = Table;
 
-import { useCodePlug, Views } from '../../../lib/code-plug';
+import { useCodePlug, Views } from 'code-plug';
 
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';

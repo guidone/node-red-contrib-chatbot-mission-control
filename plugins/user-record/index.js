@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tag } from 'rsuite';
 
-import { plug } from '../../lib/code-plug';
+import { plug } from 'code-plug';
 
 import UserRecord from './pages/user-record';
 

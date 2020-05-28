@@ -5,7 +5,7 @@ import { Button, ButtonToolbar, FormGroup, Schema } from 'rsuite';
 
 import SendMessageButton from './views/send-message-button';
 
-import { plug } from '../../lib/code-plug';
+import { plug } from 'code-plug';
 import withSocket from '../../src/wrappers/with-socket';
 import Panel from '../../src/components/grid-panel';
 import { WidgetForm, Content, Footer } from '../../src/components/widget-form';

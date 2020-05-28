@@ -3,7 +3,7 @@ import { CheckPicker, Button, IconButton, Icon } from 'rsuite';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
 
-import { useCodePlug } from '../../../lib/code-plug';
+import { useCodePlug } from 'code-plug';
 import confirm from '../confirm';
 
 import './style.scss';

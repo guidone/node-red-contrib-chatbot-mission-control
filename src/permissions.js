@@ -1,4 +1,4 @@
-import { plug } from '../lib/code-plug';
+import { plug } from 'code-plug';
 
 // Generic permissions valid for all platform
 

@@ -3,7 +3,7 @@ import { Button, FormControl, ButtonToolbar, Form, FormGroup, ControlLabel, Flex
 
 //import SendMessageButton from './views/send-message-button';
 
-//import { plug } from '../../lib/code-plug';
+//import { plug } from 'code-plug';
 //import withSocket from '../../src/wrappers/with-socket';
 import useGlobals from '../../../src/hooks/globals';
 //import Panel from '../../src/components/grid-panel';

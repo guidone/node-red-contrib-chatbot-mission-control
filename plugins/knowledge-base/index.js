@@ -1,7 +1,7 @@
 import React, { Fragment } from 'react';
 import _ from 'lodash';
 
-import { plug } from '../../lib/code-plug';
+import { plug } from 'code-plug';
 import { Contents, Categories } from '../../src/components/content';
 
 import Configuration from './pages/configuration';

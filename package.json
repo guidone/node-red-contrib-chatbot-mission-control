@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --open --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js -p --max-old-space-size=8192"
+    "build": "webpack --config webpack.prod.js -p --max-old-space-size=8192",
+    "build-plugin": "webpack --config webpack.plugin.js --display-modules -p --max-old-space-size=8192"
   },
   "author": "",
   "license": "ISC",
@@ -40,6 +41,7 @@
     "classnames": "^2.2.6",
     "cli-color": "^2.0.0",
     "cloudinary": "^1.21.0",
+    "code-plug": "^0.6.1",
     "e": "0.0.4",
     "express-fileupload": "^1.1.6",
     "filesize": "^6.1.0",

@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon } from 'rsuite';
 import moment from 'moment';
 
-import { plug } from '../../lib/code-plug';
+import { plug } from 'code-plug';
 
 import './style.scss';
 

@@ -1,4 +1,4 @@
-import { plug } from '../../lib/code-plug';
+import { plug } from 'code-plug';
 
 import MessageLogs from './pages/message-logs';
 import GoToMessagesButton from './views/go-to-messages';

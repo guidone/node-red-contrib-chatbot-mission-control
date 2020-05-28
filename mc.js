@@ -219,13 +219,14 @@ function bootstrap(server, app, log, redSettings) {
 
   // assets
   app.use(`${mcSettings.root}/main.js`, serveStatic(path.join(__dirname, 'dist/main.js')));
+  app.use(`${mcSettings.root}/commands.js`, serveStatic(path.join(__dirname, 'dist-plugins/commands.js')));
   // serve mission control page and assets
   app.use(
     '^' + mcSettings.root,
     passport.authenticate('basic', { session: false }),
     (req, res) => {
       // inject user info into template
-      fs.readFile(`${__dirname}/dist/index.html`, (err, data) => {
+      fs.readFile(`${__dirname}/src/index.html`, (err, data) => {
         const template = data.toString();
         const bootstrap = { user: req.user, settings: mcSettings };
         const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};</script>`;

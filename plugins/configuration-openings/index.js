@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tag } from 'rsuite';
 
-import { plug } from '../../lib/code-plug';
+import { plug } from 'code-plug';
 import withConfigurationPage from '../../src/components/configuration-page';
 import { NodeRedNode, SlugHelp } from '../../src/components/help-elements';
 

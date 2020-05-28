@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import { Modal, Button, Form, FormGroup, ControlLabel, FormControl, FlexboxGrid, HelpBlock, Nav } from 'rsuite';
 
-import { Views } from '../../../lib/code-plug';
+import { Views } from 'code-plug';
 import JSONEditor from '../../../src/components/json-editor';
 import LanguagePicker from '../../../src/components/language-picker';
 import ChatIdsManager from '../../../src/components/chat-ids-manager';

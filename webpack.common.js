@@ -8,6 +8,11 @@ module.exports = {
     filename: 'main.js',
     path: path.resolve(__dirname, 'dist'),
   },
+  resolve: {
+    alias: {
+      'app-context': path.resolve(__dirname, 'src/common/app-context'),
+    }
+  },
   module: {
     rules: [
       {

@@ -15,7 +15,7 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
 import { split } from 'apollo-link';
 
-import { CodePlug, useCodePlug } from '../lib/code-plug';
+import { CodePlug, Consumer, Views, Items, Plugin, PlugItUserPermissions, plug, withCodePlug, useCodePlug } from 'code-plug';
 
 import compose from './helpers/compose-reducers';
 import AppContext from './common/app-context';

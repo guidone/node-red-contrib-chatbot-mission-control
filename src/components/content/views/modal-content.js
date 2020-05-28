@@ -21,7 +21,7 @@ import MarkdownEditor from '../../../../src/components/markdown-editor';
 import ShowError from '../../../../src/components/show-error';
 import LanguagePicker from '../../../../src/components/language-picker';
 import JSONEditor from '../../../../src/components/json-editor';
-import { Views } from '../../../../lib/code-plug';
+import { Views } from 'code-plug';
 import useCanCloseModal from '../../../../src/hooks/modal-can-close';
 import useCurrentUser from '../../../../src/hooks/current-user';
 

@@ -1,8 +1,8 @@
-import { plug } from '../../lib/code-plug';
+import { plug } from 'code-plug';
 
 import SuspendForm from './views/suspend-form';
 
-plug('user-tabs', SuspendForm, { 
+plug('user-tabs', SuspendForm, {
   id: 'suspend-user',
-  label: 'Suspend' 
+  label: 'Suspend'
 });

@@ -5,7 +5,7 @@ import { Button, ButtonToolbar, SelectPicker } from 'rsuite';
 
 import confirm from '../../../src/components/confirm';
 
-import { useCodePlug, Views } from '../../../lib/code-plug';
+import { useCodePlug, Views } from 'code-plug';
 
 const Buttons = ({ edit, remove, userRecordType, disabled = false, record, dispatch = () => {} }) => {
   const history = useHistory();
