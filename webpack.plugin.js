@@ -30,15 +30,17 @@
         'ace-builds': 'amd ace-builds',
         'codemirror': 'amd codemirror',
         'marked': 'amd marked',
-        'react-ace': 'amd react-ace'
-      },
+        'react-ace': 'amd react-ace',
+        'app-context': 'amd app-context'
+      }
+      /*,
       function(context, request, callback) {
         if (/app\-context/.test(request)) {
           console.log('sahre app context')
           return callback(null, ['@/src/common/app-context', 'app-context'], 'amd');
         }
         callback();
-      },
+      },*/
     ],
     module: {
       rules: [

@@ -10,7 +10,7 @@ module.exports = {
   },
   resolve: {
     alias: {
-      'app-context': path.resolve(__dirname, 'src/common/app-context'),
+
     }
   },
   module: {
