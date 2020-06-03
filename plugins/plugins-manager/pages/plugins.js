@@ -36,9 +36,9 @@ const PLUGINS = [
   {
     id: 'commands',
     name: 'Commands',
-    version : '1.0',
+    version : '1.0.1',
     description: 'Show some content on response to commands-like messages...',
-    url: 'https://gist.githubusercontent.com/guidone/bd2d4fec49198961e946ce42c5d373ba/raw/6b80cad3b866dc87d90d94cc65d852c432d6efff/commands.js',
+    url: 'https://gist.githubusercontent.com/guidone/bd2d4fec49198961e946ce42c5d373ba/raw/4fa7f4cb89dc131528cc5815e8640cfa659147d4/commands.js',
     author: {
       name: 'guidone'
     }
@@ -46,9 +46,9 @@ const PLUGINS = [
   {
     id: 'welcome-message',
     name: 'Welcome Message',
-    version : '1.0',
+    version : '1.0.0',
     description: 'Show a welcome message for the new users of the chatbot',
-    url: 'https://gist.githubusercontent.com/guidone/1dfd51571556285ab28402c6984bb08f/raw/6ca835f2278f415a6efda4ca40092840cef3d97e/test-plugin.js',
+    url: 'https://gist.githubusercontent.com/guidone/be3d57ece22d366908e45b53b6478915/raw/7f0371e1b9f0a272c4989e844c341ebe52229e08/welcome-message.js',
     author: {
       name: 'guidone'
     }

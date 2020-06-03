@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 var gravatar = require('gravatar');
-import { Button, Container, Header, Navbar, Dropdown, Nav, Footer, Content, Icon, Sidebar, Sidenav, Avatar } from 'rsuite';
+import { Tooltip, Whisper, Header, Navbar, Dropdown, Nav, Icon, IconButton, Avatar } from 'rsuite';
+import { Link } from 'react-router-dom';
 
-import withState from '../wrappers/with-state';
+import AppContext from '../common/app-context';
 
 const initials = user => {
   if (user.firstName != null && user.firstName.length !== 0 && user.lastName != null && user.lastName.length !== 0) {
@@ -16,24 +17,10 @@ const initials = user => {
   return '';
 }
 
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
-} from 'react-router-dom';
+const AppHeader = () => {
+  const { state } = useContext(AppContext);
+  const { user, needRestart } = state;
 
-/*
-  <Nav.Item>News</Nav.Item>
-  <Nav.Item>Products</Nav.Item>
-  <Dropdown title="About">
-    <Dropdown.Item>Company</Dropdown.Item>
-    <Dropdown.Item>Team</Dropdown.Item>
-    <Dropdown.Item>Contact</Dropdown.Item>
-  </Dropdown>
-*/
-
-const AppHeader = ({ user }) => {
   return (
     <Header className="mc-header">
       <Navbar appearance="inverse">
@@ -43,6 +30,22 @@ const AppHeader = ({ user }) => {
             <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/plugins">Plugins</Link>} />
           </Nav>
           <Nav pullRight>
+            {needRestart && (
+              <Whisper
+                placement="left"
+                trigger="hover"
+                speaker={<Tooltip>Reload page to see installed plugins</Tooltip>}
+              >
+              <IconButton
+                circle
+                style={{ marginTop: '7px', marginRight: '7px'}}
+                color="red"
+                size="lg"
+                onClick={() => window.location.reload()}
+                icon={<Icon icon="exclamation-triangle" />}
+              />
+              </Whisper>
+            )}
             <Dropdown
               className="mc-avatar"
               placement="bottomEnd"
@@ -70,4 +73,4 @@ AppHeader.propTypes = {
   })
 };
 
-export default withState(AppHeader, ['user']);
+export default AppHeader;

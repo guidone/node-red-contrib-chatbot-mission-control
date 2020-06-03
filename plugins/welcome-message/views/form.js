@@ -1,7 +1,7 @@
 import React, { useState, useRef, Fragment } from 'react';
 import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav } from 'rsuite';
 
-import ContentAutocomplete from '../../../src/components/content-autocomplete';
+import { ContentAutocomplete } from '../../../src/components';
 
 export default ({
   value,

@@ -26,8 +26,7 @@ module.exports = (env = {}) => {
     entry: `./plugins/${plugin}/index.js`,
     output: {
       filename,
-      //path: path.resolve(__dirname, 'plugins/commands/dist'),
-      path: path.resolve(__dirname, 'dist-plugins'),
+      path: path.resolve(__dirname, `plugins/${plugin}/dist`),
       libraryTarget: 'amd'
     },
     externals : [

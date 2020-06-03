@@ -20,9 +20,7 @@ import './plugins/content-image';
 import './plugins/knowledge-base';
 import './plugins/carousel';
 //import './plugins/commands';
-import './plugins/welcome-message';
+//import './plugins/welcome-message';
 import './plugins/surveys';
 import './plugins/user-record';
 import './plugins/plugins-manager';
-
-//import './dist-plugins/commands';

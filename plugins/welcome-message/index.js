@@ -1,10 +1,9 @@
 import React from 'react';
-import { Tag } from 'rsuite';
 
 import { plug } from 'code-plug';
 
-import withConfigurationPage from '../../src/components/configuration-page';
-import { NodeRedNode, SlugHelp, TypeCommand } from '../../src/components/help-elements';
+import { HelpElements, withConfigurationPage } from '../../src/components';
+const { NodeRedNode, SlugHelp, TypeCommand } = HelpElements;
 import ConfigurationForm from './views/form';
 
 const Legend = () => (
