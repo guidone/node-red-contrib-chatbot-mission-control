@@ -23,8 +23,6 @@ import './plugins/carousel';
 import './plugins/welcome-message';
 import './plugins/surveys';
 import './plugins/user-record';
+import './plugins/plugins-manager';
 
-
-import './dist-plugins/commands';
-
-//Commands()
+//import './dist-plugins/commands';

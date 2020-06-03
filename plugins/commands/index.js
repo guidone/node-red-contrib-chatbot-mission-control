@@ -1,8 +1,12 @@
 import React from 'react';
 
 import { plug } from 'code-plug';
-import { NodeRedNode, SlugHelp, TypeCommand } from '../../src/components/help-elements';
-import withConfigurationPage from '../../src/components/configuration-page';
+//import { NodeRedNode, SlugHelp, TypeCommand } from '../../src/components/help-elements';
+//import withConfigurationPage from '../../src/components/configuration-page';
+import Components from '../../src/ui';
+console.log('Components', Components)
+const { withConfigurationPage, HelpElements } = Components;
+const { NodeRedNode, SlugHelp, TypeCommand } = HelpElements;
 
 import ConfigurationForm from './views/form';
 

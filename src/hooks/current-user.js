@@ -4,7 +4,6 @@ import AppContext from '../common/app-context';
 
 const useCurrentUser = () => {
   const { state } = useContext(AppContext);
-  console.log('STATE', state)
   return {
     user: state.user,
     permissions: state.user.permissions,

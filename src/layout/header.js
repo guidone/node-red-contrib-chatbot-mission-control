@@ -39,7 +39,8 @@ const AppHeader = ({ user }) => {
       <Navbar appearance="inverse">
         <Navbar.Body>
           <Nav>
-            <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/">Home</Link>} />            
+            <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/">Home</Link>} />
+            <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/plugins">Plugins</Link>} />
           </Nav>
           <Nav pullRight>
             <Dropdown
@@ -53,7 +54,7 @@ const AppHeader = ({ user }) => {
               <Dropdown.Item divider />
               <Dropdown.Item>Logout</Dropdown.Item>
             </Dropdown>
-          </Nav>          
+          </Nav>
         </Navbar.Body>
       </Navbar>
     </Header>

@@ -130,7 +130,7 @@ function bootstrap(server, app, log, redSettings) {
 
   // todo put db schema here
   const databaseSchema = DatabaseSchema(mcSettings)
-  const { Configuration, graphQLServer, graphQLSchema, Admin } = databaseSchema;
+  const { Configuration, graphQLServer, graphQLSchema, Admin, ChatBot, Plugin } = databaseSchema;
 
   //passport authentication
   passport.use(new BasicStrategy(async function (username, password, done) {
@@ -219,20 +219,40 @@ function bootstrap(server, app, log, redSettings) {
 
   // assets
   app.use(`${mcSettings.root}/main.js`, serveStatic(path.join(__dirname, 'dist/main.js')));
-  app.use(`${mcSettings.root}/commands.js`, serveStatic(path.join(__dirname, 'dist-plugins/commands.js')));
+  app.use(`${mcSettings.root}/plugins`, serveStatic(path.join(__dirname, 'dist-plugins'), {
+    'index': false
+  }));
+  //app.use(`${mcSettings.root}/welcome-message.js`, serveStatic(path.join(__dirname, 'dist-plugins/welcome-message.js')));
   // serve mission control page and assets
   app.use(
     '^' + mcSettings.root,
     passport.authenticate('basic', { session: false }),
-    (req, res) => {
+    async (req, res) => {
+      const chatbot = await ChatBot.findOne();
+      const plugins = await chatbot.getPlugins({ limit: 9999 });
+      console.log('chatbot', chatbot.toJSON())
       // inject user info into template
       fs.readFile(`${__dirname}/src/index.html`, (err, data) => {
         const template = data.toString();
-        const bootstrap = { user: req.user, settings: mcSettings };
+        const bootstrap = {
+          chatbot: {
+            ...chatbot.toJSON(),
+            plugins: plugins.map(plugin => plugin.toJSON())
+          },
+          user: req.user,
+          settings: mcSettings
+        };
         const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};</script>`;
         const assets = mcSettings.environment === 'development' ?
           'http://localhost:8080/main.js' : `${mcSettings.root}/main.js`;
-        res.send(template.replace('{{data}}', json).replace('{{assets}}', assets));
+
+        console.log('install plugins --->', plugins)
+
+        let pluginsScript = plugins.map(plugin => {
+          return `<script src="${mcSettings.root}/plugins/${plugin.filename}"></script>`;
+        });
+
+        res.send(template.replace('{{data}}', json).replace('{{assets}}', assets).replace('{{plugins}}', pluginsScript.join('')));
      });
     }
   );

@@ -1,3 +1,4 @@
 node_modules
 .DS_Store
 mission-control.sqlite
+dist-plugins

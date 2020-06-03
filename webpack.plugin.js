@@ -30,9 +30,9 @@
         'ace-builds': 'amd ace-builds',
         'codemirror': 'amd codemirror',
         'marked': 'amd marked',
-        'react-ace': 'amd react-ace',
-        'app-context': 'amd app-context'
-      }
+        'react-ace': 'amd react-ace'
+      },
+      /components/i
       /*,
       function(context, request, callback) {
         if (/app\-context/.test(request)) {

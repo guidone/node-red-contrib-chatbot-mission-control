@@ -1,0 +1,34 @@
+.page-plugins {
+
+  .plugins {
+
+
+    .plugin {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+      align-content: stretch;
+      align-items: stretch;
+      border-bottom: 1px solid #dddddd;
+      margin-bottom: 15px;
+      min-height: 120px;
+
+      .preview {
+        flex: 0 0 150px;
+
+      }
+
+      .meta {
+        flex: 1 0;
+        padding: 8px;
+
+        .rs-btn-toolbar {
+          margin-top: 10px;
+        }
+      }
+    }
+
+  }
+
+}

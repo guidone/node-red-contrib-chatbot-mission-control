@@ -230,6 +230,24 @@ module.exports = mcSettings => {
     ]
   });
 
+  const ChatBot = sequelize.define('chatbot', {
+    name: Sequelize.STRING,
+    description: Sequelize.TEXT
+  }, {
+    indexes: [
+    ]
+  });
+
+  const Plugin = sequelize.define('plugins', {
+    plugin: Sequelize.STRING,
+    version: Sequelize.STRING,
+    filename: Sequelize.STRING
+  }, {
+    indexes: [
+    ]
+  });
+
+  ChatBot.Plugins = ChatBot.hasMany(Plugin);
 
   if (!fs.existsSync(dbPath)) {
     sequelize.sync({ force: true })
@@ -259,6 +277,8 @@ module.exports = mcSettings => {
     Admin,
     Record,
     Device,
+    ChatBot,
+    Plugin,
     sequelize,
     mcSettings
   });
@@ -277,7 +297,9 @@ module.exports = mcSettings => {
     Field,
     Context,
     Record,
-    Device
+    Device,
+    ChatBot,
+    Plugin
   };
 
   return exportCache;

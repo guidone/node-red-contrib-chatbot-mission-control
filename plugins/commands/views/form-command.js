@@ -2,7 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FlexboxGrid, Input } from 'rsuite';
 
-import ContentAutocomplete from '../../../src/components/content-autocomplete';
+//import ContentAutocomplete from '../../../src/components/content-autocomplete';
+
+import Components from '../../../src/ui';
+console.log('Components', Components)
+const { ContentAutocomplete } = Components;
+
 
 const FormCommand = ({ value, onChange, disabled = false }) => (
   <FlexboxGrid justify="space-between">

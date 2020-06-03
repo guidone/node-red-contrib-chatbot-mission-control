@@ -29,11 +29,42 @@ import PageNotFound from './layout/page-not-found';
 import { ModalProvider } from './components/modal';
 
 // Import plugins
+import './components/importer';
 import './permissions';
 import '../plugins';
 
 
 import ws from 'ws';
+
+// DEFINE SOME GLOBALS
+window.globalLibs = {};
+window.define = function(moduleName, requires, factory) {
+
+  console.log('DEFINE ', moduleName, requires, factory)
+  factory(
+    window.globalLibs['code-plug'],
+    window.globalLibs.lodash,
+    window.globalLibs['prop-types'],
+    window.globalLibs.react,
+    window.globalLibs.rsuite
+  );
+
+
+};
+
+import * as globalReact from 'react';
+import * as globalPropTypes from 'prop-types';
+import * as globalCodePlug from 'code-plug';
+import * as globalLodash from 'lodash';
+import * as globalRsuite from 'rsuite';
+window.globalLibs.react = globalReact;
+window.globalLibs['prop-types'] = globalPropTypes;
+window.globalLibs['code-plug'] = globalCodePlug;
+window.globalLibs.lodash = globalLodash;
+window.globalLibs.rsuite = globalRsuite;
+
+
+
 
 const cache = new InMemoryCache(); // where current data is stored
 const apolloLink = createHttpLink({ uri: '/graphql' });

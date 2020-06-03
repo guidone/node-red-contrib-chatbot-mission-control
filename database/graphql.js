@@ -4,6 +4,9 @@ const { Kind } = require('graphql/language');
 const { PubSub, withFilter } = require('graphql-subscriptions');
 const _ = require('lodash');
 const Sequelize = require('sequelize');
+const fetch = require('node-fetch');
+const fs = require('fs');
+
 
 
 const Op = Sequelize.Op;
@@ -13,6 +16,16 @@ const pubsub = new PubSub();
 const { when, hash } = require('../lib/utils');
 
 const isCircularPaths = require('../lib/get-circular-paths');
+
+const deleteFile = filename => new Promise((resolve, reject) => {
+  fs.unlink(filename, err => {
+    if (err) {
+      reject(err)
+    } else {
+      resolve();
+    }
+  });
+});
 
 const compactObject = obj => {
   return Object.entries(obj)
@@ -102,7 +115,24 @@ const PayloadType = new GraphQLScalarType({
 });
 
 
-module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Category, Field, Context, Admin, Record, Device, sequelize, mcSettings }) => {
+module.exports = ({
+  Configuration,
+  Message,
+  User,
+  ChatId,
+  Event,
+  Content,
+  Category,
+  Field,
+  Context,
+  Admin,
+  Record,
+  Device,
+  ChatBot,
+  Plugin,
+  sequelize,
+  mcSettings
+}) => {
 
   const newUserType = new GraphQLInputObjectType({
     name: 'NewUser',
@@ -657,6 +687,73 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
       namespace: {
         type: GraphQLString,
         description: '',
+      }
+    }
+  });
+
+  const pluginType = new GraphQLObjectType({
+    name: 'Plugin',
+    description: 'tbd',
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The id of the plugin',
+      },
+      plugin: {
+        type: GraphQLString,
+        description: '',
+      },
+      version: {
+        type: GraphQLString,
+        description: '',
+      },
+      filename: {
+        type: GraphQLString,
+        description: '',
+      }
+    }
+  });
+
+  const newPluginType = new GraphQLInputObjectType({
+    name: 'NewPlugin',
+    description: 'tbd',
+    fields: {
+      plugin: {
+        type: GraphQLString,
+        description: '',
+      },
+      version: {
+        type: GraphQLString,
+        description: '',
+      },
+      filename: {
+        type: GraphQLString,
+        description: '',
+      }
+    }
+  });
+
+  const chatbotType = new GraphQLObjectType({
+    name: 'Chatbot',
+    description: 'tbd',
+    fields: {
+      id: {
+        type: new GraphQLNonNull(GraphQLInt),
+        description: 'The id of the chatbot',
+      },
+      name: {
+        type: GraphQLString,
+        description: '',
+      },
+      description: {
+        type: GraphQLString,
+        description: '',
+      },
+      plugins: {
+        type: new GraphQLList(pluginType),
+        description: 'The list of installed plugins',
+        resolve: (root) => root.getPlugins({ limit: 9999 })
+
       }
     }
   });
@@ -1559,6 +1656,39 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
           }
         },
 
+        installPlugin: {
+          type: pluginType,
+          args: {
+            plugin: { type: GraphQLString },
+            url: { type: GraphQLString },
+            version: { type: GraphQLString },
+          },
+          resolve: async function(root, { plugin, url, version }) {
+
+            const response = await fetch(url);
+            const filename = `${plugin}-${hash((new Date().toString()))}.js`;
+            const pluginFile = fs.createWriteStream(`${__dirname}/../dist-plugins/${filename}`);
+            response.body.pipe(pluginFile);
+            const chatbot = await ChatBot.findOne();
+            await Plugin.destroy({ where: { plugin }});
+            const installedPlugin = await Plugin.create({ plugin, url, version, chatbotId: chatbot.id, filename });
+            return installedPlugin;
+          }
+        },
+
+        uninstallPlugin: {
+          type: pluginType,
+          args: {
+            plugin: { type: GraphQLString }
+          },
+          resolve: async function(root, { plugin }) {
+            const deletedPlugin = await Plugin.findOne({ where: { plugin }});
+            await Plugin.destroy({ where: { plugin }});
+            await deleteFile(`${__dirname}/../dist-plugins/${deletedPlugin.filename}`);
+            return deletedPlugin;
+          }
+        },
+
         createMessage: {
           type: messageType,
           args: {
@@ -1599,6 +1729,11 @@ module.exports = ({ Configuration, Message, User, ChatId, Event, Content, Catego
     query: new GraphQLObjectType({
       name: 'Queries',
       fields: {
+
+        chatbot: {
+          type: chatbotType,
+          resolve: async() => ChatBot.findOne()
+        },
 
         contexts: {
           type: new GraphQLList(contextType),
