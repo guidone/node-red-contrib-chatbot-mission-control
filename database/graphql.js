@@ -1664,7 +1664,6 @@ module.exports = ({
             version: { type: GraphQLString },
           },
           resolve: async function(root, { plugin, url, version }) {
-
             const response = await fetch(url);
             const filename = `${plugin}-${hash((new Date().toString()))}.js`;
             const pluginFile = fs.createWriteStream(`${__dirname}/../dist-plugins/${filename}`);

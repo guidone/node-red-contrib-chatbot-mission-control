@@ -1,16 +1,33 @@
-  const merge = require('webpack-merge');
-  //const common = require('./webpack.common.js');
-  const path = require('path');
+const merge = require('webpack-merge');
+const path = require('path');
+const _ = require('lodash');
 
-  module.exports = {
+
+// launch command npm run build-plugin -- --env.plugin='commands'
+
+module.exports = (env = {}) => {
+
+  console.log('env', env)
+  let { plugin, filename } = env;
+
+  if (_.isEmpty(filename)) {
+    filename = plugin + '.js';
+  }
+
+
+  // TODO check plugin name and directory
+
+
+
+  return {
     //mode: 'production',
     //devtool: 'eval-source-map',
-    mode: 'development',
-    entry: './plugins/commands',
+    mode: 'production',
+    entry: `./plugins/${plugin}/index.js`,
     output: {
-      filename: 'commands.js',
+      filename,
+      //path: path.resolve(__dirname, 'plugins/commands/dist'),
       path: path.resolve(__dirname, 'dist-plugins'),
-      library: 'Commands',
       libraryTarget: 'amd'
     },
     externals : [
@@ -33,14 +50,6 @@
         'react-ace': 'amd react-ace'
       },
       /components/i
-      /*,
-      function(context, request, callback) {
-        if (/app\-context/.test(request)) {
-          console.log('sahre app context')
-          return callback(null, ['@/src/common/app-context', 'app-context'], 'amd');
-        }
-        callback();
-      },*/
     ],
     module: {
       rules: [
@@ -80,20 +89,12 @@
             // Compiles Sass to CSS
             'sass-loader'
           ]
+        },
+        {
+          test: require.resolve('./src/components/index.js'),
+          use: 'exports-loader?CollectionEditor,HelpElements,withConfigurationPage,ContentAutocomplete',
         }
       ]
-    },
-
-    devServer: {
-      contentBase: './dist',
-      port: 8081,
-      //publicPath: './src/images',
-      //hot: true,
-      /*proxy: {
-        '*.png': {
-          target: 'http://localhost:[port]/',
-          //pathRewrite: { '^/some/sub-path': '' },
-        }
-      }*/
     }
   };
+};

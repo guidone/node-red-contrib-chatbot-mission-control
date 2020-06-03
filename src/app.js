@@ -15,6 +15,11 @@ import { WebSocketLink } from 'apollo-link-ws';
 import { getMainDefinition } from 'apollo-utilities';
 import { split } from 'apollo-link';
 
+// Define the global scope to store the components shared with plugins
+if (window.globalLibs == null) {
+  window.globalLibs = {};
+}
+
 import { CodePlug, Consumer, Views, Items, Plugin, PlugItUserPermissions, plug, withCodePlug, useCodePlug } from 'code-plug';
 
 import compose from './helpers/compose-reducers';
@@ -28,26 +33,47 @@ import PageNotFound from './layout/page-not-found';
 
 import { ModalProvider } from './components/modal';
 
+
+
 // Import plugins
-import './components/importer';
+import './components/index';
 import './permissions';
 import '../plugins';
 
 
 import ws from 'ws';
 
-// DEFINE SOME GLOBALS
-window.globalLibs = {};
-window.define = function(moduleName, requires, factory) {
 
-  console.log('DEFINE ', moduleName, requires, factory)
-  factory(
+
+
+window.define = function(requires, factory) {
+
+  console.log('DEFINE ', requires, factory)
+  // TODO make this dynamics
+
+  let resolvedRequires = requires.map(lib => {
+    if (lib.includes('/components')) {
+      return window.globalLibs.Components;
+    } else if (window.globalLibs[lib] != null) {
+      return window.globalLibs[lib];
+    } else {
+      console.warn(`Library "${lib}" is not present in the global export list`);
+      return {};
+    }
+  });
+
+  console.log('resolvedRequires', resolvedRequires)
+
+  /*factory(
+    window.globalLibs.Components,
+    window.globalLibs.Components,
     window.globalLibs['code-plug'],
     window.globalLibs.lodash,
     window.globalLibs['prop-types'],
     window.globalLibs.react,
     window.globalLibs.rsuite
-  );
+  );*/
+  factory(...resolvedRequires);
 
 
 };

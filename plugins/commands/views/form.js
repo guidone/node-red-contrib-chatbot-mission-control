@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock } from 'rsuite';
 
 //import CollectionEditor from '../../../src/components/collection-editor';
-import Components from '../../../src/ui';
-const { CollectionEditor } = Components;
+//import Components from '../../../src/ui';
+import { CollectionEditor } from '../../../src/components';
 
 import { commands as commandsModel } from '../models';
 import FormCommand from './form-command';

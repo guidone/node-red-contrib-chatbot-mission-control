@@ -10,7 +10,10 @@ const Components = {
   ContentAutocomplete
 };
 
-window.Components = Components;
+// Define the global scope to store the components shared with plugins
+if (window.globalLibs == null) {
+  window.globalLibs = {};
+}
+window.globalLibs.Components = Components;
 
-console.log('COMPONENTS', window.Components)
 export default Components;

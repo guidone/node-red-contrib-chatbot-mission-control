@@ -4,9 +4,9 @@ import { FlexboxGrid, Input } from 'rsuite';
 
 //import ContentAutocomplete from '../../../src/components/content-autocomplete';
 
-import Components from '../../../src/ui';
-console.log('Components', Components)
-const { ContentAutocomplete } = Components;
+//import Components from '../../../src/ui';
+//console.log('Components', Components)
+import { ContentAutocomplete } from '../../../src/components';
 
 
 const FormCommand = ({ value, onChange, disabled = false }) => (
