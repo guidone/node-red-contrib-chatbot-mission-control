@@ -81,6 +81,7 @@
     "sqlite3": "^4.1.1",
     "streamifier": "^0.1.1",
     "subscriptions-transport-ws": "^0.9.16",
+    "use-http": "^1.0.12",
     "ws": "^7.2.0"
   },
   "devDependencies": {

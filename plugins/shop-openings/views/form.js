@@ -1,15 +1,11 @@
 import React, { useState, useRef, Fragment } from 'react';
 import { Button, Form, FormControl, ButtonToolbar, FormGroup, ControlLabel, HelpBlock, Nav } from 'rsuite';
 
-import ContentAutocomplete from '../../../src/components/content-autocomplete';
-import CollectionEditor from '../../../src/components/collection-editor';
-import InputLanguage from '../../../src/components/input-language';
-import Dictionary from '../../../src/components/dictionary';
-import Confidence from '../../../src/components/confidence';
+import { ContentAutocomplete, CollectionEditor, Dictionary, Confidence } from '../../../src/components';
 
 import { opening as openingModel } from '../models';
 import FormOpening from './form-opening';
-import UserAutocomplete from '../../../src/components/user-autocomplete';
+
 
 // TODO check models and schema, start < end, no repetitions in range
 

@@ -1,16 +1,11 @@
 import React from 'react';
 
 import { plug } from 'code-plug';
-//import { NodeRedNode, SlugHelp, TypeCommand } from '../../src/components/help-elements';
-//import withConfigurationPage from '../../src/components/configuration-page';
-//import Components from '../../src/ui';
-//console.log('Components', Components)
+
 import { withConfigurationPage, HelpElements } from '../../src/components';
 const { NodeRedNode, SlugHelp, TypeCommand } = HelpElements;
 
 import ConfigurationForm from './views/form';
-
-console.log('eseguo COMMANDS plugin 3');
 
 const Legend = () => (
   <div>
@@ -49,5 +44,8 @@ plug(
     id: 'configuration-commands'
   }
 );
+
+
+
 
 export default { name: 'command plugin' };

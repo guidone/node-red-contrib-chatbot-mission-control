@@ -1,9 +1,10 @@
-import React from 'react';
-import { Tag } from 'rsuite';
+import React, { Component } from 'react';
+
 
 import { plug } from 'code-plug';
-import withConfigurationPage from '../../src/components/configuration-page';
-import { NodeRedNode, SlugHelp } from '../../src/components/help-elements';
+
+import { withConfigurationPage, HelpElements } from '../../src/components';
+const { NodeRedNode, SlugHelp, TypeCommand } = HelpElements;
 
 import ConfigurationForm from './views/form';
 

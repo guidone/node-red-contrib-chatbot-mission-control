@@ -1,7 +1,7 @@
 .page-plugins {
 
   .plugins {
-
+    margin-top: 25px;
 
     .plugin {
       display: flex;
@@ -21,11 +21,27 @@
 
       .meta {
         flex: 1 0;
-        padding: 8px;
+        padding: 0px 8px;
 
         .rs-btn-toolbar {
           margin-top: 10px;
         }
+        .description {
+          min-height: 50px;
+        }
+
+        .info {
+          margin-top: 6px;
+          .author {
+            font-size: 12px;
+            color: #888888;
+            margin-left: 20px;
+          }
+        }
+      }
+
+      .buttons {
+        flex: 0 0 auto;
       }
     }
 

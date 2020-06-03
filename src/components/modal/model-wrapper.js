@@ -5,6 +5,8 @@ import classNames from 'classnames';
 
 import ShowErrors from '../show-error';
 
+import './style.scss';
+
 
 const ModalWrapper = ({
   view: InnerView,
@@ -19,7 +21,8 @@ const ModalWrapper = ({
   size = 'md',
   error,
   validation: validationProp,
-  enableSubmit = () => true
+  enableSubmit = () => true,
+  align = 'right'
 }) => {
   const [value, setValue] = useState(initialValue);
   const [validation, setValidation] = useState(validationProp);
@@ -35,7 +38,7 @@ const ModalWrapper = ({
       onHide={() => onCancel()}
       size={size}
       overflow={false}
-      className={classNames('modal-admin', className)}
+      className={classNames('ui-modal-wrapper', className, { [align]: true   })}
     >
       {!_.isEmpty(title) && (
         <Modal.Header>

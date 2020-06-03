@@ -12,6 +12,7 @@ const ModalContext = React.createContext({});
  * useModal
  * @param {Object} props
  * @param {React.View} props.view
+ * @param {String} props.align Alignment of the buttons: left, center, right
  * @param {String} props.title Title of the modal
  * @param {String} props.labelSubmit Submit button
  * @param {String} props.labelCancel Cancel button

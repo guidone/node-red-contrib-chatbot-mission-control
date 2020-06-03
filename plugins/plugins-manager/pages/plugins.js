@@ -1,12 +1,17 @@
 import React, { useContext } from 'react';
-import { Button, ButtonToolbar, Notification } from 'rsuite';
+import { Button, ButtonToolbar, Notification, Icon } from 'rsuite';
 import { useQuery, useMutation, useApolloClient } from 'react-apollo';
+import useFetch from 'use-http';
 
 
 
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmallTag from '../../../src/components/small-tag';
+import Confirm from '../../../src/components/confirm';
+import JSONEditor from '../../../src/components/json-editor';
+import { useModal } from '../../../src/components/modal';
+import LoaderModal from '../../../src/components/loader-modal';
 
 import { INSTALL_PLUGIN, CHATBOT, UNISTALL_PLUGIN } from '../queries';
 
@@ -39,6 +44,7 @@ const PLUGINS = [
     version : '1.0.1',
     description: 'Show some content on response to commands-like messages...',
     url: 'https://gist.githubusercontent.com/guidone/bd2d4fec49198961e946ce42c5d373ba/raw/4fa7f4cb89dc131528cc5815e8640cfa659147d4/commands.js',
+    flow: 'https://gist.githubusercontent.com/guidone/ddafe29046f69e757faa2388e20d11a5/raw/afbe7969b0cd44a77c24716bffeed94a2878e484/commands.flow',
     author: {
       name: 'guidone'
     }
@@ -63,10 +69,11 @@ const PLUGINS = [
     }
   },
   {
-    id: 'openings',
+    id: 'shop-openings',
     name: 'Openings',
-    version : '1.0',
+    version : '1.0.0',
     description: 'Handle shop hours, answer to sentences like are you open?',
+    url: 'https://gist.githubusercontent.com/guidone/f391fd21ad3768a5abfb0272d9263e84/raw/615010fa4e799ea22f624e21e50f0a364d0d3181/shop-openings.js',
     author: {
       name: 'guidone'
     }
@@ -129,6 +136,34 @@ function versionCompare(v1, v2, options) {
   return 0;
 }
 
+const FlowSource = ({ value: plugin }) => {
+
+  const { loading, error, data = [] } = useFetch(plugin.flow, {}, []);
+
+  console.log('--->dara', data)
+
+  return (
+    <div className="ui-flow-source">
+      {loading && <LoaderModal />}
+      {error && <div>error</div>}
+      {!loading && !error && (
+        <div>
+          <div>
+            Spiegone di come si importa un flow
+          </div>
+          <JSONEditor
+            showPrintMargin={false}
+            height="55vh"
+            readOnly={true}
+            value={JSON.stringify(data, null, 2)}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
+
+
 
 const PluginPanel = ({
   plugin,
@@ -138,24 +173,49 @@ const PluginPanel = ({
   disabled = false
 }) => {
   const { state: { chatbot } } = useContext(AppContext);
+  const { open, close } = useModal({
+    view: FlowSource,
+    title: `Node-RED flow for ${plugin.name}`,
+    size: 'lg',
+    labelSubmit: 'Close',
+    labelCancel: null,
+    align: 'center'
+  });
 
-  console.log('chatbot', chatbot, plugins)
   const installed = isInstalled(plugin, chatbot.plugins);
   const upgrade = installed && needUpdate(plugin, chatbot.plugins);
 
   return (
     <div className="plugin">
-      <div className="preview">image</div>
       <div className="meta">
         <h5>
           {plugin.name}
-          &nbsp;<SmallTag color="#0579DB">{plugin.version}</SmallTag>
         </h5>
         <div className="description">
           {plugin.description}
         </div>
-
+        <div className="info">
+          <SmallTag color="#0579DB">{plugin.version}</SmallTag>
+          {plugin.author != null && (
+            <span className="author">
+              <Icon icon="user"/> {plugin.author.name}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="buttons">
         <ButtonToolbar size="sm">
+          {installed && plugin.flow != null && (
+            <Button
+              disabled={disabled}
+              size="sm"
+              appearance="ghost"
+              onClick={async () => {
+                await open(plugin);
+                close();
+              }}
+            >Import flow</Button>
+          )}
           {installed && (
             <Button
               disabled={disabled}
@@ -218,26 +278,35 @@ const PluginsManager = ({ dispatch }) => {
               plugins={plugins}
               disabled={saving || loading}
               onInstall={async plugin => {
-                try {
-                  await install({ variables: {
-                    plugin: plugin.id,
-                    url: plugin.url,
-                    version: plugin.version
-                  }});
-                  Notification.success({ title: 'Installed', description: `Plugin "${plugin.id}" installed succesfully` });
-                } catch(e) {
-                  Notification.error({ title: 'Error', description: `Something went wrong trying to install the plugin "${plugin.id}"` });
+                if (await Confirm(
+                  <div>Install plugin <strong>{plugin.name}</strong> ?</div>,
+                  { okLabel: 'Ok, install'}
+                )) {
+                  try {
+                    await install({ variables: {
+                      plugin: plugin.id,
+                      url: plugin.url,
+                      version: plugin.version
+                    }});
+                    Notification.success({ title: 'Installed', description: `Plugin "${plugin.id}" installed succesfully` });
+                  } catch(e) {
+                    Notification.error({ title: 'Error', description: `Something went wrong trying to install the plugin "${plugin.id}"` });
+                  }
                 }
               }}
               onUninstall={async plugin => {
-                try {
-                  await uninstall({ variables: { plugin: plugin.id }});
-                  Notification.success({ title: 'Unistalled', description: `Plugin "${plugin.id}" uninstalled succesfully` });
-                } catch(e) {
-                  Notification.error({ title: 'Error', description: `Something went wrong trying to uninstall the plugin "${plugin.id}"` });
+                if (await Confirm(
+                  <div>Uninstall plugin <strong>{plugin.name}</strong> ?</div>,
+                  { okLabel: 'Ok, uninstall'}
+                )) {
+                  try {
+                    await uninstall({ variables: { plugin: plugin.id }});
+                    Notification.success({ title: 'Unistalled', description: `Plugin "${plugin.name}" uninstalled succesfully` });
+                  } catch(e) {
+                    Notification.error({ title: 'Error', description: `Something went wrong trying to uninstall the plugin "${plugin.name}"` });
+                  }
                 }
               }}
-
             />
           ))}
         </div>

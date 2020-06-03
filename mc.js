@@ -222,7 +222,6 @@ function bootstrap(server, app, log, redSettings) {
   app.use(`${mcSettings.root}/plugins`, serveStatic(path.join(__dirname, 'dist-plugins'), {
     'index': false
   }));
-  //app.use(`${mcSettings.root}/welcome-message.js`, serveStatic(path.join(__dirname, 'dist-plugins/welcome-message.js')));
   // serve mission control page and assets
   app.use(
     '^' + mcSettings.root,
@@ -245,9 +244,6 @@ function bootstrap(server, app, log, redSettings) {
         const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};</script>`;
         const assets = mcSettings.environment === 'development' ?
           'http://localhost:8080/main.js' : `${mcSettings.root}/main.js`;
-
-        console.log('install plugins --->', plugins)
-
         let pluginsScript = plugins.map(plugin => {
           return `<script src="${mcSettings.root}/plugins/${plugin.filename}"></script>`;
         });
