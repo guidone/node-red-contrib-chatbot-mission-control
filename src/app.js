@@ -33,6 +33,15 @@ import PageNotFound from './layout/page-not-found';
 
 import { ModalProvider } from './components/modal';
 
+// add an empty configuration menu, on order to be the first
+plug('sidebar', null, {
+  id: 'configuration',
+  label: 'Configuration',
+  permission: 'configure',
+  icon: 'cog',
+  order: 0,
+  options: []
+});
 
 
 // Import plugins
@@ -41,16 +50,12 @@ import './permissions';
 import '../plugins';
 
 
-import ws from 'ws';
+//import ws from 'ws';
 
 
 
 
 window.define = function(requires, factory) {
-
-  console.log('DEFINE ', requires, factory)
-  // TODO make this dynamics
-
   let resolvedRequires = requires.map(lib => {
     if (lib.includes('/components')) {
       return window.globalLibs.Components;
@@ -61,21 +66,7 @@ window.define = function(requires, factory) {
       return {};
     }
   });
-
-  console.log('resolvedRequires', resolvedRequires)
-
-  /*factory(
-    window.globalLibs.Components,
-    window.globalLibs.Components,
-    window.globalLibs['code-plug'],
-    window.globalLibs.lodash,
-    window.globalLibs['prop-types'],
-    window.globalLibs.react,
-    window.globalLibs.rsuite
-  );*/
   factory(...resolvedRequires);
-
-
 };
 
 import * as globalReact from 'react';
@@ -88,6 +79,7 @@ window.globalLibs['prop-types'] = globalPropTypes;
 window.globalLibs['code-plug'] = globalCodePlug;
 window.globalLibs.lodash = globalLodash;
 window.globalLibs.rsuite = globalRsuite;
+
 
 
 

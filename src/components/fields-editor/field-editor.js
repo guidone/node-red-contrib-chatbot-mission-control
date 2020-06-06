@@ -89,7 +89,7 @@ const FieldEditor = ({
           <FlexboxGrid.Item colspan={1} align="right">
             <IconButton
               onClick={() => onRemove()}
-              icon={<Icon icon="trash" />}
+              icon={<Icon icon="close" />}
               size="md"
             />
           </FlexboxGrid.Item>

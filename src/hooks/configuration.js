@@ -24,10 +24,21 @@ mutation($configuration: NewConfiguration!) {
 }
 `;
 
-const useConfiguration = ({ namespace, onCompleted = () => {} }) => {
+const useConfiguration = ({
+  namespace,
+  onCompleted = () => {},
+  onLoaded = () => {}
+}) => {
 
   const { loading, error, data } = useQuery(GET_CONFIGURATION, {
     variables: { namespace },
+    onCompleted: data => {
+      let configurationValue;
+      if (data != null && data.configurations != null && data.configurations.length !== 0) {
+        configurationValue = JSON.parse(data.configurations[0].payload);
+      }
+      onLoaded(configurationValue);
+    }
   });
   const { sendMessage } = useSocket();
 

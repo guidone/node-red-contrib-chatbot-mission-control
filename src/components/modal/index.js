@@ -18,6 +18,7 @@ const ModalContext = React.createContext({});
  * @param {String} props.labelCancel Cancel button
  * @param {String} props.className
  * @param {String} props.size Size of the modal
+ * @param {React} props.custom Custom view, additional button in the footer
  * @param {String} props.enableSummit Enable or disable the submit button, takes as argument the current value of the form
  * @return {Object}
  * @return {Function} return.open Open the modal with

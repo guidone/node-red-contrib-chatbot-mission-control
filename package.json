@@ -40,6 +40,7 @@
     "apollo-server-express": "^2.13.0",
     "classnames": "^2.2.6",
     "cli-color": "^2.0.0",
+    "clipboard": "^2.0.6",
     "cloudinary": "^1.21.0",
     "code-plug": "^0.6.1",
     "e": "0.0.4",

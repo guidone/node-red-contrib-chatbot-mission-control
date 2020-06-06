@@ -1,10 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, ButtonToolbar, Notification, Icon } from 'rsuite';
-import { useQuery, useMutation, useApolloClient } from 'react-apollo';
+import { useMutation, useApolloClient } from 'react-apollo';
 import useFetch from 'use-http';
+import ClipboardJS from 'clipboard';
+import Showdown from 'showdown';
 
-
-
+import ModalLoader from '../../../src/components/loader-modal';
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmallTag from '../../../src/components/small-tag';
@@ -12,10 +13,14 @@ import Confirm from '../../../src/components/confirm';
 import JSONEditor from '../../../src/components/json-editor';
 import { useModal } from '../../../src/components/modal';
 import LoaderModal from '../../../src/components/loader-modal';
+import useConfiguration from '../../../src/hooks/configuration';
+import AppContext from '../../../src/common/app-context';
+import ShowError from '../../../src/components/show-error';
 
 import { INSTALL_PLUGIN, CHATBOT, UNISTALL_PLUGIN } from '../queries';
 
-import AppContext from '../../../src/common/app-context';
+
+
 
 
 const usePlugins = ({ onCompleted = () => {} } = {}) => {
@@ -37,7 +42,7 @@ const usePlugins = ({ onCompleted = () => {} } = {}) => {
 };
 
 
-const PLUGINS = [
+/*const PLUGINS = [
   {
     id: 'commands',
     name: 'Commands',
@@ -79,7 +84,7 @@ const PLUGINS = [
     }
   }
 
-]
+]*/
 
 const isInstalled = (current, plugins) => plugins.some(plugin => plugin.plugin === current.id);
 
@@ -140,7 +145,6 @@ const FlowSource = ({ value: plugin }) => {
 
   const { loading, error, data = [] } = useFetch(plugin.flow, {}, []);
 
-  console.log('--->dara', data)
 
   return (
     <div className="ui-flow-source">
@@ -165,6 +169,40 @@ const FlowSource = ({ value: plugin }) => {
 
 
 
+const CopyAndPasteButton = ({ text, disabled = false, label = 'Copy to Clipboard' }) => {
+  useEffect(() => {
+    const clipboard = new ClipboardJS('.ui-clipboard-button', {
+      text: () => text
+    });
+    return () => clipboard.destroy();
+  }, [text]);
+
+  return (
+    <Button
+      disabled={disabled}
+      onClick={() => {
+        Notification.success({ title: 'Copied!', description: 'The Node-RED flow was copied to the clipboard '});
+      }}
+      className="ui-clipboard-button"
+      appearance="ghost"
+    >
+      {label}
+    </Button>
+  );
+};
+
+const CopyAndPasteFlow = ({ plugin }) => {
+  const { loading, data = [] } = useFetch(plugin.flow, {}, []);
+  return (
+    <CopyAndPasteButton
+      disabled={loading}
+      text={JSON.stringify(data)}
+    />
+  );
+}
+
+
+
 const PluginPanel = ({
   plugin,
   plugins,
@@ -179,11 +217,14 @@ const PluginPanel = ({
     size: 'lg',
     labelSubmit: 'Close',
     labelCancel: null,
-    align: 'center'
+    align: 'center',
+    custom: value => <CopyAndPasteFlow plugin={value}/>
   });
 
   const installed = isInstalled(plugin, chatbot.plugins);
   const upgrade = installed && needUpdate(plugin, chatbot.plugins);
+  const converter = new Showdown.Converter({ openLinksInNewWindow: true });
+
 
   return (
     <div className="plugin">
@@ -191,14 +232,22 @@ const PluginPanel = ({
         <h5>
           {plugin.name}
         </h5>
-        <div className="description">
-          {plugin.description}
-        </div>
+        <div
+          className="description"
+          dangerouslySetInnerHTML={{ __html: converter.makeHtml(plugin.description)}}
+        />
+
+
         <div className="info">
           <SmallTag color="#0579DB">{plugin.version}</SmallTag>
           {plugin.author != null && (
             <span className="author">
-              <Icon icon="user"/> {plugin.author.name}
+              <Icon icon="user"/>
+              &nbsp;
+              {plugin.author.url != null && (
+                <a href={plugin.author.url} target="_blank">{plugin.author.name}</a>
+              )}
+              {plugin.author.url == null && <span>{plugin.author.name}</span>}
             </span>
           )}
         </div>
@@ -251,8 +300,19 @@ const PluginPanel = ({
 
 
 const PluginsManager = ({ dispatch }) => {
+  const [error, setError] = useState(null);
   const client = useApolloClient();
-  const { loading, plugins, error,  } = { plugins: PLUGINS, loading: false }
+  const { } = useConfiguration({
+    namespace: 'market-place',
+    onLoaded: data => {
+      if (data != null && !_.isEmpty(data.jsonbin_id)) {
+        get(`/b/${data.jsonbin_id}/latest`);
+      } else {
+        setError('Missing JSON bin id in configuration');
+      }
+    }
+  })
+  const { data: plugins, get, error: fetchError } = useFetch('https://api.jsonbin.io', {});
   const { install, uninstall, saving } = usePlugins({
     onCompleted: async () => {
       try {
@@ -260,16 +320,20 @@ const PluginsManager = ({ dispatch }) => {
         console.log('updated chatbot', response)
         dispatch({ type: 'updateChatbot', chatbot: response.data.chatbot });
       } catch(e) {
-        console.log('e', e)
+        setError(e);
       }
     }
   });
 
+  const pageError = error || fetchError;
+  const loading = plugins == null;
+
   return (
     <PageContainer className="page-plugins">
       <Breadcrumbs pages={['Plugins']}/>
-
-      {!loading && (
+      {pageError != null && <ShowError error={pageError} />}
+      {loading && pageError == null && <ModalLoader />}
+      {!loading && pageError == null && (
         <div className="plugins">
           {plugins.map(plugin => (
             <PluginPanel
@@ -311,7 +375,6 @@ const PluginsManager = ({ dispatch }) => {
           ))}
         </div>
       )}
-
     </PageContainer>
   );
 }

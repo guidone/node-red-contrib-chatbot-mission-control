@@ -3,7 +3,9 @@ import * as HelpElements from './help-elements';
 import withConfigurationPage from './configuration-page';
 import ContentAutocomplete from './content-autocomplete';
 import Dictionary from './dictionary';
+import * as Content from './content';
 import Confidence from './confidence';
+
 
 // Define the global scope to store the components shared with plugins
 if (window.globalLibs == null) {
@@ -15,7 +17,8 @@ window.globalLibs.Components = {
   withConfigurationPage,
   ContentAutocomplete,
   Dictionary,
-  Confidence
+  Confidence,
+  Content
 };
 
 export {
@@ -24,5 +27,6 @@ export {
   withConfigurationPage,
   ContentAutocomplete,
   Dictionary,
-  Confidence
+  Confidence,
+  Content
 };

@@ -12,9 +12,6 @@ const ShowError = ({
   title = 'Server error',
   subtitle
 }) => {
-  console.log('ERROR222', error)
-  // TODO try to extract error message
-
   let message;
   if (_.isString(error)) {
     message = error;

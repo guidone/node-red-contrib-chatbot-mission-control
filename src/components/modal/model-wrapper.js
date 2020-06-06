@@ -22,14 +22,14 @@ const ModalWrapper = ({
   error,
   validation: validationProp,
   enableSubmit = () => true,
-  align = 'right'
+  align = 'right',
+  custom
 }) => {
   const [value, setValue] = useState(initialValue);
   const [validation, setValidation] = useState(validationProp);
   useEffect(() => {
     setValidation(validationProp);
   }, [validationProp]);
-
 
   return (
     <Modal
@@ -60,16 +60,21 @@ const ModalWrapper = ({
         />
       </Modal.Body>
       <Modal.Footer>
-        <Button onClick={() => onCancel()} appearance="subtle">
-          {labelCancel}
-        </Button>
-        <Button
-          disabled={disabled || !enableSubmit(value)}
-          appearance="primary"
-          onClick={() => onSubmit(value)}
-        >
-          {labelSubmit}
-        </Button>
+        {_.isFunction(custom) ? custom(value) : custom}
+        {!_.isEmpty(labelCancel) && (
+          <Button onClick={() => onCancel()} appearance="subtle">
+            {labelCancel}
+          </Button>
+        )}
+        {!_.isEmpty(labelSubmit) && (
+          <Button
+            disabled={disabled || !enableSubmit(value)}
+            appearance="primary"
+            onClick={() => onSubmit(value)}
+          >
+            {labelSubmit}
+          </Button>
+        )}
       </Modal.Footer>
     </Modal>
   );

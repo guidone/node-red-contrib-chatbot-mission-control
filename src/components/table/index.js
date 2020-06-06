@@ -112,9 +112,9 @@ const CustomTable = ({
           </div>
           {toolbar != null &&(
             <div className="toolbar">
-              <FlexboxGrid.Item colspan={children.length != null ? children.length : 6} align="right">
+
                 {toolbar}
-              </FlexboxGrid.Item>
+
             </div>
           )}
         </div>

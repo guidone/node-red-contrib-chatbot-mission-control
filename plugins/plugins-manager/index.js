@@ -1,11 +1,9 @@
 import { plug } from 'code-plug';
 
-
 import './style.scss';
-import Users from './pages/plugins';
+import PluginsList from './pages/plugins';
 
-
-plug('pages', Users, { url: '/plugins', title: 'Plugins', id: 'plugins', permission: 'plugins' });
+plug('pages', PluginsList, { url: '/plugins', title: 'Plugins', id: 'plugins', permission: 'plugins' });
 
 // register permissions
 plug(

@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import _ from 'lodash';
-import { Table, Icon, SelectPicker, ButtonGroup, Button, FlexboxGrid } from 'rsuite';
+import { Table, Icon, SelectPicker, ButtonGroup, Button, ButtonToolbar } from 'rsuite';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -61,7 +61,9 @@ const Contents = ({
   namespace,
   title,
   labels,
-  breadcrumbs
+  breadcrumbs,
+  customFieldsSchema,
+  custom
  }) => {
   const [filters, setFilters] = useState(null);
   const [ content, setContent ] = useState(null);
@@ -86,6 +88,7 @@ const Contents = ({
           error={error}
           disabled={saving}
           labels={labels}
+          customFieldsSchema={customFieldsSchema}
           onCancel={() => setContent(null)}
           onSubmit={async content => {
             if (content.id != null) {
@@ -105,10 +108,13 @@ const Contents = ({
         initialSortField="createdAt"
         initialSortDirection="desc"
         toolbar={(
-          <Button
-            appearance="primary"
-            onClick={() => setContent({ title: '', body: '', fields: [], ...filters })}>{labels.createContent}
-          </Button>
+          <ButtonToolbar>
+            {_.isFunction(custom) ? custom() : custom}
+            <Button
+              appearance="primary"
+              onClick={() => setContent({ title: '', body: '', fields: [], ...filters })}>{labels.createContent}
+            </Button>
+          </ButtonToolbar>
         )}
         onFilters={setFilters}
         filtersSchema={[
@@ -229,7 +235,14 @@ Contents.propTypes = {
       title: PropTypes.string,
       url: PropTypes.string
     })
-  ]))
+  ])),
+  customFieldsSchema: PropTypes.arrayOf(PropTypes.shape({
+    key: PropTypes.string,
+    type: PropTypes.string,
+    description: PropTypes.string,
+    defaultValue: PropTypes.string,
+    color: PropTypes.oneOf(['red','orange', 'yellow', 'green', 'cyan', 'blue', 'violet'])
+  }))
 };
 
 export default Contents;

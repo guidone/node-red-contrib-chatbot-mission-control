@@ -26,6 +26,7 @@ import './plugins/plugins-manager';
 
 import './plugins/send-message';
 
+import './plugins/market-place';
 //import './plugins/commands';
 //import './plugins/welcome-message';
 //import './plugins/shop-openings';
