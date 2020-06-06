@@ -46,7 +46,8 @@ module.exports = (env = {}) => {
         'ace-builds': 'amd ace-builds',
         'codemirror': 'amd codemirror',
         'marked': 'amd marked',
-        'react-ace': 'amd react-ace'
+        'react-ace': 'amd react-ace',
+        'use-http': 'amd use-http'
       },
       /components/i
     ],

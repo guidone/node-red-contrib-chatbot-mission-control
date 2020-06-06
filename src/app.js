@@ -74,11 +74,13 @@ import * as globalPropTypes from 'prop-types';
 import * as globalCodePlug from 'code-plug';
 import * as globalLodash from 'lodash';
 import * as globalRsuite from 'rsuite';
+import * as globalUseHttp from 'use-http';
 window.globalLibs.react = globalReact;
 window.globalLibs['prop-types'] = globalPropTypes;
 window.globalLibs['code-plug'] = globalCodePlug;
 window.globalLibs.lodash = globalLodash;
 window.globalLibs.rsuite = globalRsuite;
+window.globalLibs['use-http'] = globalUseHttp;
 
 
 
