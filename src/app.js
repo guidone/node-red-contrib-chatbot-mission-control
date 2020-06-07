@@ -47,6 +47,7 @@ plug('sidebar', null, {
 // Import plugins
 import './components/index';
 import './permissions';
+import './plugins-core';
 import '../plugins';
 
 
@@ -75,14 +76,16 @@ import * as globalCodePlug from 'code-plug';
 import * as globalLodash from 'lodash';
 import * as globalRsuite from 'rsuite';
 import * as globalUseHttp from 'use-http';
+import * as globalGraphQLTag from 'graphql-tag';
+import * as globalReactApollo from 'react-apollo';
 window.globalLibs.react = globalReact;
 window.globalLibs['prop-types'] = globalPropTypes;
 window.globalLibs['code-plug'] = globalCodePlug;
 window.globalLibs.lodash = globalLodash;
 window.globalLibs.rsuite = globalRsuite;
 window.globalLibs['use-http'] = globalUseHttp;
-
-
+window.globalLibs['graphql-tag'] = globalGraphQLTag;
+window.globalLibs['react-apollo'] = globalReactApollo;
 
 
 
@@ -121,42 +124,6 @@ const initialState = {
   user: null
 };
 
-/*function reducer1(state, action) {
-  switch (action.type) {
-    case 'increment':
-      return {...state, count: state.count + 1};
-    case 'decrement':
-      return {...state, count: state.count - 1};
-    default:
-      return state;
-  }
-}
-
-function reducer2(state, action) {
-
-  switch (action.type) {
-    case 'user':
-      return {...state, user: state.user + '*'};
-    default:
-      return state;
-  }
-}
-
-function SocketReducers(state, action) {
-  switch(action.type) {
-    case 'socket.open':
-
-
-      return state;
-    default:
-      return state;
-  }
-}
-plug('reducers', SocketReducers);*/
-
-
-//plug('reducers', reducer1);
-//plug('reducers', reducer2);
 
 
 const usePrefetchedData = () => {

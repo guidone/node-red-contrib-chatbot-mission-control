@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, ButtonToolbar, Notification, Icon } from 'rsuite';
+import { Button, ButtonToolbar, Notification, Icon, Message } from 'rsuite';
 import { useMutation, useApolloClient } from 'react-apollo';
 import useFetch from 'use-http';
 import ClipboardJS from 'clipboard';
@@ -16,6 +16,7 @@ import LoaderModal from '../../../src/components/loader-modal';
 import useConfiguration from '../../../src/hooks/configuration';
 import AppContext from '../../../src/common/app-context';
 import ShowError from '../../../src/components/show-error';
+import useSettings from '../../../src/hooks/settings';
 
 import { INSTALL_PLUGIN, CHATBOT, UNISTALL_PLUGIN } from '../queries';
 
@@ -300,6 +301,7 @@ const PluginPanel = ({
 
 
 const PluginsManager = ({ dispatch }) => {
+  const { environment } = useSettings();
   const [error, setError] = useState(null);
   const client = useApolloClient();
   const { } = useConfiguration({
@@ -332,6 +334,17 @@ const PluginsManager = ({ dispatch }) => {
     <PageContainer className="page-plugins">
       <Breadcrumbs pages={['Plugins']}/>
       {pageError != null && <ShowError error={pageError} />}
+      {environment === 'development' && (
+        <Message
+          type="warning"
+          title="Development mode"
+          description={<p>
+            Your are in <strong>development mode</strong>, all plugins are loaded with <code>import ... from ... </code> defined in
+            the file <code>./plugins.js</code>, this is a development mode, any changes to a plugin will cause reload, installing and uninstallig plugins
+            in this page will not affect the plugins actually loaded.
+          </p>}
+        />
+      )}
       {loading && pageError == null && <ModalLoader />}
       {!loading && pageError == null && (
         <div className="plugins">

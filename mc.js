@@ -86,8 +86,10 @@ function bootstrap(server, app, log, redSettings) {
   console.log(lcd.timestamp() + 'Red Bot Mission Control configuration:');
   const mcSettings = redSettings.missionControl || {};
   mcSettings.version = package.version;
-  if (process.env.DEV != null) {
+  if (process.env.DEV.toLowerCase() === 'true' || process.env.DEV.toLowerCase() === 'dev') {
     mcSettings.environment = 'development';
+  } else if (process.env.DEV.toLowerCase() === 'plugin') {
+    mcSettings.environment = 'plugin';
   } else {
     mcSettings.environment = 'production';
   }
@@ -229,7 +231,6 @@ function bootstrap(server, app, log, redSettings) {
     async (req, res) => {
       const chatbot = await ChatBot.findOne();
       const plugins = await chatbot.getPlugins({ limit: 9999 });
-      console.log('chatbot', chatbot.toJSON())
       // inject user info into template
       fs.readFile(`${__dirname}/src/index.html`, (err, data) => {
         const template = data.toString();
@@ -239,15 +240,17 @@ function bootstrap(server, app, log, redSettings) {
             plugins: plugins.map(plugin => plugin.toJSON())
           },
           user: req.user,
-          settings: mcSettings
+          settings: { ...mcSettings, environment: mcSettings.environment }
         };
-        const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};</script>`;
-        const assets = mcSettings.environment === 'development' ?
-          'http://localhost:8080/main.js' : `${mcSettings.root}/main.js`;
-        let pluginsScript = plugins.map(plugin => {
-          return `<script src="${mcSettings.root}/plugins/${plugin.filename}"></script>`;
-        });
 
+        const assets = mcSettings.environment === 'development' || mcSettings.environment === 'plugin' ?
+          'http://localhost:8080/main.js' : `${mcSettings.root}/main.js`;
+        // link external plugin scripts only in plugin mode
+        let pluginsScript = [];
+        if (mcSettings.environment === 'plugin' || mcSettings.environment === 'production') {
+          pluginsScript = plugins.map(plugin => `<script src="${mcSettings.root}/plugins/${plugin.filename}"></script>`);
+        }
+        const json = `<script>var bootstrap = ${JSON.stringify(bootstrap)};var mc_environment='${mcSettings.environment}';</script>`;
         res.send(template.replace('{{data}}', json).replace('{{assets}}', assets).replace('{{plugins}}', pluginsScript.join('')));
      });
     }

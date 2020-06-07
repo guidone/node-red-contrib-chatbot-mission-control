@@ -7,8 +7,12 @@ import PublishPlugins from './views/publish-plugins';
 import ConfigureMarketPlace from './views/configure-market-place';
 
 const Legend = () => (
-  <div>something here</div>
-)
+  <div>
+    Configure the id and the key to access <strong>jsonbing.io</strong> for the plugins met information.
+    <br />
+    Docs about the API <a href="https://jsonbin.io/api-reference/bins/read" target="blank">here</a>.
+  </div>
+);
 
 plug(
   'sidebar',
@@ -17,7 +21,7 @@ plug(
     id: 'market-place',
     label: 'Market Place',
     url: '/market-place',
-    icon: 'file-text'
+    icon: 'shopping-basket'
   }
 );
 

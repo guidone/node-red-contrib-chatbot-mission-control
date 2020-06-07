@@ -35,7 +35,7 @@ export default ({
             disabled={disabled}
           />
           <HelpBlock>
-            tbd
+            The <em>id</em> of the <strong>jsonbin.io</strong> snippet of the plugins meta info
           </HelpBlock>
         </FormGroup>
         <FormGroup>
@@ -46,7 +46,7 @@ export default ({
             disabled={disabled}
           />
           <HelpBlock>
-            tbd
+            The <em>secret key</em> to write on <strong>jsonbin.io</strong>
           </HelpBlock>
         </FormGroup>
         <FormGroup style={{ marginTop: '40px' }}>
