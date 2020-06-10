@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Button, ButtonToolbar, Notification, Icon, Message } from 'rsuite';
+import { Button, ButtonToolbar, Notification, Icon, Message, FlexboxGrid } from 'rsuite';
 import { useMutation, useApolloClient } from 'react-apollo';
 import useFetch from 'use-http';
 import ClipboardJS from 'clipboard';
@@ -10,9 +10,7 @@ import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmallTag from '../../../src/components/small-tag';
 import Confirm from '../../../src/components/confirm';
-import JSONEditor from '../../../src/components/json-editor';
 import { useModal } from '../../../src/components/modal';
-import LoaderModal from '../../../src/components/loader-modal';
 import useConfiguration from '../../../src/hooks/configuration';
 import AppContext from '../../../src/common/app-context';
 import ShowError from '../../../src/components/show-error';
@@ -20,8 +18,8 @@ import useSettings from '../../../src/hooks/settings';
 
 import { INSTALL_PLUGIN, CHATBOT, UNISTALL_PLUGIN } from '../queries';
 
-
-
+import FlowSource from './flow-source';
+import versionCompare from '../helpers/version-compare';
 
 
 const usePlugins = ({ onCompleted = () => {} } = {}) => {
@@ -95,78 +93,9 @@ const needUpdate = (current, plugins) => {
   return versionCompare(installed.version, current.version) === -1;
 }
 
-function versionCompare(v1, v2, options) {
-  var lexicographical = options && options.lexicographical,
-      zeroExtend = options && options.zeroExtend,
-      v1parts = v1.split('.'),
-      v2parts = v2.split('.');
-
-  function isValidPart(x) {
-      return (lexicographical ? /^\d+[A-Za-z]*$/ : /^\d+$/).test(x);
-  }
-
-  if (!v1parts.every(isValidPart) || !v2parts.every(isValidPart)) {
-      return NaN;
-  }
-
-  if (zeroExtend) {
-      while (v1parts.length < v2parts.length) v1parts.push("0");
-      while (v2parts.length < v1parts.length) v2parts.push("0");
-  }
-
-  if (!lexicographical) {
-      v1parts = v1parts.map(Number);
-      v2parts = v2parts.map(Number);
-  }
-
-  for (var i = 0; i < v1parts.length; ++i) {
-      if (v2parts.length == i) {
-          return 1;
-      }
-
-      if (v1parts[i] == v2parts[i]) {
-          continue;
-      }
-      else if (v1parts[i] > v2parts[i]) {
-          return 1;
-      }
-      else {
-          return -1;
-      }
-  }
-
-  if (v1parts.length != v2parts.length) {
-      return -1;
-  }
-
-  return 0;
-}
-
-const FlowSource = ({ value: plugin }) => {
-
-  const { loading, error, data = [] } = useFetch(plugin.flow, {}, []);
 
 
-  return (
-    <div className="ui-flow-source">
-      {loading && <LoaderModal />}
-      {error && <div>error</div>}
-      {!loading && !error && (
-        <div>
-          <div>
-            Spiegone di come si importa un flow
-          </div>
-          <JSONEditor
-            showPrintMargin={false}
-            height="55vh"
-            readOnly={true}
-            value={JSON.stringify(data, null, 2)}
-          />
-        </div>
-      )}
-    </div>
-  );
-};
+
 
 
 
@@ -237,8 +166,6 @@ const PluginPanel = ({
           className="description"
           dangerouslySetInnerHTML={{ __html: converter.makeHtml(plugin.description)}}
         />
-
-
         <div className="info">
           <SmallTag color="#0579DB">{plugin.version}</SmallTag>
           {plugin.author != null && (
@@ -333,61 +260,68 @@ const PluginsManager = ({ dispatch }) => {
   return (
     <PageContainer className="page-plugins">
       <Breadcrumbs pages={['Plugins']}/>
-      {pageError != null && <ShowError error={pageError} />}
-      {environment === 'development' && (
-        <Message
-          type="warning"
-          title="Development mode"
-          description={<p>
-            Your are in <strong>development mode</strong>, all plugins are loaded with <code>import ... from ... </code> defined in
-            the file <code>./plugins.js</code>, this is a development mode, any changes to a plugin will cause reload, installing and uninstallig plugins
-            in this page will not affect the plugins actually loaded.
-          </p>}
-        />
-      )}
-      {loading && pageError == null && <ModalLoader />}
-      {!loading && pageError == null && (
-        <div className="plugins">
-          {plugins.map(plugin => (
-            <PluginPanel
-              key={plugin.id}
-              plugin={plugin}
-              plugins={plugins}
-              disabled={saving || loading}
-              onInstall={async plugin => {
-                if (await Confirm(
-                  <div>Install plugin <strong>{plugin.name}</strong> ?</div>,
-                  { okLabel: 'Ok, install'}
-                )) {
-                  try {
-                    await install({ variables: {
-                      plugin: plugin.id,
-                      url: plugin.url,
-                      version: plugin.version
-                    }});
-                    Notification.success({ title: 'Installed', description: `Plugin "${plugin.id}" installed succesfully` });
-                  } catch(e) {
-                    Notification.error({ title: 'Error', description: `Something went wrong trying to install the plugin "${plugin.id}"` });
-                  }
-                }
-              }}
-              onUninstall={async plugin => {
-                if (await Confirm(
-                  <div>Uninstall plugin <strong>{plugin.name}</strong> ?</div>,
-                  { okLabel: 'Ok, uninstall'}
-                )) {
-                  try {
-                    await uninstall({ variables: { plugin: plugin.id }});
-                    Notification.success({ title: 'Unistalled', description: `Plugin "${plugin.name}" uninstalled succesfully` });
-                  } catch(e) {
-                    Notification.error({ title: 'Error', description: `Something went wrong trying to uninstall the plugin "${plugin.name}"` });
-                  }
-                }
-              }}
+      <FlexboxGrid justify="space-between">
+        <FlexboxGrid.Item colspan={17} style={{ paddingTop: '20px', paddingLeft: '20px' }}>
+          {pageError != null && <ShowError error={pageError} />}
+          {environment === 'development' && (
+            <Message
+              type="warning"
+              title="Development mode"
+              description={<p>
+                Your are in <strong>development mode</strong>, all plugins are loaded with <code>import ... from ... </code> defined in
+                the file <code>./plugins.js</code>, this is a development mode, any changes to a plugin will cause reload, installing and uninstallig plugins
+                in this page will not affect the plugins actually loaded.
+              </p>}
             />
-          ))}
-        </div>
-      )}
+          )}
+          {loading && pageError == null && <ModalLoader />}
+          {!loading && pageError == null && (
+            <div className="plugins">
+              {plugins.map(plugin => (
+                <PluginPanel
+                  key={plugin.id}
+                  plugin={plugin}
+                  plugins={plugins}
+                  disabled={saving || loading}
+                  onInstall={async plugin => {
+                    if (await Confirm(
+                      <div>Install plugin <strong>{plugin.name}</strong> ?</div>,
+                      { okLabel: 'Ok, install'}
+                    )) {
+                      try {
+                        await install({ variables: {
+                          plugin: plugin.id,
+                          url: plugin.url,
+                          version: plugin.version
+                        }});
+                        Notification.success({ title: 'Installed', description: `Plugin "${plugin.id}" installed succesfully` });
+                      } catch(e) {
+                        Notification.error({ title: 'Error', description: `Something went wrong trying to install the plugin "${plugin.id}"` });
+                      }
+                    }
+                  }}
+                  onUninstall={async plugin => {
+                    if (await Confirm(
+                      <div>Uninstall plugin <strong>{plugin.name}</strong> ?</div>,
+                      { okLabel: 'Ok, uninstall'}
+                    )) {
+                      try {
+                        await uninstall({ variables: { plugin: plugin.id }});
+                        Notification.success({ title: 'Unistalled', description: `Plugin "${plugin.name}" uninstalled succesfully` });
+                      } catch(e) {
+                        Notification.error({ title: 'Error', description: `Something went wrong trying to uninstall the plugin "${plugin.name}"` });
+                      }
+                    }
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </FlexboxGrid.Item>
+        <FlexboxGrid.Item colspan={7}>
+          some info here
+        </FlexboxGrid.Item>
+      </FlexboxGrid>
     </PageContainer>
   );
 }

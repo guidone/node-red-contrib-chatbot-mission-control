@@ -11,6 +11,7 @@ const { BasicStrategy } = require('passport-http');
 const _ = require('lodash');
 const fileupload = require('express-fileupload');
 const cloudinary = require('cloudinary').v2;
+const fetch = require('node-fetch');
 
 const lcd = require('./lib/lcd/index');
 const { hash } = require('./lib/utils/index');
@@ -221,6 +222,10 @@ function bootstrap(server, app, log, redSettings) {
 
   // assets
   app.use(`${mcSettings.root}/main.js`, serveStatic(path.join(__dirname, 'dist/main.js')));
+  app.use(`${mcSettings.root}/plugins_js.main.js`, async (req, res) => {
+    const response = await fetch('http://localhost:8080/plugins_js.main.js');
+    res.send(await response.text());
+  });
   app.use(`${mcSettings.root}/plugins`, serveStatic(path.join(__dirname, 'dist-plugins'), {
     'index': false
   }));

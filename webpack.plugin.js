@@ -1,9 +1,12 @@
 const merge = require('webpack-merge');
 const path = require('path');
 const _ = require('lodash');
+const fs = require('fs');
+const webpack = require('webpack');
+const TerserPlugin = require('terser-webpack-plugin');
 
 
-// launch command npm run build-plugin -- --env.plugin='commands'
+
 
 module.exports = (env = {}) => {
 
@@ -13,10 +16,13 @@ module.exports = (env = {}) => {
   if (_.isEmpty(filename)) {
     filename = plugin + '.js';
   }
+  const packageFile = path.resolve(__dirname, `plugins/${plugin}/package.json`);
+  if (!fs.existsSync(packageFile)) {
+    console.error(`Missing package.json file (${packageFile})`);
+  }
 
-
-  // TODO check plugin name and directory
-
+  const packageRaw = fs.readFileSync(packageFile);
+  const package = JSON.parse(String(packageRaw));
 
 
   return {
@@ -51,6 +57,23 @@ module.exports = (env = {}) => {
       },
       /components/i
     ],
+    plugins: [
+      new webpack.BannerPlugin({
+        banner: `Name: ${package.name}
+Id: ${package.name}
+Version: ${package.version}
+Description: ${package.description}
+Author: ${package.author.name} (${package.author.url})
+Repository: ${package.homepage}`,
+        entryOnly: true
+      })
+    ],
+    optimization: {
+      minimize: true,
+      minimizer: [new TerserPlugin({
+        extractComments: false,
+      })],
+    },
     module: {
       rules: [
         {

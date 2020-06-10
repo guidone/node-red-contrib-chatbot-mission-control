@@ -13,7 +13,7 @@ const SlugHelp = () => (
 );
 
 const TypeCommand = ({ children }) => (
-  <code class="ui-type-command">{children}</code>
+  <code className="ui-type-command">{children}</code>
 );
 
 export { NodeRedNode, SlugHelp, TypeCommand };

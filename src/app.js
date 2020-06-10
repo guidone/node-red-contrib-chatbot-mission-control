@@ -1,4 +1,5 @@
 import React, { useReducer, useEffect, useState, useMemo} from 'react';
+import ReactDOM from 'react-dom';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { createHttpLink } from 'apollo-link-http';
 import { ApolloClient } from 'apollo-client';
@@ -48,7 +49,7 @@ plug('sidebar', null, {
 import './components/index';
 import './permissions';
 import './plugins-core';
-import '../plugins';
+
 
 
 //import ws from 'ws';
@@ -203,5 +204,35 @@ const App = ({ bootstrap }) => (
     {codePlug => <AppRouter codePlug={codePlug} bootstrap={bootstrap}/>}
   </CodePlug>
 );
+
+
+console.log(
+  `Bootstrapping %cMissionControl%c (%cmode:%c${window.mc_environment}%c)`,
+  'font-weight:bold',
+  'font-weight:normal',
+  'color:#999999',
+  'color:#ff6633','color:#000000'
+);
+if (window.mc_environment === 'development') {
+ console.log(`%cWarning: plugins are loaded from ./plugins file since in development mode.
+The list of installed plugins will not have any effect in development mode, run the application with %cDEV=plugin node-red%c`,
+  'color:#999999',
+  'font-family: monospace'
+ );
+} else if (window.mc_environment === 'plugin') {
+  console.log(`%cWarning: running in plugin mode, plugins code is loaded from repo and installed locally.
+In order to develop plugins, run the application with %cDEV=dev node-red%c`,
+  'color:#999999',
+  'font-family: monospace'
+ );
+}
+
+(async function() {
+  if (window.mc_environment === 'development') {
+    await import('../plugins')
+  }
+  ReactDOM.render(<App bootstrap={bootstrap}/>, document.querySelector('#mission-control'));
+})();
+
 
 export default App;
