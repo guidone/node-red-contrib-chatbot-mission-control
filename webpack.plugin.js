@@ -60,8 +60,8 @@ module.exports = (env = {}) => {
     ],
     plugins: [
       new webpack.BannerPlugin({
-        banner: `Name: ${package.name.replace('red-bot', '')}
-Id: ${package.name.replace('red-bot', '')}
+        banner: `Name: ${package.name.replace('red-bot-', '')}
+Id: ${package.name.replace('red-bot-', '')}
 Version: ${package.version}
 Description: ${package.description}
 Author: ${package.author.name} (${package.author.url})
