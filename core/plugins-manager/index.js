@@ -3,6 +3,7 @@ import { plug } from 'code-plug';
 import './style.scss';
 import PluginsList from './pages/plugins';
 
+
 plug('pages', PluginsList, { url: '/plugins', title: 'Plugins', id: 'plugins', permission: 'plugins' });
 
 // register permissions

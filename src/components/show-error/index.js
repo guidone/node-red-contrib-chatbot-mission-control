@@ -14,7 +14,7 @@ const ShowError = ({
 }) => {
   let message;
   if (_.isString(error)) {
-    message = error;
+    message = <span>{error}</span>;
   } else if (error.networkError != null && error.networkError.result != null && error.networkError.result.errors != null) {
     const errors = error.networkError.result.errors;
     message = (

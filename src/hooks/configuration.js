@@ -1,5 +1,4 @@
 import gql from 'graphql-tag';
-
 import { useQuery, useMutation } from 'react-apollo';
 
 import useSocket from './socket';
@@ -29,13 +28,16 @@ const useConfiguration = ({
   onCompleted = () => {},
   onLoaded = () => {}
 }) => {
-
   const { loading, error, data } = useQuery(GET_CONFIGURATION, {
     variables: { namespace },
     onCompleted: data => {
       let configurationValue;
       if (data != null && data.configurations != null && data.configurations.length !== 0) {
+        try {
         configurationValue = JSON.parse(data.configurations[0].payload);
+        } catch(e) {
+          // do nothing
+        }
       }
       onLoaded(configurationValue);
     }
@@ -43,8 +45,13 @@ const useConfiguration = ({
   const { sendMessage } = useSocket();
 
   let configurationValue;
+  let parsingError;
   if (data != null && data.configurations != null && data.configurations.length !== 0) {
+    try {
     configurationValue = JSON.parse(data.configurations[0].payload);
+    } catch(e) {
+      parsingError = `Invalid JSON in configuration "${namespace}"`;
+    }
   }
 
   const [
@@ -55,7 +62,7 @@ const useConfiguration = ({
   return {
     loading: loading,
     saving: mutationLoading,
-    error: error || mutationError,
+    error: error || mutationError || parsingError,
     data: configurationValue,
     update: configuration => {
       updateConfiguration({

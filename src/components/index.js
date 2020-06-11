@@ -5,6 +5,7 @@ import ContentAutocomplete from './content-autocomplete';
 import Dictionary from './dictionary';
 import * as Content from './content';
 import Confidence from './confidence';
+import JsonEditor from './json-editor';
 
 
 // Define the global scope to store the components shared with plugins
@@ -18,7 +19,8 @@ window.globalLibs.Components = {
   ContentAutocomplete,
   Dictionary,
   Confidence,
-  Content
+  Content,
+  JsonEditor
 };
 
 export {
@@ -28,5 +30,6 @@ export {
   ContentAutocomplete,
   Dictionary,
   Confidence,
-  Content
+  Content,
+  JsonEditor
 };

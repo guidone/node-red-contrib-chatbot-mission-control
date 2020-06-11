@@ -4,3 +4,4 @@ mission-control.sqlite
 dist-plugins
 plugins/welcome-message
 plugins/commands
+plugins/shop-openings

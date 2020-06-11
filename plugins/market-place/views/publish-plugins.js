@@ -13,6 +13,7 @@ query {
     id,
     title,
     body,
+    payload,
     fields {
       name,
       value
@@ -45,6 +46,9 @@ const PublishPlugins = () => {
         const response = await client.query({ query: CONTENT_PLUGINS, fetchPolicy: 'network-only' });
         const plugins = response.data.contents.map(plugin => {
           const fields = plugin.fields.reduce((acc, item) => ({ ...acc, [item.name]: item.value }), {});
+          console.log('--->', plugin.payload)
+          console.log('--', plugin.payload != null && !_.isEmpty(plugin.payload.initial_configuration) ?
+          plugin.payload.initial_configuration : null)
           return {
             id: fields.id,
             name: plugin.title,
@@ -56,11 +60,14 @@ const PublishPlugins = () => {
             author: {
               name: fields.author,
               url: fields.author_url
-            }
+            },
+            initialConfiguration: plugin.payload != null && !_.isEmpty(plugin.payload.initial_configuration) ?
+              plugin.payload.initial_configuration : null
           };
         })
         setState('Publishing...');
         await put(`/b/${data.jsonbin_id}`, plugins);
+
         setState(null);
         Notification.success({ title: 'Published', description: 'Plugin list published succesfully '});
       }}

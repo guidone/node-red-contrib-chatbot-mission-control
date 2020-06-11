@@ -292,7 +292,8 @@ const PluginsManager = ({ dispatch }) => {
                         await install({ variables: {
                           plugin: plugin.id,
                           url: plugin.url,
-                          version: plugin.version
+                          version: plugin.version,
+                          initialConfiguration: plugin.initialConfiguration
                         }});
                         Notification.success({ title: 'Installed', description: `Plugin "${plugin.id}" installed succesfully` });
                       } catch(e) {

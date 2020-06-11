@@ -5,6 +5,7 @@ import { withConfigurationPage, Content } from '../../src/components';
 
 import PublishPlugins from './views/publish-plugins';
 import ConfigureMarketPlace from './views/configure-market-place';
+import DefaultConfiguration from './views/default-configuration';
 
 const Legend = () => (
   <div>
@@ -111,4 +112,9 @@ plug('pages', Content.Contents, {
       color: 'orange'
     }
   ]
+});
+
+plug('content-tabs', DefaultConfiguration, {
+  id: 'content-configuration',
+  label: 'Configuration'
 });

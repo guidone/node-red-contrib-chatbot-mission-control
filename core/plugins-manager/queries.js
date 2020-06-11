@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 
 const INSTALL_PLUGIN = gql`
-mutation ($plugin: String!, $url: String!, $version: String!) {
-  installPlugin(plugin: $plugin, url: $url, version: $version) {
+mutation ($plugin: String!, $url: String!, $version: String!, $initialConfiguration: String) {
+  installPlugin(plugin: $plugin, url: $url, version: $version, initialConfiguration: $initialConfiguration) {
     id,
     plugin,
     filename,
