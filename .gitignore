@@ -3,3 +3,4 @@ node_modules
 mission-control.sqlite
 dist-plugins
 plugins/welcome-message
+plugins/commands
