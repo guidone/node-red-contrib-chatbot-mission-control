@@ -24,6 +24,7 @@ module.exports = (env = {}) => {
   const packageRaw = fs.readFileSync(packageFile);
   const package = JSON.parse(String(packageRaw));
 
+  // TODO check if name starts with .replace('red-bot', '')
 
   return {
     //mode: 'production',
@@ -59,8 +60,8 @@ module.exports = (env = {}) => {
     ],
     plugins: [
       new webpack.BannerPlugin({
-        banner: `Name: ${package.name}
-Id: ${package.name}
+        banner: `Name: ${package.name.replace('red-bot', '')}
+Id: ${package.name.replace('red-bot', '')}
 Version: ${package.version}
 Description: ${package.description}
 Author: ${package.author.name} (${package.author.url})
