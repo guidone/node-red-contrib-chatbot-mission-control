@@ -9,7 +9,7 @@ import './plugins/carousel';
 import './plugins/send-message';
 
 
-//import './plugins/market-place';
+import './plugins/market-place';
 import './plugins/commands';
 import './plugins/welcome-message';
 import './plugins/shop-openings';

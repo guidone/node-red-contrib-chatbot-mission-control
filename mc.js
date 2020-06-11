@@ -222,6 +222,10 @@ function bootstrap(server, app, log, redSettings) {
 
   // assets
   app.use(`${mcSettings.root}/main.js`, serveStatic(path.join(__dirname, 'dist/main.js')));
+  app.use(`${mcSettings.root}/plugins/plugins_js.main.js`, async (req, res) => {
+    const response = await fetch('http://localhost:8080/plugins_js.main.js');
+    res.send(await response.text());
+  });
   app.use(`${mcSettings.root}/plugins_js.main.js`, async (req, res) => {
     const response = await fetch('http://localhost:8080/plugins_js.main.js');
     res.send(await response.text());

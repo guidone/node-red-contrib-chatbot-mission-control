@@ -25,6 +25,9 @@ const dictionarySchema = [
     name: 'openings.wednesday'
   },
   {
+    name: 'openings.thursday'
+  },
+  {
     name: 'openings.friday'
   },
   {

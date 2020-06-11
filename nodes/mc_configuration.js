@@ -22,6 +22,13 @@ const tx = function(key, language, predefined) {
 
   const dictionary = this.get('dictionary') || {};
 
+  if (typeof key !== 'string') {
+    console.error('Error in TX function: "key" is not a string');
+  }
+  if (typeof language !== 'string') {
+    console.error('Error in TX function: "language" is not a string');
+  }
+
   if (dictionary[key] != null && dictionary[key][language] != null) {
     return dictionary[key][language];
   } else if (dictionary[key] != null && dictionary[key][predefined] != null) {
