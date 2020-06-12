@@ -33,7 +33,10 @@ const TableFilters = ({
 };
 TableFilters.propTypes = {
   disabled: PropTypes.bool,
-  filtersSchema: PropTypes.arrayOf(PropTypes.oneOf([
+  onChange: PropTypes.func,
+  width: PropTypes.number,
+  filters: PropTypes.object,
+  schema: PropTypes.arrayOf(PropTypes.oneOf([
     PropTypes.func,
     PropTypes.shape({
       // the label for the filter, it's likely to be used as placeholder

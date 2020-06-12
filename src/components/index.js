@@ -6,6 +6,7 @@ import Dictionary from './dictionary';
 import * as Content from './content';
 import Confidence from './confidence';
 import JsonEditor from './json-editor';
+import TableFilters from './table-filters';
 
 
 // Define the global scope to store the components shared with plugins
@@ -20,7 +21,8 @@ window.globalLibs.Components = {
   Dictionary,
   Confidence,
   Content,
-  JsonEditor
+  JsonEditor,
+  TableFilters
 };
 
 export {
@@ -31,5 +33,6 @@ export {
   Dictionary,
   Confidence,
   Content,
-  JsonEditor
+  JsonEditor,
+  TableFilters
 };

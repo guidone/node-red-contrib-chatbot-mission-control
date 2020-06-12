@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Button, ButtonToolbar, Notification, Icon, Message, FlexboxGrid } from 'rsuite';
+import React, { useContext, useEffect, useState, Fragment } from 'react';
+import { Button, ButtonToolbar, Notification, Icon, Message, FlexboxGrid, Input } from 'rsuite';
 import { useMutation, useApolloClient } from 'react-apollo';
 import useFetch from 'use-http';
 import ClipboardJS from 'clipboard';
@@ -15,11 +15,13 @@ import useConfiguration from '../../../src/hooks/configuration';
 import AppContext from '../../../src/common/app-context';
 import ShowError from '../../../src/components/show-error';
 import useSettings from '../../../src/hooks/settings';
+import { TableFilters } from '../../../src/components';
 
 import { INSTALL_PLUGIN, CHATBOT, UNISTALL_PLUGIN } from '../queries';
 
 import FlowSource from './flow-source';
 import versionCompare from '../helpers/version-compare';
+import PluginPanel from './plugin-panel';
 
 
 const usePlugins = ({ onCompleted = () => {} } = {}) => {
@@ -85,144 +87,20 @@ const usePlugins = ({ onCompleted = () => {} } = {}) => {
 
 ]*/
 
-const isInstalled = (current, plugins) => plugins.some(plugin => plugin.plugin === current.id);
-
-const needUpdate = (current, plugins) => {
-  const installed = plugins.find(plugin => plugin.plugin === current.id);
-
-  return versionCompare(installed.version, current.version) === -1;
-}
 
 
 
 
+const filtersSchema = [
+  {
+    name: 'Name',
+    type: 'string',
+    name: 'name',
+    control: Input,
+    placeholder: 'Search plugin'
+  }
+];
 
-
-
-const CopyAndPasteButton = ({ text, disabled = false, label = 'Copy to Clipboard' }) => {
-  useEffect(() => {
-    const clipboard = new ClipboardJS('.ui-clipboard-button', {
-      text: () => text
-    });
-    return () => clipboard.destroy();
-  }, [text]);
-
-  return (
-    <Button
-      disabled={disabled}
-      onClick={() => {
-        Notification.success({ title: 'Copied!', description: 'The Node-RED flow was copied to the clipboard '});
-      }}
-      className="ui-clipboard-button"
-      appearance="ghost"
-    >
-      {label}
-    </Button>
-  );
-};
-
-const CopyAndPasteFlow = ({ plugin }) => {
-  const { loading, data = [] } = useFetch(plugin.flow, {}, []);
-  return (
-    <CopyAndPasteButton
-      disabled={loading}
-      text={JSON.stringify(data)}
-    />
-  );
-}
-
-
-
-const PluginPanel = ({
-  plugin,
-  plugins,
-  onInstall = () => {},
-  onUninstall= () => {},
-  disabled = false
-}) => {
-  const { state: { chatbot } } = useContext(AppContext);
-  const { open, close } = useModal({
-    view: FlowSource,
-    title: `Node-RED flow for ${plugin.name}`,
-    size: 'lg',
-    labelSubmit: 'Close',
-    labelCancel: null,
-    align: 'center',
-    custom: value => <CopyAndPasteFlow plugin={value}/>
-  });
-
-  const installed = isInstalled(plugin, chatbot.plugins);
-  const upgrade = installed && needUpdate(plugin, chatbot.plugins);
-  const converter = new Showdown.Converter({ openLinksInNewWindow: true });
-
-
-  return (
-    <div className="plugin">
-      <div className="meta">
-        <h5>
-          {plugin.name}
-        </h5>
-        <div
-          className="description"
-          dangerouslySetInnerHTML={{ __html: converter.makeHtml(plugin.description)}}
-        />
-        <div className="info">
-          <SmallTag color="#0579DB">{plugin.version}</SmallTag>
-          {plugin.author != null && (
-            <span className="author">
-              <Icon icon="user"/>
-              &nbsp;
-              {plugin.author.url != null && (
-                <a href={plugin.author.url} target="_blank">{plugin.author.name}</a>
-              )}
-              {plugin.author.url == null && <span>{plugin.author.name}</span>}
-            </span>
-          )}
-        </div>
-      </div>
-      <div className="buttons">
-        <ButtonToolbar size="sm">
-          {installed && plugin.flow != null && (
-            <Button
-              disabled={disabled}
-              size="sm"
-              appearance="ghost"
-              onClick={async () => {
-                await open(plugin);
-                close();
-              }}
-            >Import flow</Button>
-          )}
-          {installed && (
-            <Button
-              disabled={disabled}
-              size="sm"
-              color="red"
-              onClick={() => onUninstall(plugin)}
-            >Uninstall</Button>
-          )}
-          {!installed && (
-            <Button
-              disabled={disabled}
-              size="sm"
-              color="blue"
-              onClick={() => onInstall(plugin)}
-            >Install</Button>
-          )}
-          {upgrade && (
-            <Button
-              disabled={disabled}
-              size="sm"
-              color="orange"
-            >Update</Button>
-          )}
-        </ButtonToolbar>
-      </div>
-
-
-    </div>
-  );
-};
 
 
 
@@ -230,6 +108,7 @@ const PluginPanel = ({
 const PluginsManager = ({ dispatch }) => {
   const { environment } = useSettings();
   const [error, setError] = useState(null);
+  const [filters, setFilters] = useState({});
   const client = useApolloClient();
   const { } = useConfiguration({
     namespace: 'market-place',
@@ -276,51 +155,60 @@ const PluginsManager = ({ dispatch }) => {
           )}
           {loading && pageError == null && <ModalLoader />}
           {!loading && pageError == null && (
-            <div className="plugins">
-              {plugins.map(plugin => (
-                <PluginPanel
-                  key={plugin.id}
-                  plugin={plugin}
-                  plugins={plugins}
-                  disabled={saving || loading}
-                  onInstall={async plugin => {
-                    if (await Confirm(
-                      <div>Install plugin <strong>{plugin.name}</strong> ?</div>,
-                      { okLabel: 'Ok, install'}
-                    )) {
-                      try {
-                        await install({ variables: {
-                          plugin: plugin.id,
-                          url: plugin.url,
-                          version: plugin.version,
-                          initialConfiguration: plugin.initialConfiguration
-                        }});
-                        Notification.success({ title: 'Installed', description: `Plugin "${plugin.id}" installed succesfully` });
-                      } catch(e) {
-                        Notification.error({ title: 'Error', description: `Something went wrong trying to install the plugin "${plugin.id}"` });
-                      }
-                    }
-                  }}
-                  onUninstall={async plugin => {
-                    if (await Confirm(
-                      <div>Uninstall plugin <strong>{plugin.name}</strong> ?</div>,
-                      { okLabel: 'Ok, uninstall'}
-                    )) {
-                      try {
-                        await uninstall({ variables: { plugin: plugin.id }});
-                        Notification.success({ title: 'Unistalled', description: `Plugin "${plugin.name}" uninstalled succesfully` });
-                      } catch(e) {
-                        Notification.error({ title: 'Error', description: `Something went wrong trying to uninstall the plugin "${plugin.name}"` });
-                      }
-                    }
-                  }}
-                />
-              ))}
-            </div>
+            <Fragment>
+              <div className="plugins">
+                {plugins
+                  .filter(plugin => _.isEmpty(filters.name) || plugin.name.toLowerCase().includes(filters.name.toLowerCase()))
+                  .map(plugin => (
+                    <PluginPanel
+                      key={plugin.id}
+                      plugin={plugin}
+                      plugins={plugins}
+                      disabled={saving || loading}
+                      onInstall={async plugin => {
+                        if (await Confirm(
+                          <div>Install plugin <strong>{plugin.name}</strong> ?</div>,
+                          { okLabel: 'Ok, install'}
+                        )) {
+                          try {
+                            await install({ variables: {
+                              plugin: plugin.id,
+                              url: plugin.url,
+                              version: plugin.version,
+                              initialConfiguration: plugin.initialConfiguration
+                            }});
+                            Notification.success({ title: 'Installed', description: `Plugin "${plugin.id}" installed succesfully` });
+                          } catch(e) {
+                            Notification.error({ title: 'Error', description: `Something went wrong trying to install the plugin "${plugin.id}"` });
+                          }
+                        }
+                      }}
+                      onUninstall={async plugin => {
+                        if (await Confirm(
+                          <div>Uninstall plugin <strong>{plugin.name}</strong> ?</div>,
+                          { okLabel: 'Ok, uninstall'}
+                        )) {
+                          try {
+                            await uninstall({ variables: { plugin: plugin.id }});
+                            Notification.success({ title: 'Unistalled', description: `Plugin "${plugin.name}" uninstalled succesfully` });
+                          } catch(e) {
+                            Notification.error({ title: 'Error', description: `Something went wrong trying to uninstall the plugin "${plugin.name}"` });
+                          }
+                        }
+                      }}
+                    />
+                  ))
+                }
+              </div>
+            </Fragment>
           )}
         </FlexboxGrid.Item>
-        <FlexboxGrid.Item colspan={7}>
-          some info here
+        <FlexboxGrid.Item colspan={7} className="right-column">
+          <TableFilters
+            filters={filters}
+            schema={filtersSchema}
+            onChange={filters => setFilters(filters)}
+          />
         </FlexboxGrid.Item>
       </FlexboxGrid>
     </PageContainer>
