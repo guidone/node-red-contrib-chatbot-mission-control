@@ -57,6 +57,7 @@ const PublishPlugins = () => {
             flow: fields.flow,
             version: fields.version,
             github: fields.github,
+            keywords: fields.tags,
             author: {
               name: fields.author,
               url: fields.author_url

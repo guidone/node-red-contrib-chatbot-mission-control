@@ -101,7 +101,7 @@ const FieldsEditor = ({
 FieldsEditor.propTypes = {
   value: PropTypes.arrayOf(PropTypes.shape({
     name: PropTypes.string,
-    type: PropTypes.oneOf(['string', 'boolean', 'date', 'number']),
+    type: PropTypes.oneOf(['string', 'boolean', 'date', 'number', 'tags']),
     value: PropTypes.any
   })),
   onChange: PropTypes.func,

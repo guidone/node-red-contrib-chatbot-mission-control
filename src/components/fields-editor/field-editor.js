@@ -12,7 +12,8 @@ import {
   Whisper,
   Tooltip,
   InputGroup,
-  Input
+  Input,
+  TagPicker
 } from 'rsuite';
 
 import './style.scss';
@@ -46,13 +47,25 @@ const FieldEditor = ({
   description
 }) => {
 
+  console.log('field',field)
   let accepter;
+  let additionalProps = {};
   if (field.type === 'boolean') {
     accepter = BooleanField;
   } else if (field.type === 'date') {
     accepter = DateField;
   } else if (field.type === 'number') {
     accepter = NumberField;
+  } else if (field.type === 'tags') {
+    accepter = TagPicker;
+    additionalProps = {
+      data: !_.isArray(field.value) ?
+        [] : field.value.map(item => ({ value: item, label: item })),
+      creatable: true,
+      searchable: true,
+      preventOverflow: false,
+      block: true
+    };
   }
 
   return (
@@ -84,7 +97,12 @@ const FieldEditor = ({
             />
           </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={10}>
-            <FormControl name="value" placeholder="value" accepter={accepter}/>
+            <FormControl
+              name="value"
+              placeholder="value"
+              accepter={accepter}
+              {...additionalProps}
+            />
           </FlexboxGrid.Item>
           <FlexboxGrid.Item colspan={1} align="right">
             <IconButton
@@ -101,7 +119,7 @@ const FieldEditor = ({
 FieldEditor.propTypes = {
   field: PropTypes.shape({
     name: PropTypes.string,
-    type: PropTypes.oneOf(['string', 'boolean', 'date', 'number']),
+    type: PropTypes.oneOf(['string', 'boolean', 'date', 'number', 'tags']),
     value: PropTypes.any
   }),
   onChange: PropTypes.func,

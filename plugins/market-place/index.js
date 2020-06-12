@@ -110,6 +110,12 @@ plug('pages', Content.Contents, {
       type: 'string',
       description: `The home page of the username, if any`,
       color: 'orange'
+    },
+    {
+      key: 'tags',
+      type: 'tags',
+      description: `List of keywords, comma separated`,
+      color: 'red'
     }
   ]
 });

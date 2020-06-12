@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react';
-import { Button, ButtonToolbar, Notification, Icon } from 'rsuite';
+import { Button, ButtonToolbar, Notification, Icon, Tag, TagGroup } from 'rsuite';
 import useFetch from 'use-http';
 import ClipboardJS from 'clipboard';
 import Showdown from 'showdown';
@@ -107,6 +107,11 @@ const PluginPanel = ({
               </span>
             )}
           </div>
+          {plugin.keywords != null && (
+            <TagGroup>
+              {plugin.keywords.map(keyword => <Tag key={keyword}>{keyword}</Tag>)}
+            </TagGroup>
+          )}
         </div>
       </div>
       <div className="buttons">
@@ -147,8 +152,6 @@ const PluginPanel = ({
           )}
         </ButtonToolbar>
       </div>
-
-
     </div>
   );
 };
