@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState, Fragment } from 'react';
-import { Button, ButtonToolbar, Notification, Icon, Message, FlexboxGrid, Input } from 'rsuite';
+import React, { useContext, useEffect, useMemo, useState, Fragment } from 'react';
+import { Button, ButtonToolbar, Notification, Icon, Message, FlexboxGrid, Input, Checkbox } from 'rsuite';
 import { useMutation, useApolloClient } from 'react-apollo';
 import useFetch from 'use-http';
 import ClipboardJS from 'clipboard';
@@ -102,6 +102,30 @@ const filtersSchema = [
 ];
 
 
+const CheckTree = ({ value = [], onChange, data }) => {
+  return (
+    <div>
+      {data.map(item => (
+        <Checkbox
+          checked={value != null && value.includes(item.value)}
+          onChange={() => {
+            if (value != null && value.includes(item.value)) {
+              onChange(value.filter(item => item != item.value))
+            } else if (value != null && !value.includes(item.value)) {
+              onChange([...value, item.value]);
+            } else {
+              onChange([item.value]);
+            }
+          }}
+        >
+          <span className="plugin-keyword">
+            {item.label} <span className="count">{item.count}</span>
+          </span>
+        </Checkbox>
+      ))}
+    </div>
+  );
+};
 
 
 
@@ -125,7 +149,6 @@ const PluginsManager = ({ dispatch }) => {
     onCompleted: async () => {
       try {
         const response = await client.query({ query: CHATBOT, fetchPolicy: 'network-only' });
-        console.log('updated chatbot', response)
         dispatch({ type: 'updateChatbot', chatbot: response.data.chatbot });
       } catch(e) {
         setError(e);
@@ -135,6 +158,29 @@ const PluginsManager = ({ dispatch }) => {
 
   const pageError = error || fetchError;
   const loading = plugins == null;
+
+
+
+
+
+
+  const keywordsData = useMemo(() => {
+    if (plugins != null) {
+      const keywords = {};
+      plugins.forEach(plugin => {
+        if (!_.isEmpty(plugin.keywords)) {
+          plugin.keywords
+            .forEach(keyword => keywords[keyword] = keywords[keyword] != null ? keywords[keyword] + 1 : 1);
+        }
+      });
+      return Object.keys(keywords).sort().map(key => ({
+        value: key,
+        label: key,
+        count: keywords[key]
+      }));
+    }
+  }, [plugins]);
+
 
   return (
     <PageContainer className="page-plugins">
@@ -159,6 +205,7 @@ const PluginsManager = ({ dispatch }) => {
               <div className="plugins">
                 {plugins
                   .filter(plugin => _.isEmpty(filters.name) || plugin.name.toLowerCase().includes(filters.name.toLowerCase()))
+                  .filter(plugin => _.isEmpty(filters.keywords) || _.isEmpty(plugin.keywords) || _.intersection(filters.keywords, plugin.keywords).length !== 0)
                   .map(plugin => (
                     <PluginPanel
                       key={plugin.id}
@@ -209,6 +256,35 @@ const PluginsManager = ({ dispatch }) => {
             schema={filtersSchema}
             onChange={filters => setFilters(filters)}
           />
+
+          {keywordsData != null && (
+            <Fragment>
+              <div style={{ marginTop: '15px' }}>
+                <strong>Keywords</strong>
+                {!_.isEmpty(filters.keywords) && (
+                  <span className="clear-button">
+                    (<a href="#" onClick={e => {
+                      e.preventDefault();
+                      setFilters({ ...filters, keywords: null });
+                    }}>clear</a>)
+                  </span>
+                )}
+              </div>
+
+              <CheckTree
+                data={keywordsData}
+                value={filters.keywords}
+                onChange={keywords => setFilters({ ...filters, keywords })}
+                renderTreeNode={item => (
+                  <span className="plugin-keyword">
+                    {item.label} <span className="count">{item.count}</span>
+                  </span>
+                )}
+              />
+            </Fragment>
+          )}
+
+
         </FlexboxGrid.Item>
       </FlexboxGrid>
     </PageContainer>

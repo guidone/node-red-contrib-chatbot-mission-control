@@ -1,11 +1,29 @@
 .page-plugins {
 
   .ui-table-filters {
-    margin-top: 15px;
+    margin-top: 20px;
   }
 
   .right-column {
-    padding-left: 15px;
+    padding-left: 25px;
+  }
+
+  .clear-button {
+    font-size: 12px;
+    display: inline-block;
+    margin-left: 5px;
+  }
+
+  .plugin-keyword {
+    .count {
+      display: inline-block;
+      font-size: 11px;
+      background-color: #dddddd;
+      border-radius: 50%;
+      line-height: 11px;
+      padding: 3px 6px;
+      text-align: center;
+    }
   }
 
   .plugins {
