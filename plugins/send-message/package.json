@@ -1,6 +1,6 @@
 {
   "name": "red-bot-send-message",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "Send message directly to a user using the chatbot. A plugin for red-bot .io",
   "main": "index.js",
   "author": {

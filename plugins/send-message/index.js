@@ -7,8 +7,10 @@ import SendMessageButton from './views/send-message-button';
 
 import { plug } from 'code-plug';
 import withSocket from '../../src/wrappers/with-socket';
-import Panel from '../../src/components/grid-panel';
-import { WidgetForm, Content, Footer } from '../../src/components/widget-form';
+import { Panel } from '../../src/components';
+import { WidgetForm as Widgets } from '../../src/components';
+
+const { WidgetForm, Content, Footer } = Widgets;
 
 import './widget-send.scss';
 import SendForm from './views/send-form';

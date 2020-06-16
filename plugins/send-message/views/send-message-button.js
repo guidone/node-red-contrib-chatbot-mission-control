@@ -2,11 +2,12 @@ import React from 'react';
 import { Button, Notification, Schema } from 'rsuite';
 import _ from 'lodash';
 
-import { useModal } from '../../../src/components/modal';
+import { Modal } from '../../../src/components';
 import useSocket from '../../../src/hooks/socket';
 import useGlobals from '../../../src/hooks/globals';
 import name from '../../../src/helpers/user/readable-name';
 
+const { useModal } = Modal;
 import SendMessageForm from './send-form';
 
 const isValidMessage = value => value.recipient != null && value.chatId  != null && value.botNode != null && !_.isEmpty(value.message);

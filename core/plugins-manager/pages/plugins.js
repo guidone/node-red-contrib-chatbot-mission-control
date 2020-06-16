@@ -220,9 +220,11 @@ const PluginsManager = ({ dispatch }) => {
                               version: plugin.version,
                               initialConfiguration: plugin.initialConfiguration
                             }});
-                            Notification.success({ title: 'Installed', description: `Plugin "${plugin.id}" installed succesfully` });
+                            Notification.success({
+                              placement: 'topStart',
+                              title: 'Installed', description: `Plugin "${plugin.id}" installed succesfully` });
                           } catch(e) {
-                            Notification.error({ title: 'Error', description: `Something went wrong trying to install the plugin "${plugin.id}"` });
+                            Notification.error({ placement: 'topStart', title: 'Error', description: `Something went wrong trying to install the plugin "${plugin.id}"` });
                           }
                         }
                       }}
@@ -233,9 +235,9 @@ const PluginsManager = ({ dispatch }) => {
                         )) {
                           try {
                             await uninstall({ variables: { plugin: plugin.id }});
-                            Notification.success({ title: 'Unistalled', description: `Plugin "${plugin.name}" uninstalled succesfully` });
+                            Notification.success({ placement: 'topStart', title: 'Unistalled', description: `Plugin "${plugin.name}" uninstalled succesfully` });
                           } catch(e) {
-                            Notification.error({ title: 'Error', description: `Something went wrong trying to uninstall the plugin "${plugin.name}"` });
+                            Notification.error({ placement: 'topStart', title: 'Error', description: `Something went wrong trying to uninstall the plugin "${plugin.name}"` });
                           }
                         }
                       }}

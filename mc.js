@@ -87,9 +87,9 @@ function bootstrap(server, app, log, redSettings) {
   console.log(lcd.timestamp() + 'Red Bot Mission Control configuration:');
   const mcSettings = redSettings.missionControl || {};
   mcSettings.version = package.version;
-  if (process.env.DEV.toLowerCase() === 'true' || process.env.DEV.toLowerCase() === 'dev') {
+    if (process.env.DEV != null && (process.env.DEV.toLowerCase() === 'true' || process.env.DEV.toLowerCase() === 'dev')) {
     mcSettings.environment = 'development';
-  } else if (process.env.DEV.toLowerCase() === 'plugin') {
+  } else if (process.env.DEV != null && process.env.DEV.toLowerCase() === 'plugin') {
     mcSettings.environment = 'plugin';
   } else {
     mcSettings.environment = 'production';

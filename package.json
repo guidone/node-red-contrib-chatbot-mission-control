@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --open --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js -p --max-old-space-size=8192",
+    "build": "webpack --config webpack.prod.js -p --max-old-space-size=18192",
     "build-plugin": "webpack --config webpack.plugin.js --display-modules",
     "start-mc-dev": "DEV=dev node-red",
     "start-mc-plugin": "DEV=plugin node-red"

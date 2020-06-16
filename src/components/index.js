@@ -4,12 +4,14 @@ import withConfigurationPage from './configuration-page';
 import ContentAutocomplete from './content-autocomplete';
 import Dictionary from './dictionary';
 import * as Content from './content';
+import * as Modal from './modal';
 import Confidence from './confidence';
 import JsonEditor from './json-editor';
 import TableFilters from './table-filters';
 import UserAutocomplete from './user-autocomplete';
 import SelectTransport from './select-transport';
-
+import Panel from './grid-panel';
+import * as WidgetForm from './widget-form';
 
 // Define the global scope to store the components shared with plugins
 if (window.globalLibs == null) {
@@ -26,7 +28,10 @@ window.globalLibs.Components = {
   JsonEditor,
   TableFilters,
   UserAutocomplete,
-  SelectTransport
+  SelectTransport,
+  Modal,
+  Panel,
+  WidgetForm
 };
 
 export {
@@ -40,5 +45,8 @@ export {
   JsonEditor,
   TableFilters,
   UserAutocomplete,
-  SelectTransport
+  SelectTransport,
+  Modal,
+  Panel,
+  WidgetForm
 };
