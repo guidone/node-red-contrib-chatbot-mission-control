@@ -3,7 +3,7 @@ import { Placeholder, SelectPicker, Toggle, Button } from 'rsuite';
 import { useQuery, useMutation } from 'react-apollo';
 
 import Panel from '../../../src/components/grid-panel';
-import withSocket from '../../../src/wrappers/with-socket';
+import useSocket from '../../../src/hooks/socket';
 
 import FunnelGraph from './funnel-graph';
 import '../funnel.scss';
@@ -11,14 +11,15 @@ import { GROUPED_EVENTS, DELETE_FLOW } from '../queries';
 
 const { Paragraph } = Placeholder;
 
-const FunnelWidget = ({ sendMessage }) => {
+const FunnelWidget = () => {
   const [flow, setFlow] = useState(undefined);
   const [version, setVersion] = useState(1);
+  const { sendMessage } = useSocket();
   const [percentile, setPercentile] = useState(false);
-  const { loading, error, data, refetch } = useQuery(GROUPED_EVENTS, { 
+  const { loading, error, data, refetch } = useQuery(GROUPED_EVENTS, {
     fetchPolicy: 'network-only',
     onCompleted: ({ counters: { events: { events }}}) => {
-      setFlow(events.length !== 0 ? events[0].flow : null)    
+      setFlow(events.length !== 0 ? events[0].flow : null)
     }
   });
   const [
@@ -26,11 +27,9 @@ const FunnelWidget = ({ sendMessage }) => {
     { loading: deleting },
   ] = useMutation(DELETE_FLOW, { });
 
-
-
   return (
-    <Panel 
-      title="Funnel" 
+    <Panel
+      title="Funnel"
       className="widget-funnel"
     >
       {loading && <Paragraph rows={3}/>}
@@ -41,19 +40,19 @@ const FunnelWidget = ({ sendMessage }) => {
         <div>
           <div>
             <b>Flow</b>&nbsp;
-            <SelectPicker 
+            <SelectPicker
               value={flow}
-              data={data.counters.events.events.map(event => ({ value: event.flow, label: event.flow }))} 
+              data={data.counters.events.events.map(event => ({ value: event.flow, label: event.flow }))}
               onChange={event => {
                 setFlow(event)
-              }} 
+              }}
               cleanable={false}
-              searchable={false}          
-              placeholder="Select flow" 
+              searchable={false}
+              placeholder="Select flow"
               size="md"
             />
             &nbsp;
-            <Button               
+            <Button
               onClick ={async () => {
                 await refetch();
                 setVersion(version + 1);
@@ -67,7 +66,7 @@ const FunnelWidget = ({ sendMessage }) => {
                 if (confirm('Clear events for this flow?')) {
                   await deleteFlow({ variables: { flow } });
                   setFlow(null);
-                  sendMessage('mc.events.timestamp', { eventsTimestamp: (new Date()).toString() });  
+                  sendMessage('mc.events.timestamp', { eventsTimestamp: (new Date()).toString() });
                   refetch();
                 }
               }}>
@@ -79,9 +78,9 @@ const FunnelWidget = ({ sendMessage }) => {
             </div>
           </div>
           {flow != null && (
-            <FunnelGraph 
-              key={`${flow}_${version}`} 
-              flow={flow} 
+            <FunnelGraph
+              key={`${flow}_${version}`}
+              flow={flow}
               percentile={percentile}/>
           )}
           {flow == null && (
@@ -95,4 +94,4 @@ const FunnelWidget = ({ sendMessage }) => {
   );
 };
 
-export default withSocket(FunnelWidget);
+export default FunnelWidget;
