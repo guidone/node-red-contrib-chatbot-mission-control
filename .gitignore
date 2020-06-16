@@ -5,3 +5,4 @@ dist-plugins
 plugins/welcome-message
 plugins/commands
 plugins/shop-openings
+plugins/send-message
