@@ -1,20 +1,10 @@
-import React, { useState } from 'react';
-import { Button, FormControl, ButtonToolbar, Form, FormGroup, ControlLabel, FlexboxGrid, SelectPicker, HelpBlock } from 'rsuite';
+import React from 'react';
+import { FormControl, Form, FormGroup, ControlLabel, FlexboxGrid, HelpBlock } from 'rsuite';
 
-//import SendMessageButton from './views/send-message-button';
-
-//import { plug } from 'code-plug';
-//import withSocket from '../../src/wrappers/with-socket';
 import useGlobals from '../../../src/hooks/globals';
-//import Panel from '../../src/components/grid-panel';
-//import { WidgetForm, Content, Footer } from '../../src/components/widget-form';
-import UserAutocomplete from '../../../src/components/user-autocomplete';
-import SelectTransport from '../../../src/components/select-transport';
-
-
+import { UserAutocomplete, SelectTransport } from '../../../src/components';
 
 const hasChatbot = (activeChatbots, transport) => activeChatbots.some(chatbot => chatbot.transport === transport);
-
 
 const SendMessageForm = ({
   value: formValue,
@@ -83,7 +73,7 @@ const SendMessageForm = ({
             </FormGroup>
           </FlexboxGrid.Item>
         </FlexboxGrid>
-        <FormGroup>
+        <FormGroup style={{ marginTop: '15px' }}>
           <ControlLabel>Message to send</ControlLabel>
           <FormControl
             name="message"

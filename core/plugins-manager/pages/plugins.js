@@ -110,7 +110,7 @@ const CheckTree = ({ value = [], onChange, data }) => {
           checked={value != null && value.includes(item.value)}
           onChange={() => {
             if (value != null && value.includes(item.value)) {
-              onChange(value.filter(item => item != item.value))
+              onChange(value.filter(keyword => keyword != item.value))
             } else if (value != null && !value.includes(item.value)) {
               onChange([...value, item.value]);
             } else {
@@ -159,11 +159,7 @@ const PluginsManager = ({ dispatch }) => {
   const pageError = error || fetchError;
   const loading = plugins == null;
 
-
-
-
-
-
+  // collect all keywords
   const keywordsData = useMemo(() => {
     if (plugins != null) {
       const keywords = {};
@@ -256,7 +252,6 @@ const PluginsManager = ({ dispatch }) => {
             schema={filtersSchema}
             onChange={filters => setFilters(filters)}
           />
-
           {keywordsData != null && (
             <Fragment>
               <div style={{ marginTop: '15px' }}>
@@ -270,7 +265,6 @@ const PluginsManager = ({ dispatch }) => {
                   </span>
                 )}
               </div>
-
               <CheckTree
                 data={keywordsData}
                 value={filters.keywords}
@@ -283,8 +277,6 @@ const PluginsManager = ({ dispatch }) => {
               />
             </Fragment>
           )}
-
-
         </FlexboxGrid.Item>
       </FlexboxGrid>
     </PageContainer>

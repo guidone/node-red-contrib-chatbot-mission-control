@@ -16,7 +16,8 @@ const FlowSource = ({ value: plugin }) => {
       {!loading && !error && (
         <div>
           <div style={{ paddingBottom: '10px' }}>
-            To import this plugin as subflow in <strong>Node-RED</strong>: click on the top right icon and then <em>"Import"</em>, copy and past the
+            This plugin requires a subflow in <strong>Node-RED</strong> in order to work.<br />
+            To import this the subflow: click on the top right icon and then <em>"Import"</em>, copy and past the
             code below.
           </div>
           <JSONEditor

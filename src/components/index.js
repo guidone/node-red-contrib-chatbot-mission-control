@@ -7,6 +7,8 @@ import * as Content from './content';
 import Confidence from './confidence';
 import JsonEditor from './json-editor';
 import TableFilters from './table-filters';
+import UserAutocomplete from './user-autocomplete';
+import SelectTransport from './select-transport';
 
 
 // Define the global scope to store the components shared with plugins
@@ -22,7 +24,9 @@ window.globalLibs.Components = {
   Confidence,
   Content,
   JsonEditor,
-  TableFilters
+  TableFilters,
+  UserAutocomplete,
+  SelectTransport
 };
 
 export {
@@ -34,5 +38,7 @@ export {
   Confidence,
   Content,
   JsonEditor,
-  TableFilters
+  TableFilters,
+  UserAutocomplete,
+  SelectTransport
 };
