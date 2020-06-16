@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "",
     "start": "webpack-dev-server --open --config webpack.dev.js",
     "build": "cross-env NODE_OPTIONS=--max_old_space_size=8192 webpack --config webpack.prod.js -p",
     "build-plugin": "webpack --config webpack.plugin.js --display-modules",
