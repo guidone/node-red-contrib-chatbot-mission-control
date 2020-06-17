@@ -1,26 +1,17 @@
-import React, { useContext, useEffect, useMemo, useState, Fragment } from 'react';
-import { Button, ButtonToolbar, Notification, Icon, Message, FlexboxGrid, Input, Checkbox } from 'rsuite';
+import React, { useMemo, useState, Fragment } from 'react';
+import { Notification, Message, FlexboxGrid, Input, Checkbox } from 'rsuite';
 import { useMutation, useApolloClient } from 'react-apollo';
 import useFetch from 'use-http';
-import ClipboardJS from 'clipboard';
-import Showdown from 'showdown';
 
 import ModalLoader from '../../../src/components/loader-modal';
 import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
-import SmallTag from '../../../src/components/small-tag';
 import Confirm from '../../../src/components/confirm';
-import { useModal } from '../../../src/components/modal';
-import useConfiguration from '../../../src/hooks/configuration';
-import AppContext from '../../../src/common/app-context';
 import ShowError from '../../../src/components/show-error';
 import useSettings from '../../../src/hooks/settings';
 import { TableFilters } from '../../../src/components';
 
 import { INSTALL_PLUGIN, CHATBOT, UNISTALL_PLUGIN } from '../queries';
-
-import FlowSource from './flow-source';
-import versionCompare from '../helpers/version-compare';
 import PluginPanel from './plugin-panel';
 
 
@@ -42,55 +33,6 @@ const usePlugins = ({ onCompleted = () => {} } = {}) => {
   };
 };
 
-
-/*const PLUGINS = [
-  {
-    id: 'commands',
-    name: 'Commands',
-    version : '1.0.1',
-    description: 'Show some content on response to commands-like messages...',
-    url: 'https://gist.githubusercontent.com/guidone/bd2d4fec49198961e946ce42c5d373ba/raw/4fa7f4cb89dc131528cc5815e8640cfa659147d4/commands.js',
-    flow: 'https://gist.githubusercontent.com/guidone/ddafe29046f69e757faa2388e20d11a5/raw/afbe7969b0cd44a77c24716bffeed94a2878e484/commands.flow',
-    author: {
-      name: 'guidone'
-    }
-  },
-  {
-    id: 'welcome-message',
-    name: 'Welcome Message',
-    version : '1.0.0',
-    description: 'Show a welcome message for the new users of the chatbot',
-    url: 'https://gist.githubusercontent.com/guidone/be3d57ece22d366908e45b53b6478915/raw/7f0371e1b9f0a272c4989e844c341ebe52229e08/welcome-message.js',
-    author: {
-      name: 'guidone'
-    }
-  },
-  {
-    id: 'send-message',
-    name: 'Send Message',
-    version : '1.0',
-    description: 'Contact directly a user of the chatbot',
-    author: {
-      name: 'guidone'
-    }
-  },
-  {
-    id: 'shop-openings',
-    name: 'Openings',
-    version : '1.0.0',
-    description: 'Handle shop hours, answer to sentences like are you open?',
-    url: 'https://gist.githubusercontent.com/guidone/f391fd21ad3768a5abfb0272d9263e84/raw/615010fa4e799ea22f624e21e50f0a364d0d3181/shop-openings.js',
-    author: {
-      name: 'guidone'
-    }
-  }
-
-]*/
-
-
-
-
-
 const filtersSchema = [
   {
     name: 'Name',
@@ -100,7 +42,6 @@ const filtersSchema = [
     placeholder: 'Search plugin'
   }
 ];
-
 
 const CheckTree = ({ value = [], onChange, data }) => {
   return (
@@ -134,17 +75,8 @@ const PluginsManager = ({ dispatch }) => {
   const [error, setError] = useState(null);
   const [filters, setFilters] = useState({});
   const client = useApolloClient();
-  const { } = useConfiguration({
-    namespace: 'market-place',
-    onLoaded: data => {
-      if (data != null && !_.isEmpty(data.jsonbin_id)) {
-        get(`/b/${data.jsonbin_id}/latest`);
-      } else {
-        setError('Missing JSON bin id in configuration');
-      }
-    }
-  })
-  const { data: plugins, get, error: fetchError } = useFetch('https://api.jsonbin.io', {});
+  // json id is hard coded, general users don't have market place plugin
+  const { data: plugins, get, error: fetchError } = useFetch('https://api.jsonbin.io/b/5ed90ec1655d87580c43c899/latest', {}, []);
   const { install, uninstall, saving } = usePlugins({
     onCompleted: async () => {
       try {
@@ -176,7 +108,6 @@ const PluginsManager = ({ dispatch }) => {
       }));
     }
   }, [plugins]);
-
 
   return (
     <PageContainer className="page-plugins">
@@ -249,13 +180,13 @@ const PluginsManager = ({ dispatch }) => {
           )}
         </FlexboxGrid.Item>
         <FlexboxGrid.Item colspan={7} className="right-column">
-          <TableFilters
-            filters={filters}
-            schema={filtersSchema}
-            onChange={filters => setFilters(filters)}
-          />
           {keywordsData != null && (
             <Fragment>
+              <TableFilters
+                filters={filters}
+                schema={filtersSchema}
+                onChange={filters => setFilters(filters)}
+              />
               <div style={{ marginTop: '15px' }}>
                 <strong>Keywords</strong>
                 {!_.isEmpty(filters.keywords) && (

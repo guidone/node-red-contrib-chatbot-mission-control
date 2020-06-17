@@ -33,7 +33,7 @@ const AppHeader = () => {
             <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/plugins">Plugins</Link>} />
           </Nav>
           <Nav pullRight>
-            {_.isEmpty(user.password) && (
+            {user.isEmptyPassword && (
               <Whisper
                 placement="left"
                 trigger="hover"

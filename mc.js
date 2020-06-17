@@ -180,6 +180,7 @@ Some **formatting** is _allowed_!`
             lastName: user.last_name,
             avatar: user.avatar,
             email: user.email,
+            isEmptyPassword: _.isEmpty(user.password),
             permissions: !_.isEmpty(user.permissions) ? user.permissions.split(',') : []
           });
         } else {
