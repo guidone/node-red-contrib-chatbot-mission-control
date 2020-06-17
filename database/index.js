@@ -46,7 +46,7 @@ module.exports = mcSettings => {
       { name: 'content_slug', using: 'BTREE', fields: ['slug'] },
       { name: 'content_content', using: 'BTREE', fields: ['body'] },
       { name: 'content_language', using: 'BTREE', fields: ['language'] },
-      { name: 'category_namespace', using: 'BTREE', fields: ['namespace'] }
+      { name: 'content_namespace', using: 'BTREE', fields: ['namespace'] }
     ]
   });
 
@@ -169,8 +169,8 @@ module.exports = mcSettings => {
     payload: { type: Sequelize.TEXT }
   }, {
     indexes: [
-      { name: 'chatid_userid', using: 'BTREE', fields: ['userId'] },
-      { name: 'chatid_chatid', using: 'BTREE', fields: ['chatId'] }
+      { name: 'context_userid', using: 'BTREE', fields: ['userId'] },
+      { name: 'context_chatid', using: 'BTREE', fields: ['chatId'] }
     ]
   });
 
@@ -249,7 +249,7 @@ module.exports = mcSettings => {
 
   ChatBot.Plugins = ChatBot.hasMany(Plugin);
 
-  if (!fs.existsSync(dbPath)) {
+  /*if (!fs.existsSync(dbPath)) {
     sequelize.sync({ force: true })
       .then(() => {
         // TODO move salt to config
@@ -262,7 +262,7 @@ module.exports = mcSettings => {
     console.log(lcd.white(moment().format('DD MMM HH:mm:ss')
       + ' - [info] Mounted RedBot Mission Control database:')
       + ' ' + lcd.grey(resolve(dbPath)));
-  }
+  }*/
 
   const { graphQLServer, graphQLSchema } = GraphQLServer({
     Configuration,
@@ -299,7 +299,8 @@ module.exports = mcSettings => {
     Record,
     Device,
     ChatBot,
-    Plugin
+    Plugin,
+    sequelize
   };
 
   return exportCache;

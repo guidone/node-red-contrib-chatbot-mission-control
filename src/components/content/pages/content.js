@@ -198,7 +198,7 @@ const Contents = ({
                   onClick={async () => {
                     if (confirm(`Delete "${content.title}"?`)) {
                       await deleteContent({ variables: { id: content.id }})
-                      refetch();
+                      table.current.refetch();
                     }
                   }}
                 >

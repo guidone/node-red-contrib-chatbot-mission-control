@@ -1,10 +1,11 @@
 import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
-var gravatar = require('gravatar');
+import gravatar from 'gravatar';
 import { Tooltip, Whisper, Header, Navbar, Dropdown, Nav, Icon, IconButton, Avatar } from 'rsuite';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 
 import AppContext from '../common/app-context';
+import useCurrentUser from '../hooks/current-user';
 
 const initials = user => {
   if (user.firstName != null && user.firstName.length !== 0 && user.lastName != null && user.lastName.length !== 0) {
@@ -18,8 +19,10 @@ const initials = user => {
 }
 
 const AppHeader = () => {
+  const { user } = useCurrentUser();
   const { state } = useContext(AppContext);
-  const { user, needRestart } = state;
+  const history = useHistory();
+  const { needRestart } = state;
 
   return (
     <Header className="mc-header">
@@ -30,20 +33,36 @@ const AppHeader = () => {
             <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/plugins">Plugins</Link>} />
           </Nav>
           <Nav pullRight>
+            {_.isEmpty(user.password) && (
+              <Whisper
+                placement="left"
+                trigger="hover"
+                speaker={<Tooltip>Current user has no password!</Tooltip>}
+              >
+                <IconButton
+                  circle
+                  style={{ marginTop: '7px', marginRight: '7px'}}
+                  color="red"
+                  size="lg"
+                  onClick={() => history.push('/admins')}
+                  icon={<Icon icon="exclamation-triangle" />}
+                />
+              </Whisper>
+            )}
             {needRestart && (
               <Whisper
                 placement="left"
                 trigger="hover"
                 speaker={<Tooltip>Reload page to see installed plugins</Tooltip>}
               >
-              <IconButton
-                circle
-                style={{ marginTop: '7px', marginRight: '7px'}}
-                color="red"
-                size="lg"
-                onClick={() => window.location.reload()}
-                icon={<Icon icon="exclamation-triangle" />}
-              />
+                <IconButton
+                  circle
+                  style={{ marginTop: '7px', marginRight: '7px'}}
+                  color="red"
+                  size="lg"
+                  onClick={() => window.location.reload()}
+                  icon={<Icon icon="refresh" />}
+                />
               </Whisper>
             )}
             <Dropdown

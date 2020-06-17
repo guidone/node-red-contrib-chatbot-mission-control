@@ -1667,7 +1667,7 @@ module.exports = ({
           resolve: async function(root, { plugin, url, version, initialConfiguration }) {
             const response = await fetch(url);
             const filename = `${plugin}-${hash((new Date().toString()))}.js`;
-            const pluginFile = fs.createWriteStream(`${__dirname}/../dist-plugins/${filename}`);
+            const pluginFile = fs.createWriteStream(`${mcSettings.pluginsPath}/${filename}`);
             response.body.pipe(pluginFile);
 
             const chatbot = await ChatBot.findOne();
@@ -1697,7 +1697,11 @@ module.exports = ({
           resolve: async function(root, { plugin }) {
             const deletedPlugin = await Plugin.findOne({ where: { plugin }});
             await Plugin.destroy({ where: { plugin }});
-            await deleteFile(`${__dirname}/../dist-plugins/${deletedPlugin.filename}`);
+            try {
+              await deleteFile(`${mcSettings.pluginsPath}/${deletedPlugin.filename}`);
+            } catch(e) {
+              // do nothing, perhaps dir was removed
+            }
             return deletedPlugin;
           }
         },

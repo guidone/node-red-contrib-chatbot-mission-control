@@ -43,9 +43,6 @@ function sendMessage(topic, payload) {
   Events.emit('send', topic, payload);
 }
 
-
-
-
 // webpack https://webpack.js.org/guides/getting-started/
 // from https://github.com/node-red/node-red-dashboard/blob/63da162998c421b43a6e5ebf447ed90e04040aa3/ui.js#L309
 
@@ -64,7 +61,7 @@ function sendMessage(topic, payload) {
 // https://www.apollographql.com/docs/react/data/queries/
 
 
-function bootstrap(server, app, log, redSettings) {
+async function bootstrap(server, app, log, redSettings) {
 
 
   // print version
@@ -80,9 +77,6 @@ function bootstrap(server, app, log, redSettings) {
     lcd.error('Unable to open node-red-contrib-chatbot-mission-control/package.json');
   }
 
-
-
-
   // get mission control configurations
   console.log(lcd.timestamp() + 'Red Bot Mission Control configuration:');
   const mcSettings = redSettings.missionControl || {};
@@ -95,12 +89,29 @@ function bootstrap(server, app, log, redSettings) {
     mcSettings.environment = 'production';
   }
   console.log(lcd.timestamp() + '  ' + lcd.green('environment: ') + lcd.grey(mcSettings.environment));
+  // get the database path
   if (mcSettings.dbPath == null) {
-    mcSettings.dbPath = __dirname + '/mission-control.sqlite';
+    mcSettings.dbPath = path.join(__dirname, 'mission-control.sqlite');
   } else {
     mcSettings.dbPath = mcSettings.dbPath.replace(/\/$/, '') + '/mission-control.sqlite';
   }
   console.log(lcd.timestamp() + '  ' + lcd.green('dbPath: ') + lcd.grey(mcSettings.dbPath));
+  if (mcSettings.dbPath === path.join(__dirname, 'mission-control.sqlite')) {
+    // check is not using the default database
+    console.log(lcd.timestamp() + '  ' + lcd.orange('Warning: *.sqlite dataase  is the default one in the npm package, the database file'));
+    console.log(lcd.timestamp() + '  ' + lcd.orange('will be overwritten if the package is reinstalled, this is good for development but dangerous'));
+    console.log(lcd.timestamp() + '  ' + lcd.orange('for production. Select a different directory to store the database.'))
+  }
+  // get plugin path
+  if (mcSettings.pluginsPath == null && !fs.existsSync(mcSettings.pluginsPath)) {
+    mcSettings.pluginsPath = path.join(__dirname, 'dist-plugins');
+  }
+  console.log(lcd.timestamp() + '  ' + lcd.green('pluginsPath: ') + lcd.grey(mcSettings.pluginsPath));
+  if (mcSettings.pluginsPath == path.join(__dirname, 'dist-plugins')) {
+    console.log(lcd.timestamp() + '  ' + lcd.orange('Warning: external plugin path is the default one in the npm package, the external plugins'));
+    console.log(lcd.timestamp() + '  ' + lcd.orange('will be overwritten if the package is reinstalled, this is good for development but dangerous'));
+    console.log(lcd.timestamp() + '  ' + lcd.orange('for production. Select a different directory with permission rights.'))
+  }
   if (mcSettings.root == null) {
     mcSettings.root = '/mc';
   } else {
@@ -133,7 +144,25 @@ function bootstrap(server, app, log, redSettings) {
 
   // todo put db schema here
   const databaseSchema = DatabaseSchema(mcSettings)
-  const { Configuration, graphQLServer, graphQLSchema, Admin, ChatBot, Plugin } = databaseSchema;
+  const { Configuration, graphQLServer, graphQLSchema, Category, Content, Admin, ChatBot, Plugin, sequelize } = databaseSchema;
+
+  // if database doesn't exist, then create it and run sync to create blank tables
+  if (!fs.existsSync(mcSettings.dbPath)) {
+    await sequelize.sync({ force: true })
+    await Admin.create({ username: 'admin', password: '', permissions: '*' });
+    await ChatBot.create({ name: 'MyChatbot' });
+    await Category.create({ name: 'A category', language: 'en', namespace: 'content' });
+    await Content.create({
+      title: 'A content',
+      slug: 'my_slug',
+      language: 'en',
+      namespace: 'content',
+      categoryId: 1,
+      body: `A sample content.
+
+Some **formatting** is _allowed_!`
+    });
+  }
 
   //passport authentication
   passport.use(new BasicStrategy(async function (username, password, done) {
@@ -143,7 +172,7 @@ function bootstrap(server, app, log, redSettings) {
         done(null, false);
       } else {
         const hashedPassword = hash(password, { salt: mcSettings.salt });
-        if (user.password === hashedPassword) {
+        if (_.isEmpty(user.password) || user.password === hashedPassword) {
           done(null, {
             id: user.id,
             username: user.username,
@@ -232,7 +261,7 @@ function bootstrap(server, app, log, redSettings) {
     const response = await fetch('http://localhost:8080/plugins_js.main.js');
     res.send(await response.text());
   });
-  app.use(`${mcSettings.root}/plugins`, serveStatic(path.join(__dirname, 'dist-plugins'), {
+  app.use(`${mcSettings.root}/plugins`, serveStatic(mcSettings.pluginsPath, {
     'index': false
   }));
   // serve mission control page and assets
