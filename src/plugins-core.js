@@ -8,6 +8,7 @@ import '../core/funnel';
 import '../core/content';
 import '../core/plugins-manager';
 import '../core/user-record';
+import '../core/content-image';
 
 //import './plugins/configuration-test';
 //import './plugins/schema-form-demo';

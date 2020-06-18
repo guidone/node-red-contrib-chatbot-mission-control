@@ -77,6 +77,11 @@ module.exports = function(RED) {
       if (isVariable(query)) {
         query = await template.evaluate(query);
       }
+      // skip to second pin if empty
+      if (query == null || query === '') {
+        send([null, msg]);
+        return;
+      }
       if (_.isString(query) && query.includes(',')) {
         query = query
           .split(',')

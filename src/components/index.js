@@ -12,6 +12,9 @@ import UserAutocomplete from './user-autocomplete';
 import SelectTransport from './select-transport';
 import Panel from './grid-panel';
 import * as WidgetForm from './widget-form';
+import InputInteger from './input-integer';
+import PageContainer from './page-container';
+import ChatbotStatus from './chatbot-status';
 
 // Define the global scope to store the components shared with plugins
 if (window.globalLibs == null) {
@@ -31,7 +34,10 @@ window.globalLibs.Components = {
   SelectTransport,
   Modal,
   Panel,
-  WidgetForm
+  WidgetForm,
+  InputInteger,
+  PageContainer,
+  ChatbotStatus
 };
 
 export {
@@ -48,5 +54,8 @@ export {
   SelectTransport,
   Modal,
   Panel,
-  WidgetForm
+  WidgetForm,
+  InputInteger,
+  PageContainer,
+  ChatbotStatus
 };

@@ -16,4 +16,6 @@ const TypeCommand = ({ children }) => (
   <code className="ui-type-command">{children}</code>
 );
 
-export { NodeRedNode, SlugHelp, TypeCommand };
+const ChatbotStatus = ({ children }) => <Tag color="orange" className="ui-chatbot-status">{children}</Tag>;
+
+export { NodeRedNode, SlugHelp, TypeCommand, ChatbotStatus };
