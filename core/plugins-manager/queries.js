@@ -10,6 +10,16 @@ mutation ($plugin: String!, $url: String!, $version: String!, $initialConfigurat
   }
 }`;
 
+const UPDATE_PLUGIN = gql`
+mutation ($plugin: String!, $url: String!, $version: String!, $initialConfiguration: String) {
+  updatePlugin(plugin: $plugin, url: $url, version: $version, initialConfiguration: $initialConfiguration) {
+    id,
+    plugin,
+    filename,
+    version
+  }
+}`;
+
 const UNISTALL_PLUGIN = gql`
 mutation($plugin: String!) {
   uninstallPlugin(plugin: $plugin) {
@@ -32,4 +42,4 @@ query {
   }
 }`;
 
-export { INSTALL_PLUGIN, CHATBOT, UNISTALL_PLUGIN };
+export { INSTALL_PLUGIN, CHATBOT, UNISTALL_PLUGIN, UPDATE_PLUGIN };

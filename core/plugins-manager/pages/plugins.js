@@ -11,7 +11,7 @@ import ShowError from '../../../src/components/show-error';
 import useSettings from '../../../src/hooks/settings';
 import { TableFilters } from '../../../src/components';
 
-import { INSTALL_PLUGIN, CHATBOT, UNISTALL_PLUGIN } from '../queries';
+import { INSTALL_PLUGIN, CHATBOT, UNISTALL_PLUGIN, UPDATE_PLUGIN } from '../queries';
 import PluginPanel from './plugin-panel';
 
 
@@ -24,12 +24,17 @@ const usePlugins = ({ onCompleted = () => {} } = {}) => {
     uninstall,
     { loading: uninstallLoading, error: uninstallError },
   ] = useMutation(UNISTALL_PLUGIN, { onCompleted });
+  const [
+    update,
+    { loading: updateLoading, error: updateError },
+  ] = useMutation(UPDATE_PLUGIN, { onCompleted });
 
   return {
-    saving: installLoading || uninstallLoading,
-    error: installError || uninstallError,
+    saving: installLoading || uninstallLoading || updateLoading,
+    error: installError || uninstallError || updateError,
     install,
-    uninstall
+    uninstall,
+    update
   };
 };
 
@@ -77,7 +82,7 @@ const PluginsManager = ({ dispatch }) => {
   const client = useApolloClient();
   // json id is hard coded, general users don't have market place plugin
   const { data: plugins, get, error: fetchError } = useFetch('https://api.jsonbin.io/b/5ed90ec1655d87580c43c899/latest', {}, []);
-  const { install, uninstall, saving } = usePlugins({
+  const { install, uninstall, update, saving } = usePlugins({
     onCompleted: async () => {
       try {
         const response = await client.query({ query: CHATBOT, fetchPolicy: 'network-only' });
@@ -159,6 +164,26 @@ const PluginsManager = ({ dispatch }) => {
                           }
                         }
                       }}
+                      onUpdate={async plugin => {
+                        if (await Confirm(
+                          <div>Update plugin <strong>{plugin.name}</strong> to version <em>{plugin.version}</em>?</div>,
+                          { okLabel: 'Ok, update'}
+                        )) {
+                          try {
+                            await update({ variables: {
+                              plugin: plugin.id,
+                              url: plugin.url,
+                              version: plugin.version,
+                              initialConfiguration: plugin.initialConfiguration
+                            }});
+                            Notification.success({
+                              placement: 'topStart',
+                              title: 'Updated', description: `Plugin "${plugin.id}" updated succesfully to version ${plugin.version}` });
+                          } catch(e) {
+                            Notification.error({ placement: 'topStart', title: 'Error', description: `Something went wrong trying to install the plugin "${plugin.id}"` });
+                          }
+                        }
+                      }}
                       onUninstall={async plugin => {
                         if (await Confirm(
                           <div>Uninstall plugin <strong>{plugin.name}</strong> ?</div>,
@@ -214,6 +239,6 @@ const PluginsManager = ({ dispatch }) => {
       </FlexboxGrid>
     </PageContainer>
   );
-}
+};
 
 export default PluginsManager;

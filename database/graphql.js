@@ -1684,7 +1684,46 @@ module.exports = ({
                 });
               }
             }
+            return installedPlugin;
+          }
+        },
 
+        updatePlugin: {
+          type: pluginType,
+          args: {
+            plugin: { type: GraphQLString },
+            url: { type: GraphQLString },
+            version: { type: GraphQLString },
+            initialConfiguration: { type: GraphQLString }
+          },
+          resolve: async function(root, { plugin, url, version, initialConfiguration }) {
+            // get the current plugin
+            const currentInstall = await Plugin.findOne({ where: { plugin }});
+            // if found, otherwise just create
+            if (currentInstall != null) {
+              deleteFile(`${mcSettings.pluginsPath}/${currentInstall.filename}`);
+              await currentInstall.destroy();
+            }
+            // get the plugin code
+            const response = await fetch(url);
+            const filename = `${plugin}-${hash((new Date().toString()))}.js`;
+            const pluginFile = fs.createWriteStream(`${mcSettings.pluginsPath}/${filename}`);
+            response.body.pipe(pluginFile);
+
+            const chatbot = await ChatBot.findOne();
+            // destroy and re-create
+            await Plugin.destroy({ where: { plugin }});
+            const installedPlugin = await Plugin.create({ plugin, url, version, chatbotId: chatbot.id, filename });
+            // create default configuration, if any, if not already exist
+            if (!_.isEmpty(initialConfiguration)) {
+              const existsConfiguration = await Configuration.findOne({ where: { namespace: plugin }});
+              if (existsConfiguration == null) {
+                await Configuration.create({
+                  namespace: plugin,
+                  payload: initialConfiguration
+                });
+              }
+            }
             return installedPlugin;
           }
         },

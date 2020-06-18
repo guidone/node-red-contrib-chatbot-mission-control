@@ -60,7 +60,8 @@ const PluginPanel = ({
   plugin,
   plugins,
   onInstall = () => {},
-  onUninstall= () => {},
+  onUninstall = () => {},
+  onUpdate = () => {},
   disabled = false
 }) => {
   const { state: { chatbot } } = useContext(AppContext);
@@ -148,6 +149,7 @@ const PluginPanel = ({
               disabled={disabled}
               size="sm"
               color="orange"
+              onClick={() => onUpdate(plugin)}
             >Update</Button>
           )}
         </ButtonToolbar>
