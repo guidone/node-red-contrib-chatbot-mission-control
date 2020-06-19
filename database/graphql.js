@@ -1736,6 +1736,7 @@ module.exports = ({
           resolve: async function(root, { plugin }) {
             const deletedPlugin = await Plugin.findOne({ where: { plugin }});
             await Plugin.destroy({ where: { plugin }});
+            await Configuration.destroy({ where: { namespace: plugin }});
             try {
               await deleteFile(`${mcSettings.pluginsPath}/${deletedPlugin.filename}`);
             } catch(e) {
