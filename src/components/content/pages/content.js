@@ -37,6 +37,7 @@ query($offset: Int, $limit: Int, $order: String, $categoryId: Int, $slug: String
     language,
     createdAt,
     payload,
+    namespace,
     category {
       id,
       name

@@ -122,5 +122,6 @@ plug('pages', Content.Contents, {
 
 plug('content-tabs', DefaultConfiguration, {
   id: 'content-configuration',
-  label: 'Configuration'
+  label: 'Configuration',
+  namespace: ['plugins']
 });

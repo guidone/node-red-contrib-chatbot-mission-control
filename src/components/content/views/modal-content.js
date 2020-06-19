@@ -42,6 +42,12 @@ query($namespace: String) {
 }
 `;
 
+const isNamespace = (tabNamespace, namespace) => {
+  return _.isEmpty(tabNamespace)
+    || (_.isString(tabNamespace) && tabNamespace === namespace)
+    || (_.isArray(tabNamespace) && tabNamespace.includes(namespace));
+};
+
 const ModalContent = ({
   content,
   onCancel = () => {},
@@ -70,7 +76,6 @@ const ModalContent = ({
 
   const categories = !loading ? data.categories : [];
   const form = useRef(null);
-
   const isNew = content.id == null;
 
   labels = { ...LABELS, ...labels };
@@ -100,8 +105,8 @@ const ModalContent = ({
           <Nav.Item eventKey="content">Content</Nav.Item>
           <Nav.Item eventKey="custom_fields">Custom Fields</Nav.Item>
           <Views region="content-tabs">
-            {(View, { label, id, permission }) => {
-              if (_.isEmpty(permission) || can(permission)) {
+            {(View, { label, id, permission, namespace }) => {
+              if ((_.isEmpty(permission) || can(permission)) && isNamespace(namespace , content.namespace)) {
                 return (
                   <Nav.Item key={id} active={id === tab} eventKey={id} onSelect={() => setTab(id)}>{label}</Nav.Item>
                 );
