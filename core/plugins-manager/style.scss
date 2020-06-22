@@ -61,6 +61,7 @@
       .meta {
         flex: 1 0;
         padding: 0px 8px;
+        min-height: 50px;
 
         h5 {
           color: #106193;
@@ -69,11 +70,11 @@
           margin-top: 10px;
         }
         .description {
-          min-height: 50px;
+
         }
 
         .info {
-          margin-top: 6px;
+          margin-top: 10px;
 
           .icons {
             display: inline-block;
@@ -98,6 +99,8 @@
 
       .buttons {
         flex: 0 0 auto;
+        width: 100px;
+
       }
     }
 

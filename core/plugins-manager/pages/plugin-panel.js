@@ -3,13 +3,15 @@ import { Button, ButtonToolbar, Notification, Icon, Tag, TagGroup } from 'rsuite
 import useFetch from 'use-http';
 import ClipboardJS from 'clipboard';
 import Showdown from 'showdown';
+
 import SmallTag from '../../../src/components/small-tag';
 import { useModal } from '../../../src/components/modal';
 import AppContext from '../../../src/common/app-context';
 
 import FlowSource from './flow-source';
-
+import ModalMarkdown from '../views/modal-markdown';
 import versionCompare from '../helpers/version-compare';
+import CopyAndPasteButton from '../views/copy-and-paste';
 
 const isInstalled = (current, plugins) => plugins.some(plugin => plugin.plugin === current.id);
 
@@ -17,32 +19,9 @@ const needUpdate = (current, plugins) => {
   const installed = plugins.find(plugin => plugin.plugin === current.id);
 
   return versionCompare(installed.version, current.version) === -1;
-}
-
-
-
-
-const CopyAndPasteButton = ({ text, disabled = false, label = 'Copy to Clipboard' }) => {
-  useEffect(() => {
-    const clipboard = new ClipboardJS('.ui-clipboard-button', {
-      text: () => text
-    });
-    return () => clipboard.destroy();
-  }, [text]);
-
-  return (
-    <Button
-      disabled={disabled}
-      onClick={() => {
-        Notification.success({ title: 'Copied!', description: 'The Node-RED flow was copied to the clipboard '});
-      }}
-      className="ui-clipboard-button"
-      appearance="ghost"
-    >
-      {label}
-    </Button>
-  );
 };
+
+
 
 const CopyAndPasteFlow = ({ plugin }) => {
   const { loading, data = [] } = useFetch(plugin.flow, {}, []);
@@ -50,10 +29,10 @@ const CopyAndPasteFlow = ({ plugin }) => {
     <CopyAndPasteButton
       disabled={loading}
       text={JSON.stringify(data)}
+      notification="The Node-RED flow was copied to the clipboard"
     />
   );
-}
-
+};
 
 
 const PluginPanel = ({
@@ -75,6 +54,15 @@ const PluginPanel = ({
     custom: value => <CopyAndPasteFlow plugin={value}/>
   });
 
+  const { open: openReadMe, close: closeReadMe } = useModal({
+    view: ModalMarkdown,
+    title: plugin.name,
+    size: 'md',
+    labelSubmit: 'Close',
+    labelCancel: null,
+    align: 'center'
+  });
+
   const installed = isInstalled(plugin, chatbot.plugins);
   const upgrade = installed && needUpdate(plugin, chatbot.plugins);
   const converter = new Showdown.Converter({ openLinksInNewWindow: true });
@@ -87,8 +75,22 @@ const PluginPanel = ({
         </h5>
         <div
           className="description"
-          dangerouslySetInnerHTML={{ __html: converter.makeHtml(plugin.description)}}
+          dangerouslySetInnerHTML={{ __html: converter.makeHtml(plugin.description.split('---')[0])}}
         />
+        {plugin.description.split('---').length > 1 && (
+          <div>
+            <a
+              href="#"
+              onClick={async e => {
+                e.preventDefault();
+                await openReadMe({ markdown: plugin.description });
+                closeReadMe();
+              }}
+            >
+              more...
+            </a>
+          </div>
+        )}
         <div className="info">
           <SmallTag color="#0579DB" className="version"><span className="label">v</span>{plugin.version}</SmallTag>
           <div className="icons">
@@ -117,10 +119,29 @@ const PluginPanel = ({
       </div>
       <div className="buttons">
         <ButtonToolbar size="sm">
+          {!installed && (
+            <Button
+              disabled={disabled}
+              size="sm"
+              block
+              color="blue"
+              onClick={() => onInstall(plugin)}
+            >Install</Button>
+          )}
+          {upgrade && (
+            <Button
+              disabled={disabled}
+              block
+              size="sm"
+              color="orange"
+              onClick={() => onUpdate(plugin)}
+            >Update</Button>
+          )}
           {installed && plugin.flow != null && (
             <Button
               disabled={disabled}
               size="sm"
+              block
               appearance="ghost"
               onClick={async () => {
                 await open(plugin);
@@ -131,26 +152,11 @@ const PluginPanel = ({
           {installed && (
             <Button
               disabled={disabled}
+              block
               size="sm"
               color="red"
               onClick={() => onUninstall(plugin)}
             >Uninstall</Button>
-          )}
-          {!installed && (
-            <Button
-              disabled={disabled}
-              size="sm"
-              color="blue"
-              onClick={() => onInstall(plugin)}
-            >Install</Button>
-          )}
-          {upgrade && (
-            <Button
-              disabled={disabled}
-              size="sm"
-              color="orange"
-              onClick={() => onUpdate(plugin)}
-            >Update</Button>
           )}
         </ButtonToolbar>
       </div>
