@@ -47,7 +47,6 @@ const FieldEditor = ({
   description
 }) => {
 
-  console.log('field',field)
   let accepter;
   let additionalProps = {};
   if (field.type === 'boolean') {
@@ -127,4 +126,4 @@ FieldEditor.propTypes = {
   description: PropTypes.string
 };
 
-export default FieldEditor;
+export default React.memo(FieldEditor);
