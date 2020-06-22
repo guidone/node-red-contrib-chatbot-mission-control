@@ -154,7 +154,8 @@ const PluginsManager = ({ dispatch }) => {
                               plugin: plugin.id,
                               url: plugin.url,
                               version: plugin.version,
-                              initialConfiguration: plugin.initialConfiguration
+                              initialConfiguration: plugin.initialConfiguration,
+                              initialContent: plugin.content
                             }});
                             Notification.success({
                               placement: 'topStart',

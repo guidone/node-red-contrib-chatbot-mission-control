@@ -1662,9 +1662,11 @@ module.exports = ({
             plugin: { type: GraphQLString },
             url: { type: GraphQLString },
             version: { type: GraphQLString },
-            initialConfiguration: { type: GraphQLString }
+            initialConfiguration: { type: GraphQLString },
+            initialContent: { type: newContentType }
           },
-          resolve: async function(root, { plugin, url, version, initialConfiguration }) {
+          resolve: async function(root, { plugin, url, version, initialConfiguration, initialContent }) {
+            console.log('---> initialContent ', initialContent)
             const response = await fetch(url);
             const filename = `${plugin}-${hash((new Date().toString()))}.js`;
             const pluginFile = fs.createWriteStream(`${mcSettings.pluginsPath}/${filename}`);
@@ -1681,6 +1683,20 @@ module.exports = ({
                 await Configuration.create({
                   namespace: plugin,
                   payload: initialConfiguration
+                });
+              }
+            }
+            // create content if needed
+            if (initialContent != null && !_.isEmpty(initialContent.title)) {
+              let slugExists = false;
+              if (!_.isEmpty(initialContent.slug)) {
+                slugExists = await Content.findOne({ where: { slug: initialContent.slug }}) != null;
+              }
+              if (!slugExists) {
+                await Content.create({
+                  namespace: 'content',
+                  language: 'en',
+                  ...initialContent
                 });
               }
             }

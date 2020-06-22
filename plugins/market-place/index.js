@@ -116,6 +116,24 @@ plug('pages', Content.Contents, {
       type: 'tags',
       description: `List of keywords, comma separated`,
       color: 'red'
+    },
+    {
+      key: 'content_title',
+      type: 'string',
+      description: `Create a content with this title`,
+      color: 'violet'
+    },
+    {
+      key: 'content_slug',
+      type: 'string',
+      description: `Create a content with this slug`,
+      color: 'violet'
+    },
+    {
+      key: 'content_body',
+      type: 'string',
+      description: `Create a content with this body`,
+      color: 'violet'
     }
   ]
 });

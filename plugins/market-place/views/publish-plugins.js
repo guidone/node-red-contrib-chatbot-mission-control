@@ -46,9 +46,16 @@ const PublishPlugins = () => {
         const response = await client.query({ query: CONTENT_PLUGINS, fetchPolicy: 'network-only' });
         const plugins = response.data.contents.map(plugin => {
           const fields = plugin.fields.reduce((acc, item) => ({ ...acc, [item.name]: item.value }), {});
-          console.log('--->', plugin.payload)
-          console.log('--', plugin.payload != null && !_.isEmpty(plugin.payload.initial_configuration) ?
-          plugin.payload.initial_configuration : null)
+
+          let content = null;
+          if (!_.isEmpty(fields.content_title) || !_.isEmpty(fields.content_slug) || !_.isEmpty(fields.content_body)) {
+            content = {
+              title: fields.content_title,
+              slug: fields.content_slug,
+              body: fields.content_body
+            };
+          }
+
           return {
             id: fields.id,
             name: plugin.title,
@@ -62,6 +69,7 @@ const PublishPlugins = () => {
               name: fields.author,
               url: fields.author_url
             },
+            content,
             initialConfiguration: plugin.payload != null && !_.isEmpty(plugin.payload.initial_configuration) ?
               plugin.payload.initial_configuration : null
           };
