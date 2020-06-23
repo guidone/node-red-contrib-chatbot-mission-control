@@ -10,6 +10,7 @@ import {
   useHistory,
   useParams
 } from 'react-router-dom';
+import { useMutation } from 'react-apollo';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -19,8 +20,10 @@ import SmartDate from '../../../src/components/smart-date';
 import CustomTable from '../../../src/components/table';
 import { Input } from '../../../src/components/table-filters';
 import useSettings from '../../../src/hooks/settings';
+import { useModal } from '../../../src/components/modal';
+import confirm from '../../../src/components/confirm';
+import ShowError from '../../../src/components/show-error';
 
-// import '../styles/admins.scss';
 
 import PinPoint from '../views/pin-point';
 
@@ -38,11 +41,57 @@ query ($limit: Int, $offset: Int, $order: String) {
     createdAt,
     updatedAt,
     status,
+    jsonSchema,
     lat,
     lon
   }
 }
 `;
+
+const EDIT_DEVICE = gql`
+mutation($id: Int!, $device: NewDevice!) {
+  editDevice(id: $id, device: $device) {
+    id,
+    name,
+    payload,
+    createdAt,
+    updatedAt,
+    status,
+    lat,
+    lon,
+    jsonSchema,
+    version,
+    lastUpdate,
+    snapshot
+  }
+}
+`;
+
+const CREATE_DEVICE = gql`
+mutation($device: NewDevice!) {
+  createDevice(device: $device) {
+    id,
+    name,
+    payload,
+    createdAt,
+    updatedAt,
+    status,
+    lat,
+    lon,
+    jsonSchema,
+    version,
+    lastUpdate,
+    snapshot
+  }
+}
+`;
+
+const DELETE_DEVICE = gql`
+mutation($id: Int!) {
+  deleteDevice(id: $id) {
+    id
+  }
+}`;
 
 
 const DevicesMap = ({ devices, height = 250 }) => {
@@ -88,20 +137,54 @@ const DevicesMap = ({ devices, height = 250 }) => {
 
 }
 
+import ModalDevice from '../views/modal-device';
 
 const Devices = () => {
   const [devices, setDevices] = useState();
   const table = useRef();
+  const { open, close, disable } = useModal({
+    view: ModalDevice,
+    labelSubmit: 'Save device',
+    title: device => device != null && device.id != null ?
+      <span>Edit device <em>"{device.name}"</em></span> : <span>Create new device</span>
+  });
+  const [editDevice, { error: editError }] = useMutation(EDIT_DEVICE);
+  const [createDevice, { error: createError }] = useMutation(CREATE_DEVICE);
+  const [deleteDevice, { loading: deleteLoading, error: deleteError }] = useMutation(DELETE_DEVICE);
+
   //const [ admin, setAdmin ] = useState(null);
   //const { saving, error,  deleteAdmin, editAdmin, createAdmin } = useAdmins();
+
+  const disabled = deleteLoading;
+  const error = editError || createError || deleteError;
 
 
   return (
     <PageContainer className="page-devices">
       <Breadcrumbs pages={['Devices']}/>
+      {error != null && <ShowError error={error}/>}
       {devices != null && (
         <DevicesMap devices={devices} />
       )}
+      <div className="buttons">
+        <Button
+          appearance="primary"
+          disabled={disabled}
+          onClick={async () => {
+            const newDevice = await open({ });
+            if (newDevice != null) {
+              disable();
+              await createDevice({ variables: {
+                device: _.omit(newDevice, ['id', '__typename'])
+              }});
+              table.current.refetch();
+            }
+            close();
+          }}
+        >
+          Add Device
+        </Button>
+      </div>
       <CustomTable
         ref={table}
         query={DEVICES}
@@ -109,7 +192,6 @@ const Devices = () => {
         initialSortField="createdAt"
         initialSortDirection="desc"
         onData={devices => {
-          console.log('devices', devices)
           setDevices(devices);
         }}
         /*toolbar={(
@@ -144,29 +226,43 @@ const Devices = () => {
 
         <Column width={200} resizable>
           <HeaderCell>Status</HeaderCell>
-          <Cell dataKey="first_name"/>
+          <Cell dataKey="status"/>
         </Column>
 
         <Column width={80}>
           <HeaderCell>Action</HeaderCell>
           <Cell>
-            {admin => (
+            {device => (
               <ButtonGroup>
                 <Button
                   size="xs"
                   onClick={async () => {
-
-                  }}
-                >
-                  <Icon icon="trash" />
-                </Button>
-                <Button
-                  size="xs"
-                  onClick={() => {
-
+                    const modifiedDevice = await open(device);
+                    if (modifiedDevice != null) {
+                      disable();
+                      await editDevice({ variables: {
+                        id: device.id,
+                        device: _.omit(modifiedDevice, ['id', '__typename'])
+                      }});
+                    }
+                    close();
                   }}
                 >
                   <Icon icon="edit2" />
+                </Button>
+                <Button
+                  size="xs"
+                  onClick={async () => {
+                    if (await confirm(
+                      <div>Delete device <em>"{device.name}" ?</em></div>,
+                      { okLabel: 'Yes, delete' }
+                    )) {
+                      await deleteDevice({ variables: { id: device.id }});
+                      table.current.refetch();
+                    }
+                  }}
+                >
+                  <Icon icon="trash" />
                 </Button>
             </ButtonGroup>
             )}

@@ -1552,11 +1552,34 @@ module.exports = ({
             device: { type: newDeviceType }
           },
           async resolve(root, { id, device }) {
+            console.log('--->', device, id)
             await Device.update(device, { where: { id }});
             const updated = await Device.findOne({ where: { id }});
             console.log('publish', 'deviceUpdated', updated.id)
             pubsub.publish('deviceUpdated', { device: updated.toJSON() });
             return updated;
+          }
+        },
+
+        deleteDevice: {
+          type: deviceType,
+          args: {
+            id: { type: GraphQLInt }
+          },
+          resolve: async function(root, { id }) {
+            const device = await Device.findByPk(id);
+            await Device.destroy({ where: { id }});
+            return device;
+          }
+        },
+
+        createDevice: {
+          type: deviceType,
+          args: {
+            device: { type: newDeviceType }
+          },
+          async resolve(root, { device }) {
+            return Device.create(device);
           }
         },
 
@@ -1797,6 +1820,8 @@ module.exports = ({
           }
         }
       }
+
+
     }),
 
     query: new GraphQLObjectType({

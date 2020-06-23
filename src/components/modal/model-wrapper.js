@@ -40,9 +40,9 @@ const ModalWrapper = ({
       overflow={false}
       className={classNames('ui-modal-wrapper', className, { [align]: true   })}
     >
-      {!_.isEmpty(title) && (
+      {(!_.isEmpty(title) || _.isFunction(title)) && (
         <Modal.Header>
-          <Modal.Title>{title}</Modal.Title>
+          <Modal.Title>{_.isFunction(title) ? title(value) : title}</Modal.Title>
         </Modal.Header>
       )}
       <Modal.Body>
