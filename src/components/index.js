@@ -15,6 +15,8 @@ import * as WidgetForm from './widget-form';
 import InputInteger from './input-integer';
 import PageContainer from './page-container';
 import ChatbotStatus from './chatbot-status';
+import SmallTag from './small-tag';
+import EditDevice from './edit-device';
 
 // Define the global scope to store the components shared with plugins
 if (window.globalLibs == null) {
@@ -37,7 +39,9 @@ window.globalLibs.Components = {
   WidgetForm,
   InputInteger,
   PageContainer,
-  ChatbotStatus
+  ChatbotStatus,
+  SmallTag,
+  EditDevice
 };
 
 export {
@@ -57,5 +61,7 @@ export {
   WidgetForm,
   InputInteger,
   PageContainer,
-  ChatbotStatus
+  ChatbotStatus,
+  SmallTag,
+  EditDevice
 };
