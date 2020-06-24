@@ -23,7 +23,8 @@ const JSONEditor = ({ style, ...rest }) => (
 JSONEditor.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
-  style: PropTypes.object
+  style: PropTypes.object,
+  height: PropTypes.string
 };
 
 export default JSONEditor;

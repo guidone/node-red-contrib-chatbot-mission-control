@@ -1401,18 +1401,6 @@ module.exports = ({
           }
         },
 
-        createAdmin: {
-          type: adminType,
-          args: {
-            admin: { type: new GraphQLNonNull(newAdminType)}
-          },
-          resolve: function(root, { admin }) {
-
-
-            return Admin.create(admin);
-          }
-        },
-
         editCategory: {
           type: categoryType,
           args: {
@@ -1542,6 +1530,19 @@ module.exports = ({
             }
             await Admin.update(admin, { where: { id } })
             return await Admin.findOne({ where: { id } });
+          }
+        },
+
+        createAdmin: {
+          type: adminType,
+          args: {
+            admin: { type: new GraphQLNonNull(newAdminType)}
+          },
+          resolve: function(root, { admin }) {
+            if (!_.isEmpty(admin.password)) {
+              admin.password = hash(admin.password, { salt: mcSettings.salt });
+            }
+            return Admin.create(admin);
           }
         },
 

@@ -87,7 +87,8 @@ const ModalDevice = ({
               }
             }}
           </Views>
-          <Nav.Item eventKey="device-payload">Device payload</Nav.Item>
+          <Nav.Item eventKey="device-schema">Schema</Nav.Item>
+          <Nav.Item eventKey="device-snapshot">Snapshot</Nav.Item>
         </Nav>
         <Form
           ref={form}
@@ -112,10 +113,22 @@ const ModalDevice = ({
                 <ControlLabel>Title</ControlLabel>
                 <FormControl name="name"/>
               </FormGroup>
-              <FormGroup>
-                <ControlLabel>Status</ControlLabel>
-                <FormControl name="status"/>
-              </FormGroup>
+
+              <FlexboxGrid justify="space-between" style={{ marginBottom: '24px' }}>
+                <FlexboxGrid.Item colspan={11}>
+                  <FormGroup>
+                    <ControlLabel>Status</ControlLabel>
+                    <FormControl name="status"/>
+                  </FormGroup>
+                </FlexboxGrid.Item>
+                <FlexboxGrid.Item colspan={11}>
+                  <FormGroup>
+                    <ControlLabel>Version</ControlLabel>
+                    <FormControl name="version"/>
+                  </FormGroup>
+                </FlexboxGrid.Item>
+              </FlexboxGrid>
+
               <FlexboxGrid justify="space-between">
                 <FlexboxGrid.Item colspan={11}>
                   <FormGroup>
@@ -151,38 +164,48 @@ const ModalDevice = ({
               return <div key={id}/>;
             }}
           </Views>
-          {tab === 'device-payload' && (
-          <Form
-            formValue={jsonValue}
-            formError={formError}
-            fluid autoComplete="off"
-          >
-            <FormGroup>
-              <ControlLabel>Payload</ControlLabel>
-              <FormControl
-                readOnly={disabled}
-                name="json"
-                style={{ marginBottom: '20px' }}
-                accepter={JSONEditor}
-                onChange={json => {
-                  if (!_.isEmpty(json)) {
-                    let payload;
-                    setJsonValue({ json });
-                    try {
-                      payload = JSON.parse(json);
-                    } catch(e) {
-                      // error do nothing
-                      return;
+          {tab === 'device-schema' && (
+            <Form
+              formValue={jsonValue}
+              formError={formError}
+              fluid autoComplete="off"
+            >
+              <FormGroup>
+                <ControlLabel>Payload</ControlLabel>
+                <FormControl
+                  readOnly={disabled}
+                  name="json"
+                  height="400px"
+                  style={{ marginBottom: '20px' }}
+                  accepter={JSONEditor}
+                  onChange={json => {
+                    if (!_.isEmpty(json)) {
+                      let payload;
+                      setJsonValue({ json });
+                      try {
+                        payload = JSON.parse(json);
+                      } catch(e) {
+                        // error do nothing
+                        return;
+                      }
+                      setIsChanged(true);
+                      setFormValue({ ...formValue, payload });
                     }
-                    setIsChanged(true);
-                    setFormValue({ ...formValue, payload });
-                  }
-                }}
-              />
-            </FormGroup>
-          </Form>
+                  }}
+                />
+              </FormGroup>
+            </Form>
         )}
+
         </Form>
+        {tab === 'device-snapshot' && (
+          <JSONEditor
+            readOnly={true}
+            value={JSON.stringify(device.snapshot, null, 2)}
+            height="400px"
+            style={{ marginBottom: '20px' }}
+          />
+        )}
       </div>
   );
 };

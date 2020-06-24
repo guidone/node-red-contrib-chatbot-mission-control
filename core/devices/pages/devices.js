@@ -1,15 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Table, Icon, ButtonGroup, Button } from 'rsuite';
 import gql from 'graphql-tag';
-import GoogleMapReact from 'google-map-react';
-import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link,
-  useHistory,
-  useParams
-} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useMutation } from 'react-apollo';
 
 const { Column, HeaderCell, Cell } = Table;
@@ -18,14 +10,13 @@ import PageContainer from '../../../src/components/page-container';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmartDate from '../../../src/components/smart-date';
 import CustomTable from '../../../src/components/table';
-import { Input } from '../../../src/components/table-filters';
-import useSettings from '../../../src/hooks/settings';
 import { useModal } from '../../../src/components/modal';
 import confirm from '../../../src/components/confirm';
 import ShowError from '../../../src/components/show-error';
 
+import ModalDevice from '../views/modal-device';
+import DevicesMap from '../views/devices-map';
 
-import PinPoint from '../views/pin-point';
 
 const DEVICES = gql`
 query ($limit: Int, $offset: Int, $order: String) {
@@ -41,7 +32,9 @@ query ($limit: Int, $offset: Int, $order: String) {
     createdAt,
     updatedAt,
     status,
+    snapshot,
     jsonSchema,
+    version,
     lat,
     lon
   }
@@ -94,54 +87,19 @@ mutation($id: Int!) {
 }`;
 
 
-const DevicesMap = ({ devices, height = 250 }) => {
-  const { googleMapsKey } = useSettings();
-  let center = { lat: 45.504372, lng: 9.077766 };
 
-  const handleMapLoaded = (google, toolbar, groupedPoints, channels) => {
-
-  };
-
-  let markers = devices.map(device => (
-    <PinPoint
-      key={device.id}
-      lat={device.lat}
-      lng={device.lon}
-      point={{}}
-      popover={device.name}
-      showPopover={true}
-    />
-  ));
-
-  return (
-    <div className="ui-devices-map" style={{ height: `${height}px` }}>
-      <GoogleMapReact
-        bootstrapURLKeys={{ libraries: 'drawing', key: googleMapsKey }}
-        onGoogleApiLoaded={google =>
-          handleMapLoaded(
-            google,
-            //toolbar,
-            //groupedPoints,
-            //groupedChannels
-          )
-        }
-        defaultCenter={center}
-        defaultZoom={11}
-      >
-        {markers}
-      </GoogleMapReact>
-    </div>
-  );
+const updateDevices = (devices, device) => {
+  if (device.id != null) {
+    return devices.map(d => d.id === device.id ? device : d);
+  } else return [...devices, device];
+};
 
 
-
-}
-
-import ModalDevice from '../views/modal-device';
 
 const Devices = () => {
   const [devices, setDevices] = useState();
   const table = useRef();
+
   const { open, close, disable } = useModal({
     view: ModalDevice,
     labelSubmit: 'Save device',
@@ -177,6 +135,7 @@ const Devices = () => {
               await createDevice({ variables: {
                 device: _.omit(newDevice, ['id', '__typename'])
               }});
+              setDevices(updateDevices(devices, newDevice));
               table.current.refetch();
             }
             close();
@@ -194,15 +153,6 @@ const Devices = () => {
         onData={devices => {
           setDevices(devices);
         }}
-        /*toolbar={(
-          <div>
-            <Button appearance="primary" onClick={() => {
-              setAdmin({});
-            }}>Create admin</Button>
-          </div>
-        )}*/
-        //filtersSchema={[
-        //]}
         autoHeight
       >
         <Column width={60} align="center">
@@ -244,6 +194,7 @@ const Devices = () => {
                         id: device.id,
                         device: _.omit(modifiedDevice, ['id', '__typename'])
                       }});
+                      setDevices(updateDevices(devices, modifiedDevice));
                     }
                     close();
                   }}
