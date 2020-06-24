@@ -53,50 +53,49 @@ const EditDevice = ({
   if (state.editing) {
     return (
       <Modal backdrop show onHide={handleCancel} size="sm" overflow={false} className="modal-edit-schema">
-      <Modal.Header>
-        <Modal.Title>{!_.isEmpty(title) ? title : 'Edit'}</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        {error != null && <ShowError error={error}/>}
-        <SchemaForm
-          value={state.value}
-          jsonSchema={jsonSchema}
-          path={path}
-          errors={state.errors}
-          disabled={loading}
-          hideTitles={true}
-          onChange={value => {
-            console.log('changed', value)
-            setState({ ...state, value, errors: undefined });
-            setIsChanged(true);
-          }}
-        />
-      </Modal.Body>
-      <Modal.Footer>
-        <Button
-          onClick={handleCancel}
-          appearance="subtle"
-          disabled={loading}
-        >
-          Cancel
-        </Button>
-        <Button
-          appearance="primary"
-          disabled={loading}
-          appearance="primary"
-          onClick={() => {
-            const errors = validate(state.value, jsonSchema, path);
-            if (!skipValidation && !_.isEmpty(errors)) {
-              setState({ ...state, errors });
-            } else {
-              editDevice({ variables: { id: value.id, device: { payload: state.value } } });
-            }
-          }}
-        >
-          Save
-        </Button>
-      </Modal.Footer>
-    </Modal>
+        <Modal.Header>
+          <Modal.Title>{!_.isEmpty(title) ? title : 'Edit'}</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {error != null && <ShowError error={error}/>}
+          <SchemaForm
+            value={state.value}
+            jsonSchema={jsonSchema}
+            path={path}
+            errors={state.errors}
+            disabled={loading}
+            hideTitles={true}
+            onChange={value => {
+              setState({ ...state, value, errors: undefined });
+              setIsChanged(true);
+            }}
+          />
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            onClick={handleCancel}
+            appearance="subtle"
+            disabled={loading}
+          >
+            Cancel
+          </Button>
+          <Button
+            appearance="primary"
+            disabled={loading}
+            appearance="primary"
+            onClick={() => {
+              const errors = validate(state.value, jsonSchema, path);
+              if (!skipValidation && !_.isEmpty(errors)) {
+                setState({ ...state, errors });
+              } else {
+                editDevice({ variables: { id: value.id, device: { payload: state.value } } });
+              }
+            }}
+          >
+            Save
+          </Button>
+        </Modal.Footer>
+      </Modal>
     );
   } else {
     const link = (

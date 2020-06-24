@@ -107,13 +107,18 @@ SchemaForm.propTypes = {
   jsonSchema: PropTypes.object,
   value: PropTypes.object,
   onChange: PropTypes.func,
+  // user permissions, show all fields without permissions and those with al least one permission
+  // in this list
   permissions: PropTypes.arrayOf(PropTypes.string),
+  // show debug information
   debug: PropTypes.bool,
   disabled: PropTypes.bool,
+  // only show portions of the form (i.e. /digital[3])
   path: PropTypes.oneOfType([
     PropTypes.string,
     PropTypes.arrayOf(PropTypes.string),
   ]),
+  // hide titles of the form
   hideTitles: PropTypes.bool,
   // validate form as user is typing
   validateAsType: PropTypes.bool

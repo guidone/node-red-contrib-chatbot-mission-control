@@ -47,32 +47,41 @@ const ArrayControllerForm = ({ jsonSchema, order, value, onChange, disabled, cur
   );
 } ;
 
+import matchedPathIndex from '../helpers/matched-path-index';
+
 const ArrayController = props => {
   const { jsonSchema, level, value = [], onChange, readOnly = false, currentPath } = props;
-  const { canWrite, canRead, log, permissions, filteredProps } = useControl(props);
+  const { canWrite, canRead, log, permissions, filteredProps, path } = useControl(props);
 
   if (!canWrite) {
     log(`is readonly, available permissions %c"${permissions.join(',')}"`);
   }
   const { maxItems, minItems } = jsonSchema;
 
+  // collect all indexes that can actuall
+  const matchedIdx = matchedPathIndex(path, currentPath);
+
+  console.log('array path', path)
   console.log('currentPath in array', currentPath)
+  console.log('matched idx', matchedIdx)
 
   return (
     <Fragment>
       {!_.isEmpty(jsonSchema.title) && <div className={classNames('title', { [`title-${level}`]: true })}>{jsonSchema.title}</div>}
-      <CollectionEditor
-         {...filteredProps}
-         value={value}
-         form={ArrayControllerForm}
-         disabled={readOnly || !canWrite}
-         maxItems={_.isNumber(maxItems) ? maxItems : null}
-         minItems={_.isNumber(minItems) ? minItems : null}
-         onChange={onChange}
-         jsonSchema={jsonSchema.items}
-         sortable={false}
-         currentPath={currentPath}
-      />
+        <CollectionEditor
+          {...filteredProps}
+          value={value}
+          form={ArrayControllerForm}
+          disabled={readOnly || !canWrite}
+          maxItems={_.isNumber(maxItems) ? maxItems : null}
+          minItems={_.isNumber(minItems) ? minItems : null}
+          onChange={onChange}
+          jsonSchema={jsonSchema.items}
+          sortable={false}
+          currentPath={currentPath}
+          hideControls={_.isArray(matchedIdx) && !_.isEmpty(matchedIdx)}
+          indexes={matchedIdx}
+        />
     </Fragment>
   );
 };

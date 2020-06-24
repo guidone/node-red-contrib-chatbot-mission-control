@@ -39,8 +39,6 @@ const ObjectControl = props => {
   const { jsonSchema, level, value = {}, onChange, currentPath } = props;
   const { permissions, canRead, canWrite, log, error, path, hideTitles } = useControl(props);
 
-  console.log('hideTitles', hideTitles  )
-
   if (!canRead) {
     log('is hidden, no read permission');
     return <div />;
@@ -87,7 +85,6 @@ const ObjectControl = props => {
     .map(([field, schema]) => {
       // return an empty element if current path doesn't match allowed paths
       const controllerPath = `${currentPath}/${field}`;
-      console.log('check', controllerPath, path, matchPath(controllerPath, path))
       if (!matchPath(controllerPath, path)) {
         return <Fragment />;
       }

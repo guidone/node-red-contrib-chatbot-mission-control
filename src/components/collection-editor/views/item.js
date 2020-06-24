@@ -15,6 +15,7 @@ const Item = ({
   canRemove = true,
   form,
   sortable = true,
+  hideControls = false,
   disabledIHHOC: disabled = false,
   ...rest
 }) => {
@@ -35,14 +36,16 @@ const Item = ({
           {...rest}
         />
       </div>
-      <div className="control-buttons">
-        <IconButton
-          disabled={disabled || !canRemove}
-          icon={<Icon icon="close" />}
-          size="sm"
-          onClick={onRemove}
-        />
-      </div>
+      {!hideControls && (
+        <div className="control-buttons">
+          <IconButton
+            disabled={disabled || !canRemove}
+            icon={<Icon icon="close" />}
+            size="sm"
+            onClick={onRemove}
+          />
+        </div>
+      )}
     </div>
   );
 };
@@ -53,7 +56,8 @@ Item.propTypes = {
   onMoveUp: PropTypes.func,
   onMoveDown: PropTypes.func,
   disabled: PropTypes.bool,
-  canRemove: PropTypes.bool
+  canRemove: PropTypes.bool,
+  hideControls: PropTypes.bool
 };
 
 export default sortableElement(Item);

@@ -29,6 +29,8 @@ const CollectionEditor = ({
   disableAdd = false,
   minItems,
   maxItems,
+  indexes,
+  hideControls = false,
   ...rest
 }) => {
   const onSortEnd = ({ oldIndex, newIndex }) => {
@@ -45,8 +47,6 @@ const CollectionEditor = ({
 
   const items = value || [];
   const canAdd = !disabled && !disableAdd && (maxItems == null || maxItems > items.length);
-
-
 
   const addButton = (
     <Button
@@ -68,7 +68,7 @@ const CollectionEditor = ({
       )}
       <SortableContainer onSortEnd={onSortEnd} helperClass="sorting" useDragHandle>
         {items.map((item, idx) => (
-          <Item
+          _.isEmpty(indexes) || indexes.includes(idx) ? <Item
             key={item.id}
             value={item}
             form={form}
@@ -76,6 +76,7 @@ const CollectionEditor = ({
             index={idx}
             sortable={sortable}
             order={idx}
+            hideControls={hideControls}
             onRemove={() => {
               const cloned = [...value];
               cloned[idx] = null;
@@ -88,10 +89,10 @@ const CollectionEditor = ({
             }}
             canRemove={minItems == null || items.length > minItems}
             {...rest}
-          />
+          /> : null
         ))}
       </SortableContainer>
-      {!_.isEmpty(value) && (<div className="buttons">{addButton}</div>)}
+      {!_.isEmpty(value) && !hideControls && (<div className="buttons">{addButton}</div>)}
     </div>
   );
 };
@@ -104,7 +105,9 @@ CollectionEditor.propTypes = {
   labelAdd: PropTypes.string,
   labelEmpty: PropTypes.string,
   minItems: PropTypes.number,
-  maxItems: PropTypes.number
+  maxItems: PropTypes.number,
+  // hide all controls (add, remove)
+  hideControls: PropTypes.bool
 };
 
 

@@ -89,6 +89,7 @@ const ModalDevice = ({
           </Views>
           <Nav.Item eventKey="device-schema">Schema</Nav.Item>
           <Nav.Item eventKey="device-snapshot">Snapshot</Nav.Item>
+          <Nav.Item eventKey="device-payload">Payload</Nav.Item>
         </Nav>
         <Form
           ref={form}
@@ -202,6 +203,14 @@ const ModalDevice = ({
           <JSONEditor
             readOnly={true}
             value={JSON.stringify(device.snapshot, null, 2)}
+            height="400px"
+            style={{ marginBottom: '20px' }}
+          />
+        )}
+        {tab === 'device-payload' && (
+          <JSONEditor
+            readOnly={true}
+            value={JSON.stringify(device.payload, null, 2)}
             height="400px"
             style={{ marginBottom: '20px' }}
           />
