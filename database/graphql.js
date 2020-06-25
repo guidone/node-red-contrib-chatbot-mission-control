@@ -7,14 +7,10 @@ const Sequelize = require('sequelize');
 const fetch = require('node-fetch');
 const fs = require('fs');
 
-
-
 const Op = Sequelize.Op;
-
 const pubsub = new PubSub();
 
 const { when, hash } = require('../lib/utils');
-
 const isCircularPaths = require('../lib/get-circular-paths');
 
 const deleteFile = filename => new Promise((resolve, reject) => {
@@ -1690,8 +1686,14 @@ module.exports = ({
             initialContent: { type: newContentType }
           },
           resolve: async function(root, { plugin, url, version, initialConfiguration, initialContent }) {
-            console.log('---> initialContent ', initialContent)
+
             const response = await fetch(url);
+            console.log('RESPONSE', response.status);
+            if (!response.ok) {
+              throw `Error trying to download plugin at ${url}`;
+            }
+
+            // write down plugin
             const filename = `${plugin}-${hash((new Date().toString()))}.js`;
             const pluginFile = fs.createWriteStream(`${mcSettings.pluginsPath}/${filename}`);
             response.body.pipe(pluginFile);
