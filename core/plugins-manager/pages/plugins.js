@@ -82,7 +82,7 @@ const PluginsManager = ({ dispatch }) => {
   const client = useApolloClient();
   // json id is hard coded, general users don't have market place plugin
   const { data: plugins, get, error: fetchError } = useFetch('https://api.jsonbin.io/b/5ed90ec1655d87580c43c899/latest', {}, []);
-  const { install, uninstall, update, saving } = usePlugins({
+  const { install, uninstall, update, saving, error: pluginError } = usePlugins({
     onCompleted: async () => {
       try {
         const response = await client.query({ query: CHATBOT, fetchPolicy: 'network-only' });
@@ -93,7 +93,7 @@ const PluginsManager = ({ dispatch }) => {
     }
   });
 
-  const pageError = error || fetchError;
+  const pageError = error || fetchError || pluginError;
   const loading = plugins == null;
 
   // collect all keywords
@@ -119,7 +119,12 @@ const PluginsManager = ({ dispatch }) => {
       <Breadcrumbs pages={['Plugins']}/>
       <FlexboxGrid justify="space-between">
         <FlexboxGrid.Item colspan={17} style={{ paddingTop: '20px', paddingLeft: '20px' }}>
-          {pageError != null && <ShowError error={pageError} />}
+          {pageError != null && (
+            <ShowError
+              onClear={() => window.location.reload()}
+              error={pageError}
+            />
+          )}
           {environment === 'development' && (
             <Message
               type="warning"
@@ -132,7 +137,7 @@ const PluginsManager = ({ dispatch }) => {
             />
           )}
           {loading && pageError == null && <ModalLoader />}
-          {!loading && pageError == null && (
+          {!loading && !_.isEmpty(plugins) && (
             <Fragment>
               <div className="plugins">
                 {plugins
