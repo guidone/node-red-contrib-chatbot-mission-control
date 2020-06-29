@@ -112,12 +112,19 @@ async function bootstrap(server, app, log, redSettings) {
     console.log(lcd.timestamp() + '  ' + lcd.orange('will be overwritten if the package is reinstalled, this is good for development but dangerous'));
     console.log(lcd.timestamp() + '  ' + lcd.orange('for production. Select a different directory with permission rights.'))
   }
+  // get root
   if (mcSettings.root == null) {
     mcSettings.root = '/mc';
   } else {
     mcSettings.root = mcSettings.root.replace(/\/$/, '');
   }
   console.log(lcd.timestamp() + '  ' + lcd.green('root: ') + lcd.grey(mcSettings.root));
+  // get host
+  if (mcSettings.host == null) {
+    mcSettings.host = 'localhost';
+  }
+  console.log(lcd.timestamp() + '  ' + lcd.green('host: ') + lcd.grey(mcSettings.host));
+  // get
   mcSettings.port = redSettings.uiPort;
   console.log(lcd.timestamp() + '  ' + lcd.green('port: ') + lcd.grey(mcSettings.port));
   if (mcSettings.salt == null) {

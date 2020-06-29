@@ -1,27 +1,19 @@
 import React, { useReducer, useEffect, useState, useMemo} from 'react';
 import ReactDOM from 'react-dom';
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { createHttpLink } from 'apollo-link-http';
-import { ApolloClient } from 'apollo-client';
-import { ApolloLink } from 'apollo-link';
 import { ApolloProvider } from 'react-apollo';
 import { Container, Content, Loader } from 'rsuite';
 import {
   BrowserRouter as Router,
   Switch,
-  Route,
-  Link,
+  Route
 } from 'react-router-dom';
-import { WebSocketLink } from 'apollo-link-ws';
-import { getMainDefinition } from 'apollo-utilities';
-import { split } from 'apollo-link';
+import { CodePlug, plug, useCodePlug } from 'code-plug';
+
 
 // Define the global scope to store the components shared with plugins
 if (window.globalLibs == null) {
   window.globalLibs = {};
 }
-
-import { CodePlug, Consumer, Views, Items, Plugin, PlugItUserPermissions, plug, withCodePlug, useCodePlug } from 'code-plug';
 
 import compose from './helpers/compose-reducers';
 import AppContext from './common/app-context';
@@ -30,8 +22,7 @@ import Header from './layout/header';
 import HomePage from './pages/home';
 import WebSocketReact from './common/web-socket';
 import PageNotFound from './layout/page-not-found';
-
-
+import useClient from './hooks/client';
 import { ModalProvider } from './components/modal';
 
 // add an empty configuration menu, on order to be the first
@@ -50,13 +41,7 @@ import './components/index';
 import './permissions';
 import './plugins-core';
 
-
-
-//import ws from 'ws';
-
-
-
-
+// add global define to import dinamically plugins
 window.define = function(requires, factory) {
   let resolvedRequires = requires.map(lib => {
     if (lib.includes('/components')) {
@@ -71,6 +56,7 @@ window.define = function(requires, factory) {
   factory(...resolvedRequires);
 };
 
+// export global libraries for plugins
 import * as globalReact from 'react';
 import * as globalPropTypes from 'prop-types';
 import * as globalCodePlug from 'code-plug';
@@ -88,44 +74,9 @@ window.globalLibs['use-http'] = globalUseHttp;
 window.globalLibs['graphql-tag'] = globalGraphQLTag;
 window.globalLibs['react-apollo'] = globalReactApollo;
 
-
-
-const cache = new InMemoryCache(); // where current data is stored
-const apolloLink = createHttpLink({ uri: '/graphql' });
-
-// Create a WebSocket link:
-const wsLink = new WebSocketLink({
-  uri: `ws://localhost:1943/graphql`,
-  options: {
-    reconnect: true
-  },
-  //webSocketImpl: WebSocket
-});
-
-const link = split(
-  // split based on operation type
-  ({ query }) => {
-    const definition = getMainDefinition(query);
-    return (
-      definition.kind === 'OperationDefinition' &&
-      definition.operation === 'subscription'
-    );
-  },
-  wsLink,
-  apolloLink
-);
-
-const client = new ApolloClient({
-  cache,
-  link: ApolloLink.from([link])
-});
-
-
 const initialState = {
   user: null
 };
-
-
 
 const usePrefetchedData = () => {
   const [platforms, setPlatforms] = useState([]);
@@ -149,10 +100,11 @@ const usePrefetchedData = () => {
   }, []);
 
   return { platforms, eventTypes, messageTypes, activeChatbots, loading };
-}
+};
 
 
 const AppRouter = ({ codePlug, bootstrap }) => {
+  const client = useClient(bootstrap.settings);
   const { items } = useCodePlug('pages', { permission: { '$intersect': bootstrap.user.permissions }})
   const { platforms, eventTypes, messageTypes, activeChatbots, loading } = usePrefetchedData();
 
