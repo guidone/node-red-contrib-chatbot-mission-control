@@ -188,6 +188,7 @@ const Devices = () => {
                   size="xs"
                   onClick={async () => {
                     const modifiedDevice = await open(device);
+                    console.log('modifiedDevice', modifiedDevice)
                     if (modifiedDevice != null) {
                       disable();
                       await editDevice({ variables: {

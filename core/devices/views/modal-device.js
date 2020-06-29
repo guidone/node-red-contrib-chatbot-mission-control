@@ -48,9 +48,9 @@ const ModalDevice = ({
   const { isChanged, setIsChanged, handleCancel } = useCanCloseModal({ onCancel });
   const [formValue, setFormValue] = useState(device);
   const [formError, setFormError] = useState(null);
-  const [jsonValue, setJsonValue] = useState({
-    json: !_.isEmpty(device.payload) ? JSON.stringify(device.payload, null, 2) : ''
-  });
+  const [jsonSchema, setJsonSchema] = useState(
+    !_.isEmpty(device.jsonSchema) ? JSON.stringify(device.jsonSchema, null, 2) : ''
+  );
   const [tab, setTab] = useState('main');
 
   const form = useRef(null);
@@ -114,7 +114,6 @@ const ModalDevice = ({
                 <ControlLabel>Title</ControlLabel>
                 <FormControl name="name"/>
               </FormGroup>
-
               <FlexboxGrid justify="space-between" style={{ marginBottom: '24px' }}>
                 <FlexboxGrid.Item colspan={11}>
                   <FormGroup>
@@ -129,7 +128,6 @@ const ModalDevice = ({
                   </FormGroup>
                 </FlexboxGrid.Item>
               </FlexboxGrid>
-
               <FlexboxGrid justify="space-between">
                 <FlexboxGrid.Item colspan={11}>
                   <FormGroup>
@@ -144,8 +142,6 @@ const ModalDevice = ({
                   </FormGroup>
                 </FlexboxGrid.Item>
               </FlexboxGrid>
-
-
             </Fragment>
           )}
           <Views region="device-tabs">
@@ -166,38 +162,28 @@ const ModalDevice = ({
             }}
           </Views>
           {tab === 'device-schema' && (
-            <Form
-              formValue={jsonValue}
-              formError={formError}
-              fluid autoComplete="off"
-            >
-              <FormGroup>
-                <ControlLabel>Payload</ControlLabel>
-                <FormControl
-                  readOnly={disabled}
-                  name="json"
-                  height="400px"
-                  style={{ marginBottom: '20px' }}
-                  accepter={JSONEditor}
-                  onChange={json => {
-                    if (!_.isEmpty(json)) {
-                      let payload;
-                      setJsonValue({ json });
-                      try {
-                        payload = JSON.parse(json);
-                      } catch(e) {
-                        // error do nothing
-                        return;
-                      }
-                      setIsChanged(true);
-                      setFormValue({ ...formValue, payload });
-                    }
-                  }}
-                />
-              </FormGroup>
-            </Form>
+            <JSONEditor
+              readOnly={disabled}
+              value={jsonSchema}
+              height="400px"
+              onChange={json => {
+                if (!_.isEmpty(json)) {
+                  let jsonSchema;
+                  setJsonSchema(json);
+                  try {
+                    jsonSchema = JSON.parse(json);
+                  } catch(e) {
+                    // error do nothing
+                    return;
+                  }
+                  console.log('---', jsonSchema)
+                  setIsChanged(true);
+                  setFormValue({ ...formValue, jsonSchema });
+                  onChange({ ...formValue, jsonSchema });
+                }
+              }}
+            />
         )}
-
         </Form>
         {tab === 'device-snapshot' && (
           <JSONEditor
