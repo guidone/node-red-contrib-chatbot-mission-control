@@ -20,7 +20,7 @@ import AppContext from './common/app-context';
 import Sidebar from './layout/sidebar';
 import Header from './layout/header';
 import HomePage from './pages/home';
-import WebSocketReact from './common/web-socket';
+import { WebSocket as WebSocketReact } from './hooks/socket';
 import PageNotFound from './layout/page-not-found';
 import useClient from './hooks/client';
 import { ModalProvider } from './components/modal';

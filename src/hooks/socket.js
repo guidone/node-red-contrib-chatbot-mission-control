@@ -1,14 +1,92 @@
-import { useEffect, useReducer } from 'react';
+import React, { useEffect, useReducer } from 'react';
+import { Notification } from 'rsuite';
 
-import socketListener from '../../lib/socket';
+
+import useSettings from './settings';
+import SocketListener from '../../lib/socket';
+import AppContext from '../common/app-context';
+
+
+const SocketContext = React.createContext({});
+
+
+//const socketListener = new SocketListener({ url: `ws://localhost:${Settings.wsPort}` });
+
+let socketListener;
+
+class RawWebSocket extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = {
+      ws: null
+    };
+  }
+
+  onMessage = (topic, payload) => this.props.dispatch({ type: 'socket.message', topic, payload });
+  onOpen = () => {
+    this.props.dispatch({ type: 'socket.open' });
+    Notification.success({ title: 'Connected!'});
+  }
+
+  componentDidMount() {
+    const { settings } = this.props;
+
+    if (socketListener == null) {
+      console.log(`Created listeing socket ws://${settings.host}:1942`)
+      socketListener = new SocketListener({ url: `ws://${settings.host}:1942` });
+    }
+
+    socketListener
+      .on('message', this.onMessage)
+      .on('open', () => this.onOpen());
+  }
+
+  componentWillUnmount() {
+    socketListener
+      .off('message', this.onMessage)
+      .off('open', this.onOpen);
+  }
+
+  render() {
+    const { ws } = this.state;
+    return (
+
+      <SocketContext.Provider value={{ socketListener }}>{this.props.children}</SocketContext.Provider>
+
+    );
+  }
+}
+
+const withSettings = Component => {
+  return ({ children, ...props }) => (
+    <AppContext.Consumer>
+      {({ state }) => {
+        return (
+          <Component {...props} settings={state.settings}>
+            {children}
+          </Component>
+        );
+      }}
+    </AppContext.Consumer>
+  )
+}
+
+const WebSocket = withSettings(RawWebSocket);
+
 
 const useSocket = ({ reducer = () => {}, initialState = {}, onMessage = () => {} } = {}) => {
+  const { host } = useSettings();
   const handler = (topic, payload) => {
     dispatch({ type: 'socket.message', topic, payload });
     onMessage(topic, payload);
   };
   // connect socket
   useEffect(() => {
+    if (socketListener == null) {
+      console.log(`Created listeing socket ws://${host}:1942`);
+      socketListener = new SocketListener({ url: `ws://${host}:1942` });
+    }
     socketListener.on('message', handler);
     return () => socketListener.off('message', handler);
   }, []);
@@ -21,4 +99,4 @@ const useSocket = ({ reducer = () => {}, initialState = {}, onMessage = () => {}
   };
 }
 
-export default useSocket;
+export { useSocket as default, WebSocket, SocketContext };
