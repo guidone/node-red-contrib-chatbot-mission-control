@@ -6,6 +6,7 @@ const { ApolloLink, split } = require('apollo-link');
 const { getMainDefinition } = require('apollo-utilities');
 const { WebSocketLink } = require('apollo-link-ws');
 const ws = require('ws');
+const _ = require('lodash');
 const fetch = require('node-fetch').default;
 
 
