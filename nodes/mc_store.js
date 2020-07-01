@@ -4,7 +4,7 @@ const gql = require('graphql-tag');
 
 const { graphQLError } = require('../lib/lcd/index');
 const { isValidMessage, isSimulator, when } = require('../lib/utils/index');
-const client = require('../database/client');
+const Client = require('../database/client');
 
 const CREATE_MESSAGE = gql`
 mutation($message: NewMessage!) {
@@ -36,6 +36,7 @@ mutation($message: NewMessage!) {
 `;
 
 module.exports = function(RED) {
+  const client = Client(RED);
 
   function MissionControlStore(config) {
     RED.nodes.createNode(this, config);

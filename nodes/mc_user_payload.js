@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const gql = require('graphql-tag');
 
-const client = require('../database/client');
+const Client = require('../database/client');
 const lcd = require('../lib/lcd/index');
 
 const {
@@ -37,6 +37,7 @@ mutation($id: Int!, $user: NewUser!) {
 }`;
 
 module.exports = function(RED) {
+  const client = Client(RED);
 
   function MissionControlUserPayload(config) {
     RED.nodes.createNode(this, config);

@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const gql = require('graphql-tag');
 
-const client = require('../database/client');
+const Client = require('../database/client');
 const lcd = require('../lib/lcd/index');
 
 const {
@@ -35,6 +35,7 @@ query($chatId: String, $transport: String) {
 }`;
 
 module.exports = function(RED) {
+  const client = Client(RED);
 
   function MissionControlUser(config) {
     RED.nodes.createNode(this, config);

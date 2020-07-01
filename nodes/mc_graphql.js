@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const gql = require('graphql-tag');
 
-const client = require('../database/client');
+const Client = require('../database/client');
 const lcd = require('../lib/lcd/index');
 const MessageTemplate = require('../lib/message-template/index');
 const {
@@ -20,6 +20,7 @@ const isMutation = query => query.includes('mutation(');
 
 
 module.exports = function(RED) {
+  const client = Client(RED);
 
   function MissionControlGraphQL(config) {
     RED.nodes.createNode(this, config);

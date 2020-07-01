@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const gql = require('graphql-tag');
 
-const client = require('../database/client');
+const Client = require('../database/client');
 const MessageTemplate = require('../lib/message-template-async');
 const LIMIT = 100;
 
@@ -50,6 +50,7 @@ const findContent = (contents, { language, contextLanguage, failbackLanguage }) 
 
 
 module.exports = function(RED) {
+  const client = Client(RED);
 
   function MissionControlContent(config) {
     RED.nodes.createNode(this, config);
