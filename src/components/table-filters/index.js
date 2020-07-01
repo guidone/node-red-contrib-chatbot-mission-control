@@ -36,7 +36,7 @@ TableFilters.propTypes = {
   onChange: PropTypes.func,
   width: PropTypes.number,
   filters: PropTypes.object,
-  schema: PropTypes.arrayOf(PropTypes.oneOf([
+  schema: PropTypes.arrayOf(PropTypes.oneOfType([
     PropTypes.func,
     PropTypes.shape({
       // the label for the filter, it's likely to be used as placeholder

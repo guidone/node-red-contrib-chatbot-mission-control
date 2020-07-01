@@ -1,16 +1,11 @@
 import React, { useEffect, useReducer } from 'react';
 import { Notification } from 'rsuite';
 
-
 import useSettings from './settings';
 import SocketListener from '../../lib/socket';
 import AppContext from '../common/app-context';
 
-
 const SocketContext = React.createContext({});
-
-
-//const socketListener = new SocketListener({ url: `ws://localhost:${Settings.wsPort}` });
 
 let socketListener;
 
@@ -51,9 +46,7 @@ class RawWebSocket extends React.Component {
   render() {
     const { ws } = this.state;
     return (
-
       <SocketContext.Provider value={{ socketListener }}>{this.props.children}</SocketContext.Provider>
-
     );
   }
 }

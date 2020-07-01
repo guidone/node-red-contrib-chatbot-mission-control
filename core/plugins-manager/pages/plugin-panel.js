@@ -13,12 +13,11 @@ import ModalMarkdown from '../views/modal-markdown';
 import versionCompare from '../helpers/version-compare';
 import CopyAndPasteButton from '../views/copy-and-paste';
 
-const isInstalled = (current, plugins) => plugins.some(plugin => plugin.plugin === current.id);
+const isisInstalled = (current, plugins) => plugins.some(plugin => plugin.plugin === current.id);
 
 const needUpdate = (current, plugins) => {
-  const installed = plugins.find(plugin => plugin.plugin === current.id);
-
-  return versionCompare(installed.version, current.version) === -1;
+  const isInstalled = plugins.find(plugin => plugin.plugin === current.id);
+  return versionCompare(isInstalled.version, current.version) === -1;
 };
 
 
@@ -63,9 +62,11 @@ const PluginPanel = ({
     align: 'center'
   });
 
-  const installed = isInstalled(plugin, chatbot.plugins);
-  const upgrade = installed && needUpdate(plugin, chatbot.plugins);
+  const installedPlugin = chatbot.plugins.find(installed => installed.plugin === plugin.id);
+  const isInstalled = installedPlugin != null;
+  const upgrade = isInstalled && versionCompare(installedPlugin.version, plugin.version) === -1;
   const converter = new Showdown.Converter({ openLinksInNewWindow: true });
+  const version = isInstalled ? installedPlugin.version : plugin.version;
 
   return (
     <div className="plugin">
@@ -92,7 +93,7 @@ const PluginPanel = ({
           </div>
         )}
         <div className="info">
-          <SmallTag color="#0579DB" className="version"><span className="label">v</span>{plugin.version}</SmallTag>
+          <SmallTag color="#0579DB" className="version"><span className="label">v</span>{version}</SmallTag>
           <div className="icons">
             {plugin.github != null && (
               <a className="github" href={plugin.github} target="_blank">
@@ -119,7 +120,7 @@ const PluginPanel = ({
       </div>
       <div className="buttons">
         <ButtonToolbar size="sm">
-          {!installed && (
+          {!isInstalled && (
             <Button
               disabled={disabled}
               size="sm"
@@ -137,7 +138,7 @@ const PluginPanel = ({
               onClick={() => onUpdate(plugin)}
             >Update</Button>
           )}
-          {installed && plugin.flow != null && (
+          {isInstalled && plugin.flow != null && (
             <Button
               disabled={disabled}
               size="sm"
@@ -149,7 +150,7 @@ const PluginPanel = ({
               }}
             >Import flow</Button>
           )}
-          {installed && (
+          {isInstalled && (
             <Button
               disabled={disabled}
               block

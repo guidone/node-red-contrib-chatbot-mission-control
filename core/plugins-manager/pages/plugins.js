@@ -44,7 +44,7 @@ const filtersSchema = [
     type: 'string',
     name: 'name',
     control: Input,
-    placeholder: 'Search plugin'
+    label: 'Search plugin'
   }
 ];
 
@@ -53,6 +53,7 @@ const CheckTree = ({ value = [], onChange, data }) => {
     <div>
       {data.map(item => (
         <Checkbox
+          key={item.value}
           checked={value != null && value.includes(item.value)}
           onChange={() => {
             if (value != null && value.includes(item.value)) {
