@@ -10,13 +10,13 @@ import { split } from 'apollo-link';
 export default settings => {
   const client = useMemo(() => {
 
-    console.log('BUILD CLIENT', settings)
     const cache = new InMemoryCache(); // where current data is stored
     const apolloLink = createHttpLink({ uri: '/graphql' });
 
+    const webSocketProtol = window.location.protocol.includes('https') ? 'wss' : 'ws';
     // Create a WebSocket link:
     const wsLink = new WebSocketLink({
-      uri: `ws://${settings.host}:1943/graphql`,
+      uri: `${webSocketProtol}://${settings.host}:1943/graphql`,
       options: {
         reconnect: true
       },

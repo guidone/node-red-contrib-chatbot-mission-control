@@ -28,8 +28,9 @@ class RawWebSocket extends React.Component {
     const { settings } = this.props;
 
     if (socketListener == null) {
-      console.log(`Created listeing socket ws://${settings.host}:1942`)
-      socketListener = new SocketListener({ url: `ws://${settings.host}:1942` });
+      const webSocketProtol = window.location.protocol.includes('https') ? 'wss' : 'ws';
+      console.log(`Created listeing socket ${webSocketProtol}://${settings.host}:1942`)
+      socketListener = new SocketListener({ url: `${webSocketProtol}://${settings.host}:1942` });
     }
 
     socketListener
@@ -77,8 +78,9 @@ const useSocket = ({ reducer = () => {}, initialState = {}, onMessage = () => {}
   // connect socket
   useEffect(() => {
     if (socketListener == null) {
-      console.log(`Created listeing socket ws://${host}:1942`);
-      socketListener = new SocketListener({ url: `ws://${host}:1942` });
+      const webSocketProtol = window.location.protocol.includes('https') ? 'wss' : 'ws';
+      console.log(`Created listeing socket ${webSocketProtol}://${host}:1942`);
+      socketListener = new SocketListener({ url: `${webSocketProtol}://${host}:1942` });
     }
     socketListener.on('message', handler);
     return () => socketListener.off('message', handler);
