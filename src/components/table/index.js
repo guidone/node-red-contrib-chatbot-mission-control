@@ -33,12 +33,15 @@ const CustomTable = ({
   const numericKeys = (filtersSchema || [])
     .filter(filter => filter.type === 'number')
     .map(filter => filter.name);
-
+  const [loaded, setLoaded] = useState(false);
   const { query: urlQuery, setQuery } = useRouterQuery({
     numericKeys,
     onChangeQuery: query => {
-      setFilters(_.pick(query, filterKeys))
-
+      setFilters(_.pick(query, filterKeys));
+      // if query changes, then reload the query, but don't do at startup
+      if (loaded) {
+        refetch();
+      }
     }
   });
 
@@ -70,7 +73,10 @@ const CustomTable = ({
     sortType,
     filters,
     variables,
-    onCompleted: rows => onData(rows)
+    onCompleted: rows => {
+      onData(rows);
+      setLoaded(true);
+    }
   });
 
   useImperativeHandle(ref, () => ({
@@ -112,9 +118,7 @@ const CustomTable = ({
           </div>
           {toolbar != null &&(
             <div className="toolbar">
-
-                {toolbar}
-
+              {toolbar}
             </div>
           )}
         </div>

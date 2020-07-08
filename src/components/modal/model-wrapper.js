@@ -11,6 +11,7 @@ import './style.scss';
 const ModalWrapper = ({
   view: InnerView,
   initialValue,
+  updateValue,
   disabled = false,
   title,
   onSubmit = () => {},
@@ -30,6 +31,12 @@ const ModalWrapper = ({
   useEffect(() => {
     setValidation(validationProp);
   }, [validationProp]);
+  useEffect(() => {
+    // set the status in case of update
+    if (updateValue != null) {
+      setValue(updateValue);
+    }
+  }, [updateValue]);
 
   return (
     <Modal

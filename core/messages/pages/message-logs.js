@@ -2,7 +2,8 @@ import React, { useRef } from 'react';
 import gql from 'graphql-tag';
 import classNames from 'classnames';
 import _ from 'lodash';
-import { Table, Icon, SelectPicker, Button } from 'rsuite';
+import { useApolloClient } from 'react-apollo';
+import { Table, Icon, SelectPicker, Button, ButtonGroup } from 'rsuite';
 
 const { Column, HeaderCell, Cell } = Table;
 
@@ -14,10 +15,12 @@ import Transport from '../../../src/components/transport';
 import Breadcrumbs from '../../../src/components/breadcrumbs';
 import SmartDate from '../../../src/components/smart-date';
 import { Input } from '../../../src/components/table-filters';
-
+import { useModal } from '../../../src/components/modal';
 import CustomTable from '../../../src/components/table';
+import useClient from '../../../src/hooks/client';
 
 import '../styles/message-logs.scss';
+import PreviewMessage from '../views/preview-message';
 
 const MESSAGES = gql`
 query ($limit: Int, $offset: Int, $order: String, $inbound: Boolean, $type: String, $transport: String, $messageId: String, $chatId: String, $userId: String, $flag: String) {
@@ -62,13 +65,34 @@ query ($limit: Int, $offset: Int, $order: String, $inbound: Boolean, $type: Stri
 }
 `;
 
+const GET_USER = gql`
+query($userId: String) {
+  user(userId: $userId) {
+    id,
+    first_name,
+    last_name,
+    username,
+    payload
+  }
+}`;
+
 const SelectInbound = [
   { value: true, label: 'Inbound' },
   { value: false, label: 'Outbound' },
-]
+];
 
 const MessageLogs = ({ messageTypes, platforms }) => {
   const table = useRef();
+  const client = useApolloClient();
+  const { open, close, update } = useModal({
+    view: PreviewMessage,
+    labelSubmit: 'Close',
+    labelCancel: null,
+    size: 'sm',
+    className: 'modal-preview-message',
+    align: 'center'
+  });
+
 
   return (
     <PageContainer className="page-message-logs">
@@ -199,6 +223,42 @@ const MessageLogs = ({ messageTypes, platforms }) => {
             {({ content }) => {
               return `"${content}"`;
             }}
+          </Cell>
+        </Column>
+
+        <Column width={60}>
+          <HeaderCell>Action</HeaderCell>
+          <Cell>
+            {message => (
+              <ButtonGroup>
+                <Button
+                  size="xs"
+                  disabled={!['message'].includes(message.type)}
+                  onClick={async () => {
+                    if (message.inbound) {
+                      // in case of inbound, fetch the user
+                      open();
+                      const response = await client.query({
+                        query: GET_USER,
+                        variables: { userId: message.userId },
+                        fetchPolicy: 'network-only'
+                      });
+                      await update({
+                        ...message,
+                        username: response.data.user.username,
+                        first_name: response.data.user.first_name,
+                        last_name: response.data.user.last_name
+                      });
+                    } else {
+                      await open({ ...message, username: 'chatbot' });
+                    }
+                    close();
+                  }}
+                >
+                  <Icon icon="search" />
+                </Button>
+              </ButtonGroup>
+            )}
           </Cell>
         </Column>
       </CustomTable>

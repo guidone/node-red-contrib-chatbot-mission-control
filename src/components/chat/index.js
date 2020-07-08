@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, Fragment } from 'react';
 import momentPropTypes from 'react-moment-proptypes';
 import classNames from 'classnames';
 import _ from 'lodash';
@@ -48,12 +48,27 @@ const ChatWindow = ({ children, width = '100%', style }) => {
 import Showdown from 'showdown';
 
 const MessageFrame = ({ children, ...props }) => {
-  const { message } = props;
+  const { message, inbound } = props;
   return (
     <Message {...props}>
       <Metadata>
-        <MessageDate date={message.ts}/> &nbsp; &nbsp;
-        <MessageUser>{message.username}</MessageUser> <UserStatus />
+        {inbound && (
+          <Fragment>
+            <MessageDate date={message.createdAt}/>
+            &nbsp;
+            <MessageUser>{message.username}</MessageUser>
+            &nbsp;
+            <UserStatus />
+          </Fragment>
+        )}
+        {!inbound && (
+          <Fragment>
+            <UserStatus />
+            &nbsp;
+            <MessageUser>{message.username}</MessageUser>
+            <MessageDate date={message.createdAt}/>
+          </Fragment>
+        )}
       </Metadata>
       {children}
     </Message>
@@ -72,9 +87,7 @@ const MessageText = props => {
   }
 
   return (
-
-      <Content text={html}/>
-
+    <Content text={html}/>
   );
 };
 MessageText.propTypes = {

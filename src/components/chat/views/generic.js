@@ -52,7 +52,8 @@ const MessageDate = ({ children, date }) => {
 
   return (
     <span className="ui-chat-message-date">
-      {date != null && date.format('HH:mm')}
+      {moment.isMoment(date) && date.format('HH:mm')}
+      {_.isString(date) && moment(date).isValid() && moment(date).format('HH:mm')}
       {children}
     </span>
   );

@@ -21,7 +21,8 @@ const ModalContext = React.createContext({});
  * @param {React} props.custom Custom view, additional button in the footer
  * @param {String} props.enableSummit Enable or disable the submit button, takes as argument the current value of the form
  * @return {Object}
- * @return {Function} return.open Open the modal with
+ * @return {Function} return.open Open the modal setting the initial state of the modal
+ * * @return {Function} return.update Update the internal state of the modal and wait
  * @return {Function} return.validate Set the validation info for the form
  * @return {Function} return.error Set the server side error for the form
  */
@@ -39,6 +40,9 @@ const useModal = props => {
   const disable = useCallback(() => dispatch({ type: 'mergeModalProps', id, props: { disabled: true } }));
   const enable = useCallback(() => dispatch({ type: 'mergeModalProps', id, props: { disabled: false } }));
   const error = useCallback(error => dispatch({ type: 'mergeModalProps', id, props: { error } }));
+  const update = useCallback(value => {
+    return new Promise(resolve => dispatch({ type: 'appendView', id, resolve, updateValue: value }))
+  });
   const openWith = useCallback(async (modalProps, enableSubmit) => {
     let result = await open(modalProps, { enableSubmit });
     close();
@@ -78,7 +82,8 @@ const useModal = props => {
     disable,
     enable,
     openWith,
-    openWithModel
+    openWithModel,
+    update
   };
 };
 

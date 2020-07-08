@@ -19,8 +19,6 @@ export default (state, action) => {
           }
           return modal;
         });
-      console.log('action', action)
-      console.log('rimetto', newModals)
     } else {
       newModals = [
         ...state.modals,
