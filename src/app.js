@@ -46,6 +46,8 @@ window.define = function(requires, factory) {
   let resolvedRequires = requires.map(lib => {
     if (lib.includes('/components')) {
       return window.globalLibs.Components;
+    } else if (lib.includes('/hooks/socket')) {
+      return window.globalLibs['hooks-socket'];
     } else if (window.globalLibs[lib] != null) {
       return window.globalLibs[lib];
     } else {
@@ -65,6 +67,8 @@ import * as globalRsuite from 'rsuite';
 import * as globalUseHttp from 'use-http';
 import * as globalGraphQLTag from 'graphql-tag';
 import * as globalReactApollo from 'react-apollo';
+import globalUseSocket from './hooks/socket';
+
 window.globalLibs.react = globalReact;
 window.globalLibs['prop-types'] = globalPropTypes;
 window.globalLibs['code-plug'] = globalCodePlug;
@@ -73,6 +77,7 @@ window.globalLibs.rsuite = globalRsuite;
 window.globalLibs['use-http'] = globalUseHttp;
 window.globalLibs['graphql-tag'] = globalGraphQLTag;
 window.globalLibs['react-apollo'] = globalReactApollo;
+window.globalLibs['hooks-socket'] = globalUseSocket;
 
 const initialState = {
   user: null

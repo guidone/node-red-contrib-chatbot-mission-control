@@ -29,7 +29,7 @@ class RawWebSocket extends React.Component {
 
     if (socketListener == null) {
       const webSocketProtol = window.location.protocol.includes('https') ? 'wss' : 'ws';
-      console.log(`Created listeing socket ${webSocketProtol}://${settings.host}:1942`)
+      console.log(`Created listening socket ${webSocketProtol}://${settings.host}:1942`)
       socketListener = new SocketListener({ url: `${webSocketProtol}://${settings.host}:1942` });
     }
 

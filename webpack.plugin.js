@@ -56,6 +56,7 @@ module.exports = (env = {}) => {
         'react-ace': 'amd react-ace',
         'use-http': 'amd use-http'
       },
+      /hooks\/socket/,
       /components/i
     ],
     plugins: [
