@@ -17,6 +17,7 @@ import PageContainer from './page-container';
 import ChatbotStatus from './chatbot-status';
 import SmallTag from './small-tag';
 import EditDevice from './edit-device';
+import MarkdownViewer from './markdown-viewer';
 
 // Define the global scope to store the components shared with plugins
 if (window.globalLibs == null) {
@@ -41,7 +42,8 @@ window.globalLibs.Components = {
   PageContainer,
   ChatbotStatus,
   SmallTag,
-  EditDevice
+  EditDevice,
+  MarkdownViewer
 };
 
 export {
@@ -63,5 +65,6 @@ export {
   PageContainer,
   ChatbotStatus,
   SmallTag,
-  EditDevice
+  EditDevice,
+  MarkdownViewer
 };

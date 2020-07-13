@@ -1,18 +1,11 @@
 import React from 'react';
-import Showdown from 'showdown';
 import PropTypes from 'prop-types';
 
+import { MarkdownViewer } from '../../../src/components';
 
-const ModalMarkdown = ({ value = {} }) => {
-  const converter = new Showdown.Converter({ openLinksInNewWindow: true });
-
-  return (
-    <div
-      className="modal-markdown-content"
-      dangerouslySetInnerHTML={{ __html: converter.makeHtml(value.markdown.replace('---', ''))}}
-    />
-  );
-};
+const ModalMarkdown = ({ value = {} }) => (
+  <MarkdownViewer text={value.markdown.replace('---', '')} />
+);
 ModalMarkdown.propTypes = {
   value: PropTypes.shape({
     markdown: PropTypes.string
