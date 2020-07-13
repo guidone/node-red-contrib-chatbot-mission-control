@@ -49,7 +49,7 @@ module.exports = function(RED) {
       }
       // TODO only if valid message
       let translatedQuery = node.query;
-      if (isValidMessage(msg)) {
+      if (isValidMessage(msg, null, { silent: true })) {
         const template = MessageTemplate(msg, node);
         translatedQuery = await template(node.query);
       }
