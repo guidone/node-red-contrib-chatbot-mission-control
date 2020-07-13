@@ -2,6 +2,7 @@ import React, { useContext } from 'react';
 import PropTypes from 'prop-types';
 import gravatar from 'gravatar';
 import { Tooltip, Whisper, Header, Navbar, Dropdown, Nav, Icon, IconButton, Avatar } from 'rsuite';
+import { useCodePlug } from 'code-plug';
 import { Link, useHistory } from 'react-router-dom';
 
 import AppContext from '../common/app-context';
@@ -18,10 +19,27 @@ const initials = user => {
   return '';
 }
 
+const sortBy = (a, b) => {
+  if (a.order == null && b.order == null) {
+    return 0;
+  } else if (b.order == null) {
+    return -1;
+  } else if (a.order == null) {
+    return 1;
+  } else if (a.order < b.order) {
+    return -1;
+  } else if (a.order > b.order) {
+    return 1;
+  }
+  return 0;
+};
+
 const AppHeader = () => {
   const { user } = useCurrentUser();
   const { state } = useContext(AppContext);
   const history = useHistory();
+  const { permissionQuery } = useCurrentUser();
+  const { props } = useCodePlug('menu', permissionQuery);
   const { needRestart } = state;
 
   return (
@@ -30,7 +48,17 @@ const AppHeader = () => {
         <Navbar.Body>
           <Nav>
             <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/">Home</Link>} />
-            <Nav.Item renderItem={() => <Link className="rs-nav-item-content" to="/plugins">Plugins</Link>} />
+            {props
+              .sort(sortBy)
+              .map(({ label, onClick = () => {}, url, id }) => {
+                return (
+                  <Nav.Item
+                    key={id}
+                    renderItem={() => <Link className="rs-nav-item-content" to={url}>{label}</Link>}
+                  />
+                );
+              })
+            }
           </Nav>
           <Nav pullRight>
             {user.isEmptyPassword && (

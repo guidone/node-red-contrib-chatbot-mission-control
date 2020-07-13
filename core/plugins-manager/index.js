@@ -24,3 +24,14 @@ plug('reducers', (state, action) => {
   }
   return state;
 });
+
+plug(
+  'menu',
+  null,
+  {
+    id: 'plugin-manager',
+    label: 'Plugins',
+    url: '/plugins',
+    //permission: 'admins'
+  }
+);
