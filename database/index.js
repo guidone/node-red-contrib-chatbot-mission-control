@@ -232,6 +232,7 @@ module.exports = mcSettings => {
 
   const ChatBot = sequelize.define('chatbot', {
     name: Sequelize.STRING,
+    guid: Sequelize.STRING,
     description: Sequelize.TEXT
   }, {
     indexes: [

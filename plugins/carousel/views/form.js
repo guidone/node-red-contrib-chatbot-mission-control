@@ -23,7 +23,7 @@ export default ({
   const [formError, setFormError] = useState(null);
   const [tab, setTab] = useState('carousel');
   const form = useRef(null);
-  console.log('render', disabled)
+
   return (
     <div>
       <Nav appearance="tabs" activeKey={tab} onSelect={setTab} style={{ marginBottom: '25px' }}>

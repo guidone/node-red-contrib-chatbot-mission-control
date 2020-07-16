@@ -1,4 +1,5 @@
 // Core plugins
+import '../core/chatbot-configuration';
 import '../core/messages-log';
 import '../core/messages';
 import '../core/users';

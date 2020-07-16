@@ -745,11 +745,33 @@ module.exports = ({
         type: GraphQLString,
         description: '',
       },
+      guid: {
+        type: GraphQLString,
+        description: '',
+      },
       plugins: {
         type: new GraphQLList(pluginType),
         description: 'The list of installed plugins',
         resolve: (root) => root.getPlugins({ limit: 9999 })
+      }
+    }
+  });
 
+  const inputChatbotType = new GraphQLInputObjectType({
+    name: 'InputChatbot',
+    description: 'tbd',
+    fields: {
+      name: {
+        type: GraphQLString,
+        description: '',
+      },
+      description: {
+        type: GraphQLString,
+        description: '',
+      },
+      guid: {
+        type: GraphQLString,
+        description: '',
       }
     }
   });
@@ -1394,6 +1416,17 @@ module.exports = ({
           },
           resolve: function(root, { category }) {
             return Category.create(category);
+          }
+        },
+
+        editChatbot: {
+          type: chatbotType,
+          args: {
+            chatbot: { type: new GraphQLNonNull(inputChatbotType)}
+          },
+          async resolve(root, { chatbot }) {
+            const currentChatbot = await ChatBot.findOne();
+            await ChatBot.update(chatbot, { where: { id: currentChatbot.id } });
           }
         },
 
