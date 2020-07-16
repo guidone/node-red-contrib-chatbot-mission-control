@@ -1224,6 +1224,27 @@ module.exports = ({
     }
   });
 
+  const buildContentQuery = ({ slug, categoryId, language, title, id, ids, namespace, search, slugs }) => {
+    const whereParams = compactObject({
+      id: _.isArray(ids) && !_.isEmpty(ids) ? { [Op.in]: ids } : id,
+      categoryId,
+      slug: _.isArray(slugs) && !_.isEmpty(slugs) ? { [Op.in]: slugs } : slug,
+      language,
+      namespace
+    });
+    if (title != null) {
+      whereParams.title = { [Op.like]: `%${title}%` };
+    }
+    if (search != null) {
+      whereParams[Op.or] = [
+        { title: { [Op.like]: `%${search}%` } },
+        { slug: { [Op.like]: `%${search}%` } },
+      ]
+    }
+    return whereParams;
+  }
+
+
   const contentCounterType = new GraphQLObjectType({
     name: 'ContentCounters',
     description: 'Content Counters',
@@ -1233,18 +1254,23 @@ module.exports = ({
         description: 'Total contents',
         args: {
           slug: { type: GraphQLString },
-          language: { type: GraphQLString },
-          namespace: { type: GraphQLString },
-          categoryId: { type: GraphQLInt }
-        },
-        resolve: (root, { slug, categoryId, language, namespace }) => Content.count({
-          where: compactObject({
-            categoryId,
-            slug,
-            language,
-            namespace
-          })
-        })
+            order: { type: GraphQLString },
+            offset: { type: GraphQLInt },
+            limit: { type: GraphQLInt },
+            categoryId: { type: GraphQLInt },
+            id: { type: GraphQLInt },
+            ids: { type: new GraphQLList(GraphQLInt)},
+            slugs: { type: new GraphQLList(GraphQLString)},
+            language: { type: GraphQLString },
+            namespace: { type: GraphQLString },
+            title: { type: GraphQLString },
+            search: { type: GraphQLString }
+          },
+        resolve(root, { slug, categoryId, language, title, id, ids, namespace, search, slugs }) {
+          return Content.count({
+            where: buildContentQuery({ slug, categoryId, language, title, id, ids, namespace, search, slugs })
+          });
+        }
       }
     }
   });
@@ -1988,27 +2014,11 @@ module.exports = ({
             search: { type: GraphQLString }
           },
           resolve(root, { slug, order, offset = 0, limit = 10, categoryId, language, title, id, ids, namespace, search, slugs }) {
-            const whereParams = compactObject({
-              id: _.isArray(ids) && !_.isEmpty(ids) ? { [Op.in]: ids } : id,
-              categoryId,
-              slug: _.isArray(slugs) && !_.isEmpty(slugs) ? { [Op.in]: slugs } : slug,
-              language,
-              namespace
-            });
-            if (title != null) {
-              whereParams.title = { [Op.like]: `%${title}%` };
-            }
-            if (search != null) {
-              whereParams[Op.or] = [
-                { title: { [Op.like]: `%${search}%` } },
-                { slug: { [Op.like]: `%${search}%` } },
-              ]
-            }
             return Content.findAll({
               limit,
               offset,
               order: splitOrder(order),
-              where: whereParams
+              where: buildContentQuery({ slug, categoryId, language, title, id, ids, namespace, search, slugs })
             });
           }
         },

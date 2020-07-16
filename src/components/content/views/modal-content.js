@@ -73,7 +73,7 @@ const ModalContent = ({
     fetchPolicy: 'network-only',
     variables: { namespace }
   });
-
+console.log('-----', namespace)
   const categories = !loading ? data.categories : [];
   const form = useRef(null);
   const isNew = content.id == null;

@@ -18,17 +18,17 @@ import useContents from '../hooks/content';
 import ModalContent from '../views/modal-content';
 
 const CONTENTS = gql`
-query($offset: Int, $limit: Int, $order: String, $categoryId: Int, $slug: String, $language: String, $namespace: String) {
+query($offset: Int, $limit: Int, $order: String, $categoryId: Int, $slug: String, $language: String, $namespace: String, $search: String) {
   counters {
     rows: contents {
-     count(categoryId: $categoryId, slug: $slug, language: $language, namespace: $namespace)
+     count(categoryId: $categoryId, slug: $slug, language: $language, namespace: $namespace, search: $search)
     }
   }
-  categories(namespace: $namespace  ) {
+  categories(namespace: $namespace) {
     id,
     name
   }
-  rows: contents(offset: $offset, limit: $limit, order: $order, categoryId: $categoryId, slug: $slug, language: $language, namespace: $namespace) {
+  rows: contents(offset: $offset, limit: $limit, order: $order, categoryId: $categoryId, slug: $slug, language: $language, namespace: $namespace, search: $search) {
     id,
     slug,
     title,
@@ -90,6 +90,7 @@ const Contents = ({
           disabled={saving}
           labels={labels}
           customFieldsSchema={customFieldsSchema}
+          namespace={namespace}
           onCancel={() => setContent(null)}
           onSubmit={async content => {
             if (content.id != null) {
@@ -119,6 +120,11 @@ const Contents = ({
         )}
         onFilters={setFilters}
         filtersSchema={[
+          {
+            name: 'search',
+            label: 'Search',
+            control: Input
+          },
           {
             name: 'categoryId',
             placeholder: 'Filter by category',
