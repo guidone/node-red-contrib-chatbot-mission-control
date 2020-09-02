@@ -5,51 +5,9 @@ import { useQuery } from 'react-apollo';
 import _ from 'lodash';
 
 import { SEARCH } from './queries';
+import renderItem from './views/render-item';
+import renderUserAsString from './views/render-user-as-string';
 import './style.scss';
-
-const renderItem = ({ id, username, userId, first_name, last_name }) => {
-  if (!_.isEmpty(first_name) || !_.isEmpty(last_name)) {
-    return (
-      <div className="ui-autocomplete-render-item">
-        <b>{[first_name, last_name].filter(s => !_.isEmpty(s)).join(' ')}</b>
-        {!_.isEmpty(username) && <span>&nbsp;-&nbsp;{username}</span>}
-        &nbsp;
-        <span className="id">(id: {id})</span>
-      </div>
-    );
-  } else if (!_.isEmpty(username)) {
-    return (
-      <div className="ui-autocomplete-render-item">
-        <b>{username}</b>
-        &nbsp;
-        <span className="id">(id: {id})</span>
-      </div>
-    );
-  } else {
-    return (
-      <div className="ui-autocomplete-render-item">
-        <b>Anonymous</b>
-        &nbsp;
-        <span className="id">(id: {id})</span>
-      </div>
-    );
-  };
-};
-
-const renderUserAsString = ({ id, username, userId, first_name, last_name }) => {
-  if (!_.isEmpty(first_name) || !_.isEmpty(last_name)) {
-    return (
-      [first_name, last_name].filter(s => !_.isEmpty(s)).join(' ')
-      + (!_.isEmpty(username) ? ` - ${username}` : '')
-      + ` (id: ${id})`
-    );
-  } else if (!_.isEmpty(username)) {
-    return `${username} (id: ${id})`;
-  } else {
-    return `Anonymous (id: ${id})`;
-  }
-};
-
 
 const UserAutocomplete = ({
   value,
@@ -95,6 +53,7 @@ const UserAutocomplete = ({
               const found = items.find(item => item.id === current);
               if (found != null) {
                 setSearch(null);
+                console.log('one')
                 onChange(found);
               }
             } else if (isBackspace) {
@@ -110,6 +69,7 @@ const UserAutocomplete = ({
           onSelect={item => {
             if (item != null) {
               setSearch(null);
+              console.log('due')
               onChange(item);
             }
           }}
