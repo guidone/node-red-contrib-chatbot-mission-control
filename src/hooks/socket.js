@@ -90,7 +90,9 @@ const useSocket = ({ reducer = () => {}, initialState = {}, onMessage = () => {}
   return {
     state,
     dispatch,
-    sendMessage: (topic, payload) => socketListener.send(JSON.stringify({ topic, payload }))
+    // deprecated, bad name
+    sendMessage: (topic, payload) => socketListener.send(JSON.stringify({ topic, payload })),
+    sendToInput: (topic, payload) => socketListener.send(JSON.stringify({ topic, payload }))
   };
 }
 
