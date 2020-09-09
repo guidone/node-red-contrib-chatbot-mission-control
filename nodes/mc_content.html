@@ -22,7 +22,6 @@
     outputLabels: ['Query result', 'Empty response'],
     icon: 'chatbot-command.png',
     label: function() {
-      console.log('alalslsas',this, this.query)
       return 'MC Content' + (this.query != null && this.query !== '' ? ' (' + this.query + ')' : '');
     }
   });

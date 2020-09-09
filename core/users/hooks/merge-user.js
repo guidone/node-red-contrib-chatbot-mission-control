@@ -8,7 +8,7 @@ import PropTypes from 'prop-types';
 import UserAutocomplete from '../../../src/components/user-autocomplete';
 import Transport from '../../../src/components/transport';
 
-const UserLabel = user => {
+const UserLabel = ({ user }) => {
   if (!_.isEmpty(user.first_name) || !_.isEmpty(user.last_name)) {
     return (
       <span>
@@ -45,7 +45,6 @@ UserLabel.propTypes = {
     }))
   })
 };
-
 
 
 const MERGE_USER = gql`
@@ -102,13 +101,13 @@ const MergeModal = ({
               accepter={UserAutocomplete}
             />
             <HelpBlock>
-              This will merge the user <UserLabel user={user} /> into the selected user. Fields like
-              <em>email</em>, <em>first_name</em>, <em>last_name</em>, <em>username</em>, <em>language</em> will be copied into
+              This will merge the user <UserLabel user={user} /> into the selected user. Fields like <em>email</em>,
+              <em> first_name</em>, <em>last_name</em>, <em>username</em>, <em>language</em> will be copied into
               the destination user (if empty), the <em>chatIds</em> for the platform{user.chatIds.length > 1 ? 's' : ''}
               &nbsp;<span>{user.chatIds.map(item => <Transport key={item.transport} transport={item.transport}/>)}</span>&nbsp;
               will be assigned to the destination user (if not already defined).
               <br/>
-              <strong>The operation is irreversible!</strong>
+              <strong className="warning">The operation is irreversible!</strong>
             </HelpBlock>
           </FormGroup>
 
